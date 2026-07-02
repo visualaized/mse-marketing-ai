@@ -1,0 +1,231 @@
+<!--
+  MSE Filterpressen GmbH — Standard-E-Mail-Signatur (Template)
+  EXPLIZIT WEISSER Hintergrund (bgcolor + background-color, NICHT "transparent"), dunkle
+  (anthrazitfarbene) Schrift und Icons. Wichtig: "transparent" darf hier NIE verwendet werden —
+  ohne einen explizit gesetzten hellen Hintergrund übernehmen viele Mail-Clients/Browser im
+  Dark Mode einen eigenen dunklen Canvas, wodurch die anthrazitfarbene Schrift auf dunklem
+  Grund fast unsichtbar wird (genau das ist beim ersten Referenz-Screenshot des Kunden passiert:
+  keine reine Farbwahl, sondern eine fehlende explizite Hintergrundfarbe). Struktur (zweisprachige
+  Rolle, Icon-Kontaktzeilen, klickbares Banner-Bild, Social-Icons, Phishing-Hinweis, "Think before
+  you print") bleibt erhalten. Tabellenbasiert, ausschließlich Inline-Styles, kein externes
+  Stylesheet, kein Flexbox/Grid — maximale Kompatibilität mit Outlook, Apple Mail, Gmail.
+
+  Platzhalter (vor Auslieferung ersetzen; optionale Zeilen bei fehlender Angabe komplett entfernen):
+  {{LOGO_URL}}          – PFLICHT, keine optionale Zeile: gehostete URL der echten Wortmarke aus
+                          brand/logo/ (z. B. "Logo_06.10.2020_ohne Hintergrund.png") — nie weglassen,
+                          nie durch Klartext ersetzen, nie selbst nachzeichnen/generieren.
+  {{NAME}}              – Vor- und Nachname, fett
+  {{ROLE_DE}} / {{ROLE_EN}}   – Funktion zweisprachig, z. B. "Technische Geschäftsführung" / "Chief Technical Officer"
+  {{DEPARTMENT_DE}}     – Abteilung/Bereich DE, z. B. "Management" (optional; sonst Zeile auf "MSE Filterpressen GmbH" kürzen)
+  {{PHONE}}             – Direktdurchwahl, als Anzeigetext UND für tel:-Link (z. B. "+49 7232 3650 40")
+  {{EMAIL}}             – persönliche E-Mail-Adresse
+  {{WEBSITE_DISPLAY}}   – Anzeigetext der Website, z. B. "www.mse-filterpressen.com"
+  {{WEBSITE_URL}}       – vollständige URL für Links (Website-Zeile UND Banner-Klickziel), z. B. "https://www.mse-filterpressen.com"
+  {{ADDRESS}}           – z. B. "Am Eisengraben 3, 75196 Remchingen, Deutschland"
+  {{CORRECT_DOMAIN}}    – echte Domain für den Phishing-Hinweis, z. B. "mse-filterpressen.de"
+  {{FAKE_DOMAIN_EXAMPLE}} – Beispiel einer bereits beobachteten Fake-Domain (vom Kunden nennen lassen, nicht erfinden)
+  {{BANNER_IMAGE_URL}}  – gehostete URL des Banner-Bilds (vom Kunden geliefert ODER via bild-video-generierung erzeugt, 2K)
+  {{BANNER_ALT}}        – Alt-Text des Banners (kurz, beschreibend, kein Keyword-Stuffing)
+  {{BANNER_LINK_URL}}   – Klickziel des Banners (meist {{WEBSITE_URL}} oder eine Kampagnen-/Landingpage-URL)
+  {{ICON_PHONE_URL}} / {{ICON_EMAIL_URL}} / {{ICON_WEB_URL}} / {{ICON_PIN_URL}} / {{ICON_LEAF_URL}}
+                        – gehostete URLs der dunklen (anthrazitfarbenen) Icon-Grafiken (Blatt-Icon bleibt grün, siehe unten).
+                          Referenz-Icon-Set liegt unter brand/elements/icons/ (icon-phone.png, icon-email.png,
+                          icon-web.png, icon-pin.png, icon-leaf.png) — PFLICHT als echte <img>-Grafiken einsetzen,
+                          niemals Unicode-/Emoji-Zeichen (☎ ✉ 🌐 📍) als Textersatz verwenden.
+  {{SOCIAL_LINKEDIN_URL}} / {{SOCIAL_INSTAGRAM_URL}} / {{SOCIAL_X_URL}} / {{SOCIAL_FACEBOOK_URL}}
+                        – Social-Profil-URLs (jede Spalte optional; nicht vorhandene Kanäle komplett entfernen)
+  {{SOCIAL_LINKEDIN_ICON_URL}} / {{SOCIAL_INSTAGRAM_ICON_URL}} / {{SOCIAL_X_ICON_URL}} / {{SOCIAL_FACEBOOK_ICON_URL}}
+                        – gehostete URLs der jeweiligen dunklen (anthrazitfarbenen) Social-Icon-Grafiken
+-->
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#FFFFFF" style="border-collapse:collapse; width:100%; max-width:640px; background-color:#FFFFFF; font-family:'Nudica', Arial, Helvetica, sans-serif;">
+
+  <!-- Grußzeile -->
+  <!-- Logo (echtes Marken-Asset, Wortmarke auf hellem Grund — korrekte Kontrast-Nutzung laut
+       brand-guidelines.md §6). {{LOGO_URL}} MUSS immer das echte Logo aus brand/logo/ sein
+       (z. B. "Logo_06.10.2020_ohne Hintergrund.png") — niemals weglassen oder durch Klartext
+       ersetzen. -->
+  <tr>
+    <td style="padding:24px 24px 4px 24px;">
+      <img src="{{LOGO_URL}}" alt="MSE Filterpressen" width="130" style="display:block; border:0; width:130px; height:auto;">
+    </td>
+  </tr>
+
+  <tr>
+    <td style="padding:16px 24px 16px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:14px; color:#1B1B1B; line-height:1.4;">
+      Mit freundlichen Gr&uuml;&szlig;en / Best regards
+    </td>
+  </tr>
+
+  <!-- Name / Rolle / Abteilung -->
+  <tr>
+    <td style="padding:0 24px 4px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:20px; font-weight:bold; color:#1B1B1B; line-height:1.3;">
+      {{NAME}}
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:0 24px 2px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:14px; color:#1B1B1B; line-height:1.4;">
+      {{ROLE_DE}} | {{ROLE_EN}}
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:0 24px 20px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:14px; color:#1B1B1B; line-height:1.4;">
+      {{DEPARTMENT_DE}} | MSE Filterpressen GmbH
+    </td>
+  </tr>
+
+  <!-- Trennlinie (dünner, blauer Akzent — einziger Farbakzent im Textblock) -->
+  <tr>
+    <td style="padding:0 24px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
+        <tr><td style="border-top:1px solid #3498DB; font-size:0; line-height:0;">&nbsp;</td></tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Kontaktzeilen mit Icon -->
+  <tr>
+    <td style="padding:20px 24px 0 24px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+        <tr>
+          <td style="width:22px; height:22px; padding:0 12px 10px 0; vertical-align:middle;">
+            <!-- Telefon-Icon (Material Symbols Outlined, anthrazitfarben) -->
+            <img src="{{ICON_PHONE_URL}}" width="18" height="18" alt="" style="display:block; border:0;">
+          </td>
+          <td style="padding:0 0 10px 0; vertical-align:middle; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:13px; line-height:1.4;">
+            <a href="tel:{{PHONE}}" style="color:#1B1B1B; text-decoration:underline;">{{PHONE}}</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="width:22px; height:22px; padding:0 12px 10px 0; vertical-align:middle;">
+            <!-- E-Mail-Icon -->
+            <img src="{{ICON_EMAIL_URL}}" width="18" height="18" alt="" style="display:block; border:0;">
+          </td>
+          <td style="padding:0 0 10px 0; vertical-align:middle; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:13px; line-height:1.4;">
+            <a href="mailto:{{EMAIL}}" style="color:#1B1B1B; text-decoration:underline;">{{EMAIL}}</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="width:22px; height:22px; padding:0 12px 10px 0; vertical-align:middle;">
+            <!-- Website-Icon -->
+            <img src="{{ICON_WEB_URL}}" width="18" height="18" alt="" style="display:block; border:0;">
+          </td>
+          <td style="padding:0 0 10px 0; vertical-align:middle; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:13px; line-height:1.4;">
+            <a href="{{WEBSITE_URL}}" style="color:#1B1B1B; text-decoration:underline;">{{WEBSITE_DISPLAY}}</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="width:22px; height:22px; padding:0 12px 10px 0; vertical-align:middle;">
+            <!-- Standort-Icon -->
+            <img src="{{ICON_PIN_URL}}" width="18" height="18" alt="" style="display:block; border:0;">
+          </td>
+          <td style="padding:0 0 10px 0; vertical-align:middle; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:13px; line-height:1.4; color:#1B1B1B;">
+            {{ADDRESS}}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Trennlinie -->
+  <tr>
+    <td style="padding:4px 24px 0 24px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
+        <tr><td style="border-top:1px solid #E0E0E0; font-size:0; line-height:0;">&nbsp;</td></tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Phishing-Hinweis (Sicherheitshinweis, bewusste Ausnahme von der Farbregel: Rot ist hier
+       Warnfarbe/Sicherheitshinweis, keine dekorative Markenfarbe) -->
+  <tr>
+    <td style="padding:16px 24px 20px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:12px; color:#E74C3C; line-height:1.6;">
+      Important Notice: Fraudulent emails are currently circulating using similar-looking domains
+      (e.g. <em><strong>@{{FAKE_DOMAIN_EXAMPLE}}</strong></em>).
+      Please only respond to emails ending in <strong><em>@{{CORRECT_DOMAIN}}</em></strong>.
+      If in doubt, kindly contact us by phone for verification.
+    </td>
+  </tr>
+
+  <!-- Klickbares Banner-Bild — bewusst OHNE HTML-width-Attribut auf dem <img> (siehe SKILL.md
+       Abschnitt 2a "Responsives Banner"): ein festes width="..."-Attribut wird von mobilen
+       Mail-Clients oft wörtlich als Pixelbreite übernommen, auch wenn die umgebende Tabellenzelle
+       auf einem schmalen Bildschirm bereits geschrumpft ist — das Bild ragt dann über den Rand
+       hinaus und wirkt "abgeschnitten". Nur CSS-width:100%/max-width sorgt dafür, dass das Bild
+       immer exakt die Breite seiner (fluiden) Zelle übernimmt. -->
+  <tr>
+    <td style="padding:0 24px 20px 24px;">
+      <a href="{{BANNER_LINK_URL}}" style="border:0; text-decoration:none;" target="_blank">
+        <img src="{{BANNER_IMAGE_URL}}" alt="{{BANNER_ALT}}" style="display:block; border:0; outline:none; width:100%; max-width:592px; height:auto;">
+      </a>
+    </td>
+  </tr>
+
+  <!-- Social-Icons (jede Spalte optional; komplette Spalte entfernen, falls Kanal nicht vorhanden) -->
+  <tr>
+    <td style="padding:0 24px 20px 24px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+        <tr>
+          <td style="padding:0 10px 0 0;">
+            <a href="{{SOCIAL_LINKEDIN_URL}}" target="_blank" style="border:0; text-decoration:none;">
+              <img src="{{SOCIAL_LINKEDIN_ICON_URL}}" width="24" height="24" alt="LinkedIn" style="display:block; border:0;">
+            </a>
+          </td>
+          <td style="padding:0 10px 0 0;">
+            <a href="{{SOCIAL_INSTAGRAM_URL}}" target="_blank" style="border:0; text-decoration:none;">
+              <img src="{{SOCIAL_INSTAGRAM_ICON_URL}}" width="24" height="24" alt="Instagram" style="display:block; border:0;">
+            </a>
+          </td>
+          <td style="padding:0 10px 0 0;">
+            <a href="{{SOCIAL_X_URL}}" target="_blank" style="border:0; text-decoration:none;">
+              <img src="{{SOCIAL_X_ICON_URL}}" width="24" height="24" alt="X" style="display:block; border:0;">
+            </a>
+          </td>
+          <td style="padding:0;">
+            <a href="{{SOCIAL_FACEBOOK_URL}}" target="_blank" style="border:0; text-decoration:none;">
+              <img src="{{SOCIAL_FACEBOOK_ICON_URL}}" width="24" height="24" alt="Facebook" style="display:block; border:0;">
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Rechtlicher Pflichtblock -->
+  <tr>
+    <td style="padding:0 24px 4px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:11px; color:#707070; line-height:1.7;">
+      MSE Filterpressen Gesellschaft mit beschr&auml;nkter Haftung<br>
+      Gesch&auml;ftsf&uuml;hrung: Giuseppe Rum&eacute;, Riccardo Valerio Rum&eacute;<br>
+      Sitz der Gesellschaft: Remchingen<br>
+      Registergericht: Amtsgericht Mannheim, HRB-Nr. 502677<br>
+      USt-IdNr.: DE144200297
+    </td>
+  </tr>
+
+  <!-- Vertraulichkeitshinweis -->
+  <tr>
+    <td style="padding:16px 24px 4px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:11px; color:#707070; line-height:1.6;">
+      Diese E-Mail und etwaige Anlagen sind vertraulich und ausschlie&szlig;lich f&uuml;r den/die
+      bezeichneten Empf&auml;nger bestimmt. Sollten Sie diese Nachricht irrt&uuml;mlich erhalten
+      haben, informieren Sie uns bitte und l&ouml;schen Sie diese anschlie&szlig;end.
+    </td>
+  </tr>
+
+  <!-- "Think before you print" (etablierter Umwelt-Footer-Hinweis; bewusste Ausnahme von der
+       Farbregel: Grün ist hier ein allgemein anerkanntes, ökologisches Signalzeichen im E-Mail-Fuß,
+       keine Markenfarbe im gestalterischen Sinn) -->
+  <tr>
+    <td style="padding:16px 24px 24px 24px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+        <tr>
+          <td style="font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:12px; font-style:italic; color:#3BAA4A; padding:0 8px 0 0; vertical-align:middle;">
+            &bdquo;Think before you print&ldquo;
+          </td>
+          <td style="vertical-align:middle;">
+            <img src="{{ICON_LEAF_URL}}" width="20" height="20" alt="" style="display:block; border:0;">
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+</table>

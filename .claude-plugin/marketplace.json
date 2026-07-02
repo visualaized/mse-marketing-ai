@@ -1,0 +1,14 @@
+{
+  "name": "visualaized-mse-marketplace",
+  "owner": {
+    "name": "visualaized / pebro GmbH",
+    "email": "hello@visualaized.io"
+  },
+  "plugins": [
+    {
+      "name": "mse-marketing-ai",
+      "source": "./",
+      "description": "KI-Marketing-Zentrale für MSE Filterpressen GmbH."
+    }
+  ]
+}

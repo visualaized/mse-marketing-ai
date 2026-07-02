@@ -1,0 +1,10 @@
+{
+  "_comment": "BEISPIEL / VORLAGE — diese Datei wird vom Dashboard nicht gelesen. Zum Anlegen einer echten Kampagne diesen Inhalt nach Campaigns/<kampagnen-slug>/meta.json kopieren und das _comment-Feld entfernen. Siehe SKILL.md Abschnitt 2 fuer das vollstaendige Schema.",
+  "thema": "CellTRON Xtreme im Batterierecycling",
+  "kanaele": ["LinkedIn", "Newsletter-DE", "Instagram"],
+  "status": "in Arbeit",
+  "zeitraum_start": "2026-07-01",
+  "zeitraum_ende": "2026-07-31",
+  "verantwortlich": "Marketing-Team",
+  "notiz": "Fokus auf Batterierecycling-Anwendung, Launch-Video in Produktion"
+}

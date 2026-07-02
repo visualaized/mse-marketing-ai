@@ -1,0 +1,238 @@
+<!--
+  MSE Filterpressen GmbH — E-Mail-Signatur, CI-Sign-Variante (Template)
+  Identisch zu templates/signatur-standard.html (gleiche Struktur, Farben, Schrift, QA-Regeln —
+  siehe SKILL.md Abschnitt 0), aber alle PERSONENBEZOGENEN Platzhalter sind hier durch die
+  CI-Sign-Platzhaltersyntax ersetzt, damit CI Sign die Werte automatisch pro Mitarbeiter aus dem
+  Active-Directory-Profil zieht, statt sie manuell pro Person einzusetzen. Alle unternehmensweiten
+  (nicht personenbezogenen) Platzhalter — Logo, Banner, Icons, Social-Links, Rechtsblock, Phishing-
+  Hinweis-Domains — bleiben unverändert {{...}}-Platzhalter, da CI Sign dafür keine AD-Attribute hat;
+  diese werden wie gewohnt einmalig beim Signatur-Rollout befüllt.
+
+  CI-Sign-Syntax (siehe SKILL.md Abschnitt 5b für die vollständige Erklärung):
+  - @@attributName   -> wird durch den Attributwert ersetzt; ist das Attribut leer, wird NUR der
+                        Platzhalter (inkl. eines eventuell direkt folgenden Leerzeichens) entfernt,
+                        der Rest der Zeile bleibt stehen.
+  - ##attributName    -> wird durch den Attributwert ersetzt; ist das Attribut leer, wird die
+                        GESAMTE Zeile entfernt, in der der Platzhalter steht.
+  WICHTIG: vor dem produktiven Rollout einen Testexport mit mindestens einem Profil mit und einem
+  Profil OHNE optionales Attribut (z. B. ohne Mobiltelefon) durch CI Sign laufen lassen, um das
+  exakte Lösch-Verhalten (Zeilen- vs. Tabellenzeilen-Ebene) im jeweiligen CI-Sign-Versionsstand zu
+  verifizieren, bevor die Vorlage unternehmensweit ausgerollt wird.
+
+  Verbleibende unternehmensweite Platzhalter (vor Rollout einmalig ersetzen):
+  {{LOGO_URL}} · {{WEBSITE_DISPLAY}} · {{WEBSITE_URL}} · {{CORRECT_DOMAIN}} · {{FAKE_DOMAIN_EXAMPLE}} ·
+  {{BANNER_IMAGE_URL}} · {{BANNER_ALT}} · {{BANNER_LINK_URL}} ·
+  {{ICON_PHONE_URL}} / {{ICON_EMAIL_URL}} / {{ICON_WEB_URL}} / {{ICON_PIN_URL}} / {{ICON_LEAF_URL}} ·
+  {{SOCIAL_*_URL}} / {{SOCIAL_*_ICON_URL}} (jede Spalte optional, nicht vorhandene Kanäle komplett
+  entfernen — CI Sign kennt hierfür keine Automatik, das bleibt manuelle Redaktionsarbeit).
+
+  CI-Sign-Attribut-Platzhalter (ersetzen alle {{...}}-Personendaten aus signatur-standard.html):
+  ##displayName        – Name (fett) — ersetzt {{NAME}}
+  ##title               – Funktion/Rolle (nur EINE Sprache, da AD-Attribut "title" nicht zweisprachig
+                          ist) — ersetzt {{ROLE_DE}}/{{ROLE_EN}}. Zweisprachigkeit siehe Hinweis unten.
+  ##department          – Abteilung/Bereich — ersetzt {{DEPARTMENT_DE}}; eigene Zeile, wird bei
+                          leerem Attribut komplett entfernt (## statt @@), Firmenzeile bleibt separat.
+  @@telephoneNumber     – Direktdurchwahl — ersetzt {{PHONE}} (Anzeigetext UND tel:-Link).
+  @@mobile              – Mobiltelefon (optional, eigene Zeile mit ## zum Entfernen bei Fehlen).
+  @@mail                – persönliche E-Mail-Adresse — ersetzt {{EMAIL}}.
+  @@streetAdress        – Straße/Hausnummer (Schreibweise exakt so, nicht "streetAddress" — offizielle
+                          CI-Sign-AD-Attributbezeichnung, siehe Recherche in SKILL.md).
+  @@postalCode          – PLZ.
+  @@l                   – Ort/Stadt.
+
+  Hinweis Zweisprachigkeit der Rolle: Active Directory kennt "title" nur einsprachig. Optionen:
+  (a) für zweisprachige Rollen ein eigenes benutzerdefiniertes AD-Attribut anlegen lassen (IT-seitig,
+  außerhalb dieses Angebots) und dessen CI-Sign-Platzhaltername verwenden, oder (b) nur die deutsche
+  Rolle automatisch ziehen und die englische Fassung manuell/statisch im Template ergänzen, sobald
+  die Zielgruppe überwiegend deutschsprachig ist. Vor dem Rollout mit dem Kunden klären, welche
+  Variante gewünscht ist — nicht eigenmächtig entscheiden.
+-->
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#FFFFFF" style="border-collapse:collapse; width:100%; max-width:640px; background-color:#FFFFFF; font-family:'Nudica', Arial, Helvetica, sans-serif;">
+
+  <!-- Logo (echtes Marken-Asset, Pflicht, siehe Kommentarkopf) -->
+  <tr>
+    <td style="padding:24px 24px 4px 24px;">
+      <img src="{{LOGO_URL}}" alt="MSE Filterpressen" width="130" style="display:block; border:0; width:130px; height:auto;">
+    </td>
+  </tr>
+
+  <tr>
+    <td style="padding:16px 24px 16px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:14px; color:#1B1B1B; line-height:1.4;">
+      Mit freundlichen Gr&uuml;&szlig;en / Best regards
+    </td>
+  </tr>
+
+  <!-- Name / Rolle / Abteilung (per CI-Sign-Attribut) -->
+  <tr>
+    <td style="padding:0 24px 4px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:20px; font-weight:bold; color:#1B1B1B; line-height:1.3;">
+      ##displayName
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:0 24px 2px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:14px; color:#1B1B1B; line-height:1.4;">
+      ##title
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:0 24px 2px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:14px; color:#1B1B1B; line-height:1.4;">
+      ##department
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:0 24px 20px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:14px; color:#1B1B1B; line-height:1.4;">
+      MSE Filterpressen GmbH
+    </td>
+  </tr>
+
+  <!-- Trennlinie (dünner, blauer Akzent) -->
+  <tr>
+    <td style="padding:0 24px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
+        <tr><td style="border-top:1px solid #3498DB; font-size:0; line-height:0;">&nbsp;</td></tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Kontaktzeilen mit Icon (per CI-Sign-Attribut) -->
+  <tr>
+    <td style="padding:20px 24px 0 24px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+        <tr>
+          <td style="width:22px; height:22px; padding:0 12px 10px 0; vertical-align:middle;">
+            <img src="{{ICON_PHONE_URL}}" width="18" height="18" alt="" style="display:block; border:0;">
+          </td>
+          <td style="padding:0 0 10px 0; vertical-align:middle; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:13px; line-height:1.4;">
+            <a href="tel:@@telephoneNumber" style="color:#1B1B1B; text-decoration:underline;">@@telephoneNumber</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="width:22px; height:22px; padding:0 12px 10px 0; vertical-align:middle;">
+            <img src="{{ICON_PHONE_URL}}" width="18" height="18" alt="" style="display:block; border:0;">
+          </td>
+          <td style="padding:0 0 10px 0; vertical-align:middle; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:13px; line-height:1.4;">
+            <a href="tel:##mobile" style="color:#1B1B1B; text-decoration:underline;">##mobile</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="width:22px; height:22px; padding:0 12px 10px 0; vertical-align:middle;">
+            <img src="{{ICON_EMAIL_URL}}" width="18" height="18" alt="" style="display:block; border:0;">
+          </td>
+          <td style="padding:0 0 10px 0; vertical-align:middle; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:13px; line-height:1.4;">
+            <a href="mailto:@@mail" style="color:#1B1B1B; text-decoration:underline;">@@mail</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="width:22px; height:22px; padding:0 12px 10px 0; vertical-align:middle;">
+            <img src="{{ICON_WEB_URL}}" width="18" height="18" alt="" style="display:block; border:0;">
+          </td>
+          <td style="padding:0 0 10px 0; vertical-align:middle; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:13px; line-height:1.4;">
+            <a href="{{WEBSITE_URL}}" style="color:#1B1B1B; text-decoration:underline;">{{WEBSITE_DISPLAY}}</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="width:22px; height:22px; padding:0 12px 10px 0; vertical-align:middle;">
+            <img src="{{ICON_PIN_URL}}" width="18" height="18" alt="" style="display:block; border:0;">
+          </td>
+          <td style="padding:0 0 10px 0; vertical-align:middle; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:13px; line-height:1.4; color:#1B1B1B;">
+            @@streetAdress, @@postalCode @@l
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Trennlinie -->
+  <tr>
+    <td style="padding:4px 24px 0 24px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
+        <tr><td style="border-top:1px solid #E0E0E0; font-size:0; line-height:0;">&nbsp;</td></tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Phishing-Hinweis (dokumentierte Farbausnahme, siehe SKILL.md Abschnitt 0) -->
+  <tr>
+    <td style="padding:16px 24px 20px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:12px; color:#E74C3C; line-height:1.6;">
+      Important Notice: Fraudulent emails are currently circulating using similar-looking domains
+      (e.g. <em><strong>@{{FAKE_DOMAIN_EXAMPLE}}</strong></em>).
+      Please only respond to emails ending in <strong><em>@{{CORRECT_DOMAIN}}</em></strong>.
+      If in doubt, kindly contact us by phone for verification.
+    </td>
+  </tr>
+
+  <!-- Klickbares Banner-Bild (unternehmensweit, kein Personenbezug) -->
+  <tr>
+    <td style="padding:0 24px 20px 24px;">
+      <a href="{{BANNER_LINK_URL}}" style="border:0; text-decoration:none;" target="_blank">
+        <img src="{{BANNER_IMAGE_URL}}" alt="{{BANNER_ALT}}" style="display:block; border:0; outline:none; width:100%; max-width:592px; height:auto;">
+      </a>
+    </td>
+  </tr>
+
+  <!-- Social-Icons (unternehmensweit; jede Spalte optional, komplett entfernen falls Kanal fehlt) -->
+  <tr>
+    <td style="padding:0 24px 20px 24px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+        <tr>
+          <td style="padding:0 10px 0 0;">
+            <a href="{{SOCIAL_LINKEDIN_URL}}" target="_blank" style="border:0; text-decoration:none;">
+              <img src="{{SOCIAL_LINKEDIN_ICON_URL}}" width="24" height="24" alt="LinkedIn" style="display:block; border:0;">
+            </a>
+          </td>
+          <td style="padding:0 10px 0 0;">
+            <a href="{{SOCIAL_INSTAGRAM_URL}}" target="_blank" style="border:0; text-decoration:none;">
+              <img src="{{SOCIAL_INSTAGRAM_ICON_URL}}" width="24" height="24" alt="Instagram" style="display:block; border:0;">
+            </a>
+          </td>
+          <td style="padding:0 10px 0 0;">
+            <a href="{{SOCIAL_X_URL}}" target="_blank" style="border:0; text-decoration:none;">
+              <img src="{{SOCIAL_X_ICON_URL}}" width="24" height="24" alt="X" style="display:block; border:0;">
+            </a>
+          </td>
+          <td style="padding:0;">
+            <a href="{{SOCIAL_FACEBOOK_URL}}" target="_blank" style="border:0; text-decoration:none;">
+              <img src="{{SOCIAL_FACEBOOK_ICON_URL}}" width="24" height="24" alt="Facebook" style="display:block; border:0;">
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Rechtlicher Pflichtblock (unternehmensweit, kein Personenbezug) -->
+  <tr>
+    <td style="padding:0 24px 4px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:11px; color:#707070; line-height:1.7;">
+      MSE Filterpressen Gesellschaft mit beschr&auml;nkter Haftung<br>
+      Gesch&auml;ftsf&uuml;hrung: Giuseppe Rum&eacute;, Riccardo Valerio Rum&eacute;<br>
+      Sitz der Gesellschaft: Remchingen<br>
+      Registergericht: Amtsgericht Mannheim, HRB-Nr. 502677<br>
+      USt-IdNr.: DE144200297
+    </td>
+  </tr>
+
+  <!-- Vertraulichkeitshinweis -->
+  <tr>
+    <td style="padding:16px 24px 4px 24px; font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:11px; color:#707070; line-height:1.6;">
+      Diese E-Mail und etwaige Anlagen sind vertraulich und ausschlie&szlig;lich f&uuml;r den/die
+      bezeichneten Empf&auml;nger bestimmt. Sollten Sie diese Nachricht irrt&uuml;mlich erhalten
+      haben, informieren Sie uns bitte und l&ouml;schen Sie diese anschlie&szlig;end.
+    </td>
+  </tr>
+
+  <!-- "Think before you print" (dokumentierte Farbausnahme, siehe SKILL.md Abschnitt 0) -->
+  <tr>
+    <td style="padding:16px 24px 24px 24px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+        <tr>
+          <td style="font-family:'Nudica', Arial, Helvetica, sans-serif; font-size:12px; font-style:italic; color:#3BAA4A; padding:0 8px 0 0; vertical-align:middle;">
+            &bdquo;Think before you print&ldquo;
+          </td>
+          <td style="vertical-align:middle;">
+            <img src="{{ICON_LEAF_URL}}" width="20" height="20" alt="" style="display:block; border:0;">
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+</table>

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSE Marketing-Zentrale — Kampagnen-Dashboard</title>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header__inner">
+      <!-- Blaues 3-Streifen-Bildzeichen (echtes Marken-Asset) — als lokale Kopie (logo.png)
+           direkt im App-Ordner, damit die App self-contained ist und auch der Standalone-
+           Server (server.mjs, liefert nur diesen Ordner aus) das Logo ausliefern kann.
+           Beim Deployment aus brand/logo/MSE Favicon.png hierher kopieren. Niemals weglassen
+           oder durch Klartext ersetzen. -->
+      <img class="header__logo" src="./logo.png" alt="MSE Filterpressen">
+      <div class="header__inner-text">
+        <span class="eyebrow eyebrow--inverted">MSE Marketing-Zentrale</span>
+        <h1 class="header__title">Kampagnen-Dashboard</h1>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <section class="toolbar" aria-label="Filter und Sortierung">
+      <div class="toolbar__group">
+        <label class="eyebrow" for="filter-status">Status</label>
+        <select id="filter-status" class="control">
+          <option value="">Alle</option>
+          <option value="geplant">geplant</option>
+          <option value="in Arbeit">in Arbeit</option>
+          <option value="veröffentlicht">veröffentlicht</option>
+          <option value="abgeschlossen">abgeschlossen</option>
+        </select>
+      </div>
+
+      <div class="toolbar__group">
+        <label class="eyebrow" for="filter-kanal">Kanal</label>
+        <select id="filter-kanal" class="control">
+          <option value="">Alle</option>
+        </select>
+      </div>
+
+      <div class="toolbar__group">
+        <label class="eyebrow" for="sort-order">Sortierung</label>
+        <select id="sort-order" class="control">
+          <option value="start-desc">Start (neueste zuerst)</option>
+          <option value="start-asc">Start (älteste zuerst)</option>
+          <option value="thema-asc">Thema (A–Z)</option>
+          <option value="status-asc">Status</option>
+        </select>
+      </div>
+
+      <div class="toolbar__count" id="result-count" aria-live="polite"></div>
+    </section>
+
+    <!-- Planungsbereich: nur sichtbar, wenn der lokale Dashboard-Server läuft
+         (Feature-Detection über GET /api/ping — bei rein statischem Hosting bleibt
+         der Bereich ausgeblendet, das Dashboard ist dann reine Lese-Übersicht). -->
+    <section class="plan" id="plan-section" hidden>
+      <button type="button" class="plan__toggle" id="plan-toggle" aria-expanded="false">
+        + Kampagne planen
+      </button>
+
+      <form class="plan__form" id="plan-form" hidden>
+        <h2 class="plan__title" id="plan-form-title">Neue Kampagne planen</h2>
+
+        <div class="plan__grid">
+          <div class="plan__field plan__field--wide">
+            <label class="eyebrow" for="plan-thema">Thema / Beschreibung *</label>
+            <input class="control" type="text" id="plan-thema" required
+                   placeholder="z. B. CellTRON Light Markteinführung">
+          </div>
+
+          <div class="plan__field">
+            <label class="eyebrow" for="plan-start">Geplante Ver&ouml;ffentlichung *</label>
+            <input class="control" type="date" id="plan-start" required>
+          </div>
+
+          <div class="plan__field">
+            <label class="eyebrow" for="plan-ende">Ende (optional)</label>
+            <input class="control" type="date" id="plan-ende">
+          </div>
+        </div>
+
+        <fieldset class="plan__kanaele">
+          <legend class="eyebrow">Geplante Kan&auml;le *</legend>
+          <div class="plan__kanaele-grid" id="plan-kanaele">
+            <label class="plan__check"><input type="checkbox" value="Instagram"> Instagram</label>
+            <label class="plan__check"><input type="checkbox" value="LinkedIn"> LinkedIn</label>
+            <label class="plan__check"><input type="checkbox" value="X"> X</label>
+            <label class="plan__check"><input type="checkbox" value="Newsletter-DE"> Newsletter DE</label>
+            <label class="plan__check"><input type="checkbox" value="Newsletter-EN"> Newsletter EN</label>
+            <label class="plan__check"><input type="checkbox" value="Landing Page"> Landing Page</label>
+            <label class="plan__check"><input type="checkbox" value="E-Mail-Signatur"> E-Mail-Signatur</label>
+            <label class="plan__check"><input type="checkbox" value="Bild/Video"> Bild/Video</label>
+          </div>
+        </fieldset>
+
+        <div class="plan__field plan__field--wide">
+          <label class="eyebrow" for="plan-notiz">Notizen (optional)</label>
+          <textarea class="control plan__textarea" id="plan-notiz" rows="3"
+                    placeholder="Anlass, Zielgruppe, Kernbotschaft, Besonderheiten …"></textarea>
+        </div>
+
+        <div class="plan__actions">
+          <button type="submit" class="plan__submit">Kampagne einplanen</button>
+          <button type="button" class="plan__cancel" id="plan-cancel">Abbrechen</button>
+          <span class="plan__feedback" id="plan-feedback" aria-live="polite"></span>
+        </div>
+      </form>
+    </section>
+
+    <section id="content-area" aria-live="polite">
+      <p class="state-message">Lade Kampagnen…</p>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>Kampagnen-Dashboard · Übersicht &amp; Kampagnenplanung · keine Freigabeprozesse</p>
+  </footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var state = {
+    campaigns: [],
+    filterStatus: "",
+    filterKanal: "",
+    sortOrder: "start-desc",
+    planningEnabled: false,
+    editingSlug: null
+  };
+
+  var contentArea = document.getElementById("content-area");
+  var resultCount = document.getElementById("result-count");
+  var filterStatusEl = document.getElementById("filter-status");
+  var filterKanalEl = document.getElementById("filter-kanal");
+  var sortOrderEl = document.getElementById("sort-order");
+
+  function formatDate(isoString) {
+    if (!isoString) return "";
+    var parts = isoString.split("-");
+    if (parts.length !== 3) return isoString;
+    var months = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+    var year = parts[0];
+    var monthIndex = parseInt(parts[1], 10) - 1;
+    var day = parseInt(parts[2], 10);
+    if (monthIndex < 0 || monthIndex > 11 || isNaN(day)) return isoString;
+    return day + ". " + months[monthIndex] + " " + year;
+  }
+
+  function formatZeitraum(start, ende) {
+    var s = formatDate(start);
+    var e = ende ? formatDate(ende) : "";
+    if (!s && !e) return "—";
+    if (s && e) return s + " – " + e;
+    if (s && !e) return "seit " + s;
+    return e;
+  }
+
+  function statusClass(status) {
+    switch (status) {
+      case "geplant": return "status status--outline";
+      case "in Arbeit": return "status status--accent";
+      case "veröffentlicht": return "status status--filled";
+      case "abgeschlossen": return "status status--faded";
+      default: return "status status--outline";
+    }
+  }
+
+  function escapeHtml(value) {
+    var div = document.createElement("div");
+    div.textContent = value == null ? "" : String(value);
+    return div.innerHTML;
+  }
+
+  function collectKanaele(campaigns) {
+    var set = {};
+    campaigns.forEach(function (c) {
+      (c.kanaele || []).forEach(function (k) { set[k] = true; });
+    });
+    return Object.keys(set).sort(function (a, b) { return a.localeCompare(b, "de"); });
+  }
+
+  function populateKanalFilter(campaigns) {
+    var kanaele = collectKanaele(campaigns);
+    var current = filterKanalEl.value;
+    filterKanalEl.innerHTML = '<option value="">Alle</option>';
+    kanaele.forEach(function (k) {
+      var opt = document.createElement("option");
+      opt.value = k;
+      opt.textContent = k;
+      filterKanalEl.appendChild(opt);
+    });
+    if (kanaele.indexOf(current) !== -1) {
+      filterKanalEl.value = current;
+    }
+  }
+
+  function applyFilterAndSort(campaigns) {
+    var result = campaigns.filter(function (c) {
+      var statusOk = !state.filterStatus || c.status === state.filterStatus;
+      var kanalOk = !state.filterKanal || (c.kanaele || []).indexOf(state.filterKanal) !== -1;
+      return statusOk && kanalOk;
+    });
+
+    result.sort(function (a, b) {
+      switch (state.sortOrder) {
+        case "start-asc":
+          return (a.zeitraum_start || "").localeCompare(b.zeitraum_start || "");
+        case "thema-asc":
+          return (a.thema || "").localeCompare(b.thema || "", "de");
+        case "status-asc":
+          return (a.status || "").localeCompare(b.status || "", "de");
+        case "start-desc":
+        default:
+          return (b.zeitraum_start || "").localeCompare(a.zeitraum_start || "");
+      }
+    });
+
+    return result;
+  }
+
+  function renderEmptyState(message) {
+    contentArea.innerHTML = '<p class="state-message">' + escapeHtml(message) + "</p>";
+    resultCount.textContent = "";
+  }
+
+  function renderError(message) {
+    contentArea.innerHTML =
+      '<div class="state-message state-message--error">' +
+      "<p>" + escapeHtml(message) + "</p>" +
+      '<p class="state-message__hint">Diese Seite lädt Kampagnendaten per <code>fetch()</code> aus ' +
+      '<code>campaigns-index.json</code>. Wird die Seite direkt als Datei geöffnet ' +
+      "(<code>file://…</code>), blockieren die meisten Browser diesen Zugriff aus " +
+      "Sicherheitsgründen. Bitte stattdessen über einen lokalen Server aufrufen, z. B. mit " +
+      "<code>node server.mjs</code> im <code>app</code>-Ordner, oder über den Webserver des Kunden.</p>" +
+      "</div>";
+    resultCount.textContent = "";
+  }
+
+  function renderCampaigns(campaigns) {
+    if (!campaigns.length) {
+      renderEmptyState("Keine Kampagnen für diese Auswahl gefunden.");
+      return;
+    }
+
+    resultCount.textContent = campaigns.length + (campaigns.length === 1 ? " Kampagne" : " Kampagnen");
+
+    var table = document.createElement("table");
+    table.className = "campaign-table";
+
+    var thead = document.createElement("thead");
+    thead.innerHTML =
+      "<tr>" +
+      '<th class="eyebrow">Thema</th>' +
+      '<th class="eyebrow">Kanäle</th>' +
+      '<th class="eyebrow">Status</th>' +
+      '<th class="eyebrow">Zeitraum</th>' +
+      '<th class="eyebrow">Verantwortlich / Notiz</th>' +
+      "</tr>";
+    table.appendChild(thead);
+
+    var tbody = document.createElement("tbody");
+
+    campaigns.forEach(function (c) {
+      var tr = document.createElement("tr");
+
+      var tdThema = document.createElement("td");
+      tdThema.className = "cell-thema";
+      var themaTitle = document.createElement("span");
+      themaTitle.textContent = c.thema || "(ohne Titel)";
+      tdThema.appendChild(themaTitle);
+
+      // Generierte Inhalte der Kampagne (meta.json-Feld "inhalte") — ausklappbar,
+      // Links öffnen über den lesenden /hub/-Mount des Servers in neuem Tab.
+      if (Array.isArray(c.inhalte) && c.inhalte.length) {
+        var details = document.createElement("details");
+        details.className = "inhalte";
+        var summary = document.createElement("summary");
+        summary.className = "inhalte__summary";
+        summary.textContent = c.inhalte.length + (c.inhalte.length === 1 ? " Inhalt" : " Inhalte") + " anzeigen";
+        details.appendChild(summary);
+        var list = document.createElement("ul");
+        list.className = "inhalte__list";
+        c.inhalte.forEach(function (item) {
+          if (!item || !item.pfad) return;
+          var li = document.createElement("li");
+          var a = document.createElement("a");
+          a.className = "inhalte__link";
+          a.href = "./hub/" + String(item.pfad).replace(/^\/+/, "");
+          a.target = "_blank";
+          a.rel = "noopener";
+          a.textContent = item.label || item.pfad;
+          li.appendChild(a);
+          list.appendChild(li);
+        });
+        details.appendChild(list);
+        tdThema.appendChild(details);
+      }
+
+      // Bearbeiten/Löschen — nur für GEPLANTE Kampagnen und nur bei laufendem Server
+      // (planningEnabled wird nach erfolgreichem /api/ping gesetzt).
+      if (c.status === "geplant" && state.planningEnabled && c.slug) {
+        var actions = document.createElement("div");
+        actions.className = "row-actions";
+        var editBtn = document.createElement("button");
+        editBtn.type = "button";
+        editBtn.className = "row-actions__btn";
+        editBtn.textContent = "Bearbeiten";
+        editBtn.addEventListener("click", function () { startEditCampaign(c); });
+        var delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "row-actions__btn row-actions__btn--danger";
+        delBtn.textContent = "Löschen";
+        delBtn.addEventListener("click", function () { deleteCampaign(c); });
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+        tdThema.appendChild(actions);
+      }
+      tr.appendChild(tdThema);
+
+      var tdKanaele = document.createElement("td");
+      (c.kanaele || []).forEach(function (k) {
+        var pill = document.createElement("span");
+        pill.className = "pill";
+        pill.textContent = k;
+        tdKanaele.appendChild(pill);
+      });
+      if (!c.kanaele || !c.kanaele.length) {
+        tdKanaele.textContent = "—";
+      }
+      tr.appendChild(tdKanaele);
+
+      var tdStatus = document.createElement("td");
+      var badge = document.createElement("span");
+      badge.className = statusClass(c.status);
+      badge.textContent = c.status || "unbekannt";
+      tdStatus.appendChild(badge);
+      tr.appendChild(tdStatus);
+
+      var tdZeitraum = document.createElement("td");
+      tdZeitraum.className = "cell-zeitraum";
+      tdZeitraum.textContent = formatZeitraum(c.zeitraum_start, c.zeitraum_ende);
+      tr.appendChild(tdZeitraum);
+
+      var tdMeta = document.createElement("td");
+      tdMeta.className = "cell-meta";
+      var bits = [];
+      if (c.verantwortlich) bits.push('<span class="cell-meta__verantwortlich">' + escapeHtml(c.verantwortlich) + "</span>");
+      if (c.notiz) bits.push('<span class="cell-meta__notiz">' + escapeHtml(c.notiz) + "</span>");
+      tdMeta.innerHTML = bits.length ? bits.join("<br>") : "—";
+      tr.appendChild(tdMeta);
+
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    contentArea.innerHTML = "";
+    contentArea.appendChild(table);
+  }
+
+  function render() {
+    if (!state.campaigns.length) {
+      renderEmptyState("Noch keine Kampagnen angelegt.");
+      return;
+    }
+    var filtered = applyFilterAndSort(state.campaigns);
+    renderCampaigns(filtered);
+  }
+
+  filterStatusEl.addEventListener("change", function () {
+    state.filterStatus = filterStatusEl.value;
+    render();
+  });
+
+  filterKanalEl.addEventListener("change", function () {
+    state.filterKanal = filterKanalEl.value;
+    render();
+  });
+
+  sortOrderEl.addEventListener("change", function () {
+    state.sortOrder = sortOrderEl.value;
+    render();
+  });
+
+  function loadCampaigns() {
+    return fetch("./campaigns-index.json", { cache: "no-store" })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        state.campaigns = Array.isArray(data) ? data : [];
+        populateKanalFilter(state.campaigns);
+        render();
+      })
+      .catch(function () {
+        renderError("Kampagnendaten konnten nicht geladen werden.");
+      });
+  }
+
+  loadCampaigns();
+
+  /* ------------------------------------------------------------------
+     Kampagnenplanung — nur aktiv, wenn der lokale Dashboard-Server läuft
+     (server.mjs beantwortet /api/ping; statisches Hosting liefert 404,
+     dann bleibt der Planungsbereich komplett ausgeblendet).
+     ------------------------------------------------------------------ */
+
+  var planSection = document.getElementById("plan-section");
+  var planToggle = document.getElementById("plan-toggle");
+  var planForm = document.getElementById("plan-form");
+  var planCancel = document.getElementById("plan-cancel");
+  var planFeedback = document.getElementById("plan-feedback");
+
+  fetch("./api/ping", { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      if (data && data.planning) {
+        state.planningEnabled = true;
+        planSection.hidden = false;
+        render(); // Zeilen neu rendern, damit Bearbeiten/Löschen-Buttons erscheinen
+      }
+    })
+    .catch(function () { /* statisches Hosting — Planungsbereich bleibt versteckt */ });
+
+  function setFormVisible(visible) {
+    planForm.hidden = !visible;
+    planToggle.setAttribute("aria-expanded", visible ? "true" : "false");
+    planToggle.hidden = visible;
+    if (visible) {
+      document.getElementById("plan-thema").focus();
+    }
+  }
+
+  function resetPlanForm() {
+    planForm.reset();
+    state.editingSlug = null;
+    document.getElementById("plan-form-title").textContent = "Neue Kampagne planen";
+    document.querySelector(".plan__submit").textContent = "Kampagne einplanen";
+    planFeedback.textContent = "";
+    planFeedback.className = "plan__feedback";
+  }
+
+  function startEditCampaign(c) {
+    state.editingSlug = c.slug;
+    document.getElementById("plan-form-title").textContent = "Geplante Kampagne bearbeiten";
+    document.querySelector(".plan__submit").textContent = "Änderungen speichern";
+    document.getElementById("plan-thema").value = c.thema || "";
+    document.getElementById("plan-start").value = c.zeitraum_start || "";
+    document.getElementById("plan-ende").value = c.zeitraum_ende || "";
+    document.getElementById("plan-notiz").value = c.notiz || "";
+    document.querySelectorAll("#plan-kanaele input[type=checkbox]").forEach(function (cb) {
+      cb.checked = (c.kanaele || []).indexOf(cb.value) !== -1;
+    });
+    planFeedback.textContent = "";
+    planFeedback.className = "plan__feedback";
+    setFormVisible(true);
+    planSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function deleteCampaign(c) {
+    if (!window.confirm('Geplante Kampagne "' + (c.thema || c.slug) + '" wirklich löschen?')) {
+      return;
+    }
+    fetch("./api/campaigns/" + encodeURIComponent(c.slug), { method: "DELETE" })
+      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+      .then(function (result) {
+        if (!result.ok) {
+          var msg = (result.data && result.data.errors) ? result.data.errors.join(" ") : "Löschen fehlgeschlagen.";
+          window.alert(msg);
+          return;
+        }
+        if (state.editingSlug === c.slug) {
+          resetPlanForm();
+          setFormVisible(false);
+        }
+        loadCampaigns();
+      })
+      .catch(function () {
+        window.alert("Server nicht erreichbar — läuft node server.mjs?");
+      });
+  }
+
+  planToggle.addEventListener("click", function () {
+    resetPlanForm();
+    setFormVisible(true);
+  });
+  planCancel.addEventListener("click", function () {
+    resetPlanForm();
+    setFormVisible(false);
+  });
+
+  planForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    planFeedback.textContent = "";
+    planFeedback.className = "plan__feedback";
+
+    var kanaele = [];
+    document.querySelectorAll("#plan-kanaele input[type=checkbox]:checked").forEach(function (cb) {
+      kanaele.push(cb.value);
+    });
+
+    if (!kanaele.length) {
+      planFeedback.textContent = "Bitte mindestens einen Kanal auswählen.";
+      planFeedback.className = "plan__feedback plan__feedback--error";
+      return;
+    }
+
+    var payload = {
+      thema: document.getElementById("plan-thema").value.trim(),
+      kanaele: kanaele,
+      zeitraum_start: document.getElementById("plan-start").value,
+      zeitraum_ende: document.getElementById("plan-ende").value || undefined,
+      notiz: document.getElementById("plan-notiz").value.trim() || undefined
+    };
+
+    var isEdit = !!state.editingSlug;
+    var url = isEdit ? "./api/campaigns/" + encodeURIComponent(state.editingSlug) : "./api/campaigns";
+    var method = isEdit ? "PUT" : "POST";
+
+    fetch(url, {
+      method: method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+      .then(function (result) {
+        if (!result.ok) {
+          var msg = (result.data && result.data.errors) ? result.data.errors.join(" ") : "Speichern fehlgeschlagen.";
+          planFeedback.textContent = msg;
+          planFeedback.className = "plan__feedback plan__feedback--error";
+          return;
+        }
+        resetPlanForm();
+        planFeedback.textContent = isEdit ? "Änderungen gespeichert." : "Kampagne eingeplant.";
+        planFeedback.className = "plan__feedback plan__feedback--ok";
+        setFormVisible(false);
+        loadCampaigns();
+      })
+      .catch(function () {
+        planFeedback.textContent = "Server nicht erreichbar — läuft node server.mjs?";
+        planFeedback.className = "plan__feedback plan__feedback--error";
+      });
+  });
+
+})();
+</script>
+
+</body>
+</html>

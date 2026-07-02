@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>{{SUBJECT}}</title>
+<!--[if mso]>
+<noscript>
+<xml>
+<o:OfficeDocumentSettings>
+<o:PixelsPerInch>96</o:PixelsPerInch>
+</o:OfficeDocumentSettings>
+</xml>
+</noscript>
+<![endif]-->
+<style>
+  /* Optionale Nudica-Einbindung: NUR ergänzen, wenn eine stabile, öffentlich erreichbare
+     Font-Datei-URL vorliegt (siehe SKILL.md "Optionale Nudica-Einbindung"). Viele E-Mail-Clients
+     (v. a. Outlook Desktop) ignorieren @font-face ohnehin und fallen automatisch auf Arial zurück —
+     das ist eine bekannte, akzeptierte Einschränkung von HTML-E-Mail, kein Fehler. Clients, die es
+     unterstützen (u. a. Apple Mail, iOS Mail, viele Webmailer), zeigen echtes Nudica.
+  @font-face {
+    font-family: 'Nudica';
+    src: url('{{FONT_URL_REGULAR}}') format('opentype');
+    font-weight: 400; font-style: normal;
+  }
+  @font-face {
+    font-family: 'Nudica';
+    src: url('{{FONT_URL_BOLD}}') format('opentype');
+    font-weight: 700; font-style: normal;
+  }
+  */
+  body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+  table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+  img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+  body { margin: 0; padding: 0; width: 100% !important; height: 100% !important; background-color: #F5F5F5; }
+
+  @media only screen and (max-width: 640px) {
+    .mse-container { width: 100% !important; max-width: 100% !important; }
+    .mse-px { padding-left: 20px !important; padding-right: 20px !important; }
+    .mse-headline { font-size: 24px !important; line-height: 32px !important; }
+    .mse-hero-img { width: 100% !important; height: auto !important; }
+  }
+</style>
+</head>
+<body style="margin:0; padding:0; background-color:#F5F5F5;">
+
+  <!-- Preheader (hidden, shown only in inbox preview) -->
+  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#F5F5F5;">
+    {{PREHEADER}}
+  </div>
+
+  <center style="width:100%; background-color:#F5F5F5;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F5F5F5;">
+      <tr>
+        <td align="center" style="padding: 32px 16px;">
+
+          <table role="presentation" class="mse-container" width="640" cellpadding="0" cellspacing="0" border="0" style="width:640px; max-width:640px; background-color:#FFFFFF;">
+
+            <!-- Header band (Light Grey — Standard-Logo-Nutzung laut Brand Guidelines §6: das
+                 Original-Logo ist dunkel/transparent und braucht einen hellen Untergrund für
+                 Kontrast; niemals auf einem dunklen Anthrazit-Band platzieren, dafür gibt es kein
+                 freigegebenes Weiß-Logo-Asset). {{LOGO_URL}} MUSS immer das echte Logo aus
+                 brand/logo/ sein (z. B. "Logo_06.10.2020_ohne Hintergrund.png") — niemals durch
+                 Klartext ersetzen oder selbst nachzeichnen/neu erzeugen. -->
+            <tr>
+              <td style="background-color:#F5F5F5; padding: 24px 40px;" class="mse-px">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td align="left" valign="middle">
+                      <img src="{{LOGO_URL}}" width="160" alt="MSE Filterpressen" style="display:block; width:160px; max-width:160px; height:auto;">
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Hero image -->
+            <tr>
+              <td style="background-color:#FFFFFF;">
+                <img src="{{HEADER_IMAGE_URL}}" alt="{{HEADLINE}}" width="640" class="mse-hero-img" style="display:block; width:100%; max-width:640px; height:auto;">
+              </td>
+            </tr>
+
+            <!-- Eyebrow + Headline -->
+            <tr>
+              <td class="mse-px" style="padding: 40px 40px 0 40px; background-color:#FFFFFF;">
+                <p style="margin:0 0 12px 0; font-family:'Nudica', Arial, sans-serif; font-size:12px; line-height:16px; letter-spacing:2px; text-transform:uppercase; color:#707070;">
+                  {{EYEBROW}}
+                </p>
+                <h1 class="mse-headline" style="margin:0; font-family:'Nudica', Arial, sans-serif; font-size:30px; line-height:38px; font-weight:700; color:#1B1B1B;">
+                  {{HEADLINE}}
+                </h1>
+              </td>
+            </tr>
+
+            <!-- Body text -->
+            <tr>
+              <td class="mse-px" style="padding: 20px 40px 8px 40px; background-color:#FFFFFF;">
+                <p style="margin:0; font-family:'Nudica', Arial, sans-serif; font-size:16px; line-height:26px; color:#3A3A3A;">
+                  {{BODY_TEXT}}
+                </p>
+              </td>
+            </tr>
+
+            <!-- Ghost-CTA: circle with diagonal arrow + tracked uppercase label -->
+            <tr>
+              <td class="mse-px" style="padding: 28px 40px 44px 40px; background-color:#FFFFFF;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="border-radius:24px; background-color:#FFFFFF; border:1px solid #3498DB;">
+                      <a href="{{CTA_URL}}" target="_blank" style="display:inline-block; padding: 12px 22px 12px 24px; font-family:'Nudica', Arial, sans-serif; font-size:13px; line-height:16px; letter-spacing:1.5px; text-transform:uppercase; color:#3498DB; text-decoration:none; font-weight:700;">
+                        {{CTA_LABEL}}&nbsp;&nbsp;<span style="display:inline-block; border:1px solid #3498DB; border-radius:50%; width:20px; height:20px; text-align:center; line-height:18px; font-size:12px; color:#3498DB;">&#8599;</span>
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Thin divider -->
+            <tr>
+              <td style="padding: 0 40px; background-color:#FFFFFF;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="border-top:1px solid #F5F5F5; font-size:1px; line-height:1px;">&nbsp;</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td class="mse-px" style="padding: 28px 40px 36px 40px; background-color:#FFFFFF;">
+                <p style="margin:0 0 16px 0; font-family:'Nudica', Arial, sans-serif; font-size:11px; line-height:18px; color:#707070;">
+                  MSE Filterpressen GmbH &middot; Am Eisengraben 3 &middot; 75196 Remchingen &middot; Deutschland &middot;
+                  Tel. +49 (0) 7232 3650-0 &middot; Fax -80 &middot;
+                  <a href="mailto:info@mse-filterpressen.de" style="color:#707070; text-decoration:underline;">info@mse-filterpressen.de</a>
+                  (Vertrieb: <a href="mailto:vertrieb@mse-filterpressen.de" style="color:#707070; text-decoration:underline;">vertrieb@mse-filterpressen.de</a>) &middot;
+                  <a href="https://mse-filterpressen.com" style="color:#707070; text-decoration:underline;">mse-filterpressen.com</a> &middot;
+                  Gesch&auml;ftsf&uuml;hrer: Giuseppe Rum&eacute;, Riccardo Valerio Rum&eacute; &middot;
+                  Amtsgericht Mannheim HRB 502677 &middot; USt-IdNr. DE 144200297.
+                </p>
+                <p style="margin:0; font-family:'Nudica', Arial, sans-serif; font-size:11px; line-height:18px; color:#707070;">
+                  Sie m&ouml;chten diese E-Mails nicht mehr erhalten?
+                  <a href="{{ unsubscribe_link }}" style="color:#707070; text-decoration:underline;">Hier abmelden</a>.
+                </p>
+              </td>
+            </tr>
+
+          </table>
+
+        </td>
+      </tr>
+    </table>
+  </center>
+
+</body>
+</html>

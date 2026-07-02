@@ -1,0 +1,15 @@
+{
+  "name": "mse-marketing-ai",
+  "description": "KI-Marketing-Zentrale für MSE Filterpressen GmbH — markenkonforme Bild-/Video-Generierung, Newsletter, Social Media (Instagram/LinkedIn/X), Kampagnen-Dashboard, E-Mail-Signaturen und Landing Pages, gesteuert über den zentralen Markenkern im Marketing Hub.",
+  "version": "1.9.0",
+  "author": {
+    "name": "visualaized / pebro GmbH",
+    "email": "hello@visualaized.io",
+    "url": "https://visualaized.io"
+  },
+  "license": "Proprietary",
+  "keywords": ["marketing", "mse-filterpressen", "brand", "klaviyo", "higgsfield", "upload-post"],
+  "engines": {
+    "claude": ">=2.1.0"
+  }
+}
