@@ -84,6 +84,8 @@ vollständig benannt (z. B. "nur Instagram und Newsletter, sonst nichts").
    - Newsletter (Klaviyo — automatisch DE + EN als Entwürfe im jeweils passenden Segment)
    - Landing Page (mit DE/EN-Umschalter)
    - E-Mail-Signatur (Kampagnen-Banner)
+   - Whitepaper (informatives Themen-PDF, on-brand — Download-Link im Newsletter und/oder auf
+     der Landing Page)
 
    Bild/Video ist **kein eigener Auswahlpunkt**, sondern wird als Fundament automatisch mitgedacht
    (siehe Frage 2). Wünscht der Nutzer ausdrücklich *nur* Bilder/Videos ohne Text-Format, wählt er
@@ -120,6 +122,7 @@ Je nach Auswahl rufst du die passenden Skills auf (bzw. befolgst deren Anweisung
 | X-Post | `social-x` |
 | Landing Page | `landing-pages` |
 | E-Mail-Signatur | `email-signatur` |
+| Whitepaper (PDF) | `whitepaper` |
 | Kontakt-Migration Brevo→Klaviyo | `newsletter-migration` (nur auf ausdrücklichen Wunsch, kein Standardschritt) |
 
 Wähle sinnvolle Reihenfolge: **erst Bild/Video** (liefert Visuals für alle anderen Bausteine), dann

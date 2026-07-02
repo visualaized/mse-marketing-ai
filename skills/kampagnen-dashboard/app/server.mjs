@@ -67,6 +67,7 @@ const VALID_KANAELE = [
   "Newsletter-EN",
   "Landing Page",
   "E-Mail-Signatur",
+  "Whitepaper",
 ];
 
 const CONTENT_TYPES = {

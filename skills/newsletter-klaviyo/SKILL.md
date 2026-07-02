@@ -177,6 +177,11 @@ nie zurückbauen):**
    Footer-Bilds, verifiziert), heller Text (`#C9C9C9`, Links `#FFFFFF`), kein Abstand zwischen
    Bild und Footer (Bild `display:block`, direkt anschließende Zelle).
 4. **Keine Faxnummer** — Fax wird laut Kundenvorgabe nirgends genannt.
+5. **Whitepaper-Download (falls die Kampagne eines hat, siehe Skill `whitepaper`):** Download-Link
+   als **sekundärer Ghost-CTA** unter dem Haupt-CTA (gleicher Ghost-Stil, Label Verb + Outcome,
+   z. B. „Whitepaper herunterladen (PDF)") — in BEIDEN Sprachversionen, jeweils auf die
+   sprachpassende PDF-URL (existiert nur eine DE-Fassung, in der EN-Version als
+   „(PDF, German)" kennzeichnen). Ersetzt nie den Haupt-CTA.
 
 ### Schritt 5 — Qualitätssicherung (siehe Checkliste unten)
 Vor dem Anlegen in Klaviyo den fertigen HTML-Inhalt gegen die Checkliste in Abschnitt 4 prüfen.

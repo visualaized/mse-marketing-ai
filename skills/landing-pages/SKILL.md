@@ -72,7 +72,7 @@ Die Seite folgt dem MSE-Baukasten aus Modular-Block-Sections. Basis-Template:
 | **Problem/Kontext** | Light Content Section | Weißer Hintergrund, zentrierte Eyebrow → Anthrazit-Headline (Sentence case) → Body-Text. Formuliert das Prozessproblem des Kunden im Engineering-First-Ton (Problem zuerst, nicht das Produkt). |
 | **Lösung/Produkt** | Split Layout | 50/50 Text (weiß) / Bild (Vollbild, real). Zeigt, wie MSE das Problem löst — technisch, konkret. |
 | **Benefits/Features** | 3-Spalten-Cards | Hellgraue Karten, je ein technischer Vorteil/Spec mit kurzem Subhead + Text. |
-| **CTA** | Solid CTA + Kontaktverweis | Anthrazit-Pille, weißer getrackter Text, Pfeil ↗. CTA-Label = Verb + Outcome. |
+| **CTA** | Website-.btn-Stil + Kontaktverweis | Pfeilkreis + Uppercase-Label (Verb + Outcome). Hat die Kampagne ein **Whitepaper** (Skill `whitepaper`): darunter eine Download-Zeile im Ghost-Stil mit Pfeilkreis (`data-de`/`data-en`-Label + `data-href-de`/`data-href-en` auf die PDF-URL[s], sprachpassend) — ergänzt den Haupt-CTA, ersetzt ihn nie. |
 | **Footer** | site-footer (dunkel) | **Immer derselbe Footer wie die Website** (`class="site-footer relative block js-dark"`-Nachbau, siehe Abschnitt 9). |
 
 Text-Fluss innerhalb jeder Sektion konsequent nach MSE-Muster: **Eyebrow → große Headline → kurze

@@ -72,6 +72,23 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.13.0** (2026-07-02) — **Neuer Baustein: PDF-Whitepaper** (Skill `whitepaper`):
+  1. **A4-Druckvorlage** (`templates/whitepaper-template.html`) nach dem Website-Design-System:
+     dunkle Titelseite mit Cover-Foto + „Whitepaper"-Badge, Sections mit Eyebrow→Headline→Body im
+     Website-Typo-Verhältnis, Infoboxen/Key-Facts/Statement-Box/Datentabellen, dunkle
+     CTA-Schlussseite mit Pfeilkreis, Bildzeichen auf jeder Seite in der Ecke, kein Fax.
+  2. **On-brand Diagramm-System**: Schaubilder/Graphen als Inline-SVG mit verbindlichen Regeln
+     (nur Markenfarben, ein Blau-Akzent, eckige Balken, hairline-Gitter, Nudica-Beschriftung,
+     keine Torten-Diagramme, Quellenzeile) — fertige CSS-Klassen + Balkendiagramm-Muster im
+     Template.
+  3. **PDF-Erzeugung** über `scripts/build_whitepaper.py`: bettet echte Nudica-Fonts ein und
+     rendert via Chrome/Edge headless (`--print-to-pdf`, Timeout-Sicherheitsnetz); Fallback
+     Browser-Druckdialog dokumentiert. End-to-End getestet (4-seitiges CellTRON-Demo-PDF).
+  4. **Kampagnen-Integration**: „Whitepaper" als Kanal in der Kanalauswahl der Zentrale und im
+     Kampagnen-Dashboard (Planungsformular + Server-Validierung); Download-Verlinkung als
+     sekundärer Ghost-CTA im Newsletter (beide Sprachen, sprachpassend) und als Download-Zeile
+     in der Landing-Page-CTA-Sektion dokumentiert; PDF wird im `inhalte`-Feld der Kampagne
+     registriert.
 - **1.12.0** (2026-07-02) — Grafik-Kompositionen (compose_slide.py) exakt on Brand:
   1. **Bildzeichen-Platzierungsregel (Kundenvorgabe):** Das Favicon-Bildzeichen steht nie mehr
      frei im Raum — neue Option `--logo-pos tl|tr|bl|br|headline` (vier Bildecken mit

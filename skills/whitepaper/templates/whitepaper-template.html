@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>{{TITLE}}</title>
+<style>
+
+/* ============================================================
+   MSE Filterpressen GmbH — Whitepaper-Druckvorlage (A4)
+   Design strikt nach brand/website-design-system.md (verifizierte
+   Website-Werte): Ink Black #0D0E11, Secondary Grey #5D6A77,
+   Light Grey #F8F8F8, MSE Blue #3D96D2 (sparsam), eckige Formen,
+   2rem-Pfeilkreis-Sprache, Headline nie ohne Eyebrow.
+   Typo-Verhältnis wie Website: Eyebrow : Headline : Body = 0.4 : 1 : 0.3.
+   Erzeugung: scripts/build_whitepaper.py (Chrome headless -> PDF)
+   oder Browser-Druckdialog ("Als PDF sichern", Ränder: Standard).
+   ============================================================ */
+
+@font-face {
+  font-family: 'Nudica';
+  src: url('{{FONT_DATA_URI_REGULAR}}') format('opentype');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Nudica';
+  src: url('{{FONT_DATA_URI_MEDIUM}}') format('opentype');
+  font-weight: 600;
+}
+@font-face {
+  font-family: 'Nudica';
+  src: url('{{FONT_DATA_URI_BOLD}}') format('opentype');
+  font-weight: 700;
+}
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Nudica', Arial, sans-serif;
+  color: #0D0E11;
+  font-size: 10pt;         /* Body-Basis */
+  line-height: 1.4;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* Jede .page ist eine A4-Seite */
+.page {
+  width: 210mm;
+  height: 297mm;
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+  background: #FFFFFF;
+  padding: 22mm 20mm 24mm 20mm;
+}
+
+.page:last-child { page-break-after: auto; }
+
+/* ---------- Typografie (Website-Verhältnisse) ---------- */
+
+.eyebrow {
+  font-size: 9pt;                 /* 0.4 x H1 */
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  color: #5D6A77;
+  margin: 0 0 4mm 0;
+}
+
+h1 {
+  font-size: 26pt;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #0D0E11;
+  margin: 0 0 6mm 0;
+}
+
+h2 {
+  font-size: 17pt;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #0D0E11;
+  margin: 0 0 4mm 0;
+}
+
+h3 {
+  font-size: 11.5pt;
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #0D0E11;
+  margin: 0 0 2.5mm 0;
+}
+
+p {
+  font-size: 10pt;
+  line-height: 1.5;
+  color: #0D0E11;
+  margin: 0 0 3.5mm 0;
+}
+
+ul { margin: 0 0 3.5mm 0; padding-left: 5mm; }
+li { font-size: 10pt; line-height: 1.5; margin-bottom: 1.5mm; }
+
+.small { font-size: 7.5pt; line-height: 1.5; color: #5D6A77; }
+
+/* ---------- Bildzeichen: NUR Bildecke oder Headline-Kante (Kundenvorgabe) ---------- */
+.corner-logo {
+  position: absolute;
+  top: 12mm;
+  left: 12mm;
+  width: 7mm;
+  height: auto;
+}
+
+.corner-logo--light-page { top: 12mm; left: 12mm; }
+
+/* ---------- Seitenfooter (jede Inhaltsseite) ---------- */
+.page-footer {
+  position: absolute;
+  left: 20mm;
+  right: 20mm;
+  bottom: 10mm;
+  display: flex;
+  justify-content: space-between;
+  border-top: 0.4pt solid #D9DCDF;   /* Trennstriche immer dunkel/neutral, nie blau */
+  padding-top: 3mm;
+  font-size: 7pt;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #5D6A77;
+}
+
+/* ---------- Titelseite (dunkel, wie Website-Hero/-Footer) ---------- */
+.page--cover {
+  background: #0D0E11;
+  color: #FFF;
+  padding: 0;
+}
+
+.cover__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+}
+
+.cover__content {
+  position: absolute;
+  left: 20mm;
+  right: 20mm;
+  bottom: 30mm;
+}
+
+.cover__eyebrow {
+  font-size: 10pt;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  color: #C9CDD1;
+  margin: 0 0 5mm 0;
+}
+
+.cover__title {
+  font-size: 34pt;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #FFF;
+  margin: 0 0 6mm 0;
+  text-shadow: 0 1px 6mm rgba(0,0,0,0.5);
+}
+
+.cover__subtitle {
+  font-size: 11pt;
+  line-height: 1.5;
+  color: #E4E6E8;
+  max-width: 130mm;
+  margin: 0;
+  text-shadow: 0 1px 4mm rgba(0,0,0,0.5);
+}
+
+.cover__badge {
+  position: absolute;
+  top: 14mm;
+  right: 14mm;
+  font-size: 8pt;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #FFF;
+  border: 0.6pt solid rgba(255,255,255,0.6);
+  padding: 2.2mm 4.5mm;
+}
+
+.cover__logo {
+  position: absolute;
+  top: 12mm;
+  left: 12mm;
+  width: 8mm;
+  height: auto;
+}
+
+.cover__footerline {
+  position: absolute;
+  left: 20mm;
+  right: 20mm;
+  bottom: 12mm;
+  border-top: 0.4pt solid rgba(248,248,248,0.23);
+  padding-top: 3mm;
+  font-size: 7pt;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #C9CDD1;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ---------- Inhaltselemente ---------- */
+
+.section { margin-bottom: 9mm; }
+
+/* Infobox / Key-Fact-Box: eckig, Light Grey wie .bg--light */
+.infobox {
+  background: #F8F8F8;
+  padding: 6mm 7mm;
+  margin: 0 0 5mm 0;
+}
+.infobox p:last-child { margin-bottom: 0; }
+
+/* Key-Facts-Raster (3 Spalten, wie block--cols-3) */
+.facts {
+  display: flex;
+  gap: 4mm;
+  margin: 0 0 5mm 0;
+}
+.fact {
+  flex: 1;
+  background: #F8F8F8;
+  padding: 5mm 5.5mm;
+}
+.fact__value {
+  font-size: 17pt;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #0D0E11;
+  line-height: 1.15;
+  margin-bottom: 1.5mm;
+}
+.fact__label {
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  color: #5D6A77;
+}
+
+/* Dunkle Statement-/Quote-Box (wie block--black) */
+.statement {
+  background: #0D0E11;
+  color: #FFF;
+  padding: 8mm 9mm;
+  margin: 0 0 5mm 0;
+}
+.statement p {
+  color: #FFF;
+  font-size: 13pt;
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* Tabellen: hairline-Linien, kein Zebra, keine Rundungen */
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 5mm 0;
+}
+table.data th {
+  text-align: left;
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  color: #5D6A77;
+  border-bottom: 0.6pt solid #0D0E11;
+  padding: 2mm 3mm 2mm 0;
+}
+table.data td {
+  font-size: 9.5pt;
+  color: #0D0E11;
+  border-bottom: 0.4pt solid #D9DCDF;
+  padding: 2.2mm 3mm 2.2mm 0;
+  vertical-align: top;
+}
+
+/* Bild mit Caption */
+.figure { margin: 0 0 5mm 0; }
+.figure img { width: 100%; display: block; }
+.figure figcaption {
+  font-size: 7.5pt;
+  color: #5D6A77;
+  margin-top: 2mm;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+/* ---------- Diagramm-Stile (SVG) — 100 % on brand ----------
+   Regeln (siehe SKILL.md Abschnitt "Schaubilder"):
+   - Farben NUR: #0D0E11 (Primärreihe), #5D6A77 (Sekundärreihe), #3D96D2 (EINE
+     hervorgehobene Reihe/Wert, sparsam), #F8F8F8/#D9DCDF (Flächen/Gitter).
+   - Eckige Balken (kein rx), hairline-Gitterlinien, Beschriftung Nudica.
+   - Achsen-/Wertelabels wie Eyebrow (klein, uppercase, 600, #5D6A77). ---------- */
+.chart { margin: 0 0 5mm 0; }
+.chart svg { width: 100%; height: auto; display: block; }
+.chart .chart-label {
+  font-family: 'Nudica', Arial, sans-serif;
+  font-size: 6.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  fill: #5D6A77;
+}
+.chart .chart-value {
+  font-family: 'Nudica', Arial, sans-serif;
+  font-size: 7px;
+  font-weight: 700;
+  fill: #0D0E11;
+}
+.chart .chart-grid { stroke: #D9DCDF; stroke-width: 0.3; }
+.chart .chart-axis { stroke: #0D0E11; stroke-width: 0.6; }
+.chart .bar-primary { fill: #0D0E11; }
+.chart .bar-secondary { fill: #5D6A77; }
+.chart .bar-accent { fill: #3D96D2; }
+.chart .line-primary { stroke: #0D0E11; stroke-width: 1.2; fill: none; }
+.chart .line-accent { stroke: #3D96D2; stroke-width: 1.2; fill: none; }
+.chart .dot { fill: #0D0E11; }
+.chart .dot-accent { fill: #3D96D2; }
+
+/* ---------- Schlussseite: CTA + Kontakt (dunkel) ---------- */
+.page--closing {
+  background: #0D0E11;
+  color: #FFF;
+}
+.page--closing .eyebrow { color: #C9CDD1; }
+.page--closing h2 { color: #FFF; font-size: 22pt; }
+.page--closing p { color: #E4E6E8; }
+
+.cta-line {
+  display: flex;
+  align-items: center;
+  gap: 4mm;
+  margin: 8mm 0 10mm 0;
+  color: #FFF;
+}
+.cta-line__circle {
+  width: 9mm;
+  height: 9mm;
+  border: 0.6pt solid #FFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10pt;
+  flex-shrink: 0;
+}
+.cta-line__label {
+  font-size: 10.5pt;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.closing__legal {
+  position: absolute;
+  left: 20mm;
+  right: 20mm;
+  bottom: 12mm;
+  border-top: 0.4pt solid rgba(248,248,248,0.23);
+  padding-top: 3mm;
+  font-size: 7pt;
+  line-height: 1.7;
+  color: #C9CDD1;
+}
+
+</style>
+</head>
+<body>
+
+  <!-- ============================================================
+       SEITE 1 — TITELSEITE (dunkel; Bildzeichen in der Ecke,
+       Kundenregel: Logo NIE frei im Raum)
+       ============================================================ -->
+  <div class="page page--cover">
+    <img class="cover__image" src="{{COVER_IMAGE}}" alt="">
+    <img class="cover__logo" src="{{LOGO_ICON}}" alt="MSE Filterpressen">
+    <div class="cover__badge">Whitepaper</div>
+    <div class="cover__content">
+      <p class="cover__eyebrow">{{COVER_EYEBROW}}</p>
+      <h1 class="cover__title">{{TITLE}}</h1>
+      <p class="cover__subtitle">{{SUBTITLE}}</p>
+    </div>
+    <div class="cover__footerline">
+      <span>MSE Filterpressen GmbH</span>
+      <span>{{DATE_LABEL}}</span>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       INHALTSSEITEN — Muster: Eyebrow -> H2 -> Body; Infoboxen,
+       Key-Facts, Diagramme, Tabellen nach Bedarf. Dieses Template
+       zeigt je ein Beispiel jedes Elements; beim Befüllen Seiten
+       nach Bedarf duplizieren/entfernen. Faustregel: max. ~2 Sections
+       pro Seite, großzügiger Weißraum wie auf der Website.
+       ============================================================ -->
+  <div class="page">
+    <img class="corner-logo" src="{{LOGO_ICON}}" alt="">
+
+    <div class="section">
+      <p class="eyebrow">{{SECTION_1_EYEBROW}}</p>
+      <h2>{{SECTION_1_HEADLINE}}</h2>
+      <p>{{SECTION_1_BODY}}</p>
+    </div>
+
+    <!-- Key-Facts-Raster (Zahlen NUR aus bestätigten Quellen — nichts erfinden) -->
+    <div class="facts">
+      <div class="fact">
+        <div class="fact__value">{{FACT_1_VALUE}}</div>
+        <div class="fact__label">{{FACT_1_LABEL}}</div>
+      </div>
+      <div class="fact">
+        <div class="fact__value">{{FACT_2_VALUE}}</div>
+        <div class="fact__label">{{FACT_2_LABEL}}</div>
+      </div>
+      <div class="fact">
+        <div class="fact__value">{{FACT_3_VALUE}}</div>
+        <div class="fact__label">{{FACT_3_LABEL}}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <p class="eyebrow">{{SECTION_2_EYEBROW}}</p>
+      <h2>{{SECTION_2_HEADLINE}}</h2>
+      <p>{{SECTION_2_BODY}}</p>
+      <div class="infobox">
+        <h3>{{INFOBOX_TITLE}}</h3>
+        <p>{{INFOBOX_BODY}}</p>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>MSE Filterpressen &middot; {{TITLE_SHORT}}</span>
+      <span>Seite 2</span>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       BEISPIELSEITE MIT DIAGRAMM — Balkendiagramm als Inline-SVG
+       im Brand-Stil (Muster; Werte/Anzahl Balken beim Befüllen
+       anpassen, Farben/Klassen NICHT ändern)
+       ============================================================ -->
+  <div class="page">
+    <img class="corner-logo" src="{{LOGO_ICON}}" alt="">
+
+    <div class="section">
+      <p class="eyebrow">{{CHART_SECTION_EYEBROW}}</p>
+      <h2>{{CHART_SECTION_HEADLINE}}</h2>
+      <p>{{CHART_SECTION_BODY}}</p>
+    </div>
+
+    <div class="chart">
+      <svg viewBox="0 0 170 80" xmlns="http://www.w3.org/2000/svg">
+        <!-- Gitterlinien (hairline) -->
+        <line class="chart-grid" x1="18" y1="14" x2="162" y2="14"/>
+        <line class="chart-grid" x1="18" y1="32" x2="162" y2="32"/>
+        <line class="chart-grid" x1="18" y1="50" x2="162" y2="50"/>
+        <!-- Achse -->
+        <line class="chart-axis" x1="18" y1="68" x2="162" y2="68"/>
+        <!-- Balken: eckig; Akzentbalken (#3D96D2) nur für DEN hervorgehobenen Wert -->
+        <rect class="bar-primary"   x="26"  y="44" width="16" height="24"/>
+        <rect class="bar-primary"   x="60"  y="36" width="16" height="32"/>
+        <rect class="bar-primary"   x="94"  y="26" width="16" height="42"/>
+        <rect class="bar-accent"    x="128" y="16" width="16" height="52"/>
+        <!-- Wertelabels -->
+        <text class="chart-value" x="34"  y="41" text-anchor="middle">{{BAR_1_VALUE}}</text>
+        <text class="chart-value" x="68"  y="33" text-anchor="middle">{{BAR_2_VALUE}}</text>
+        <text class="chart-value" x="102" y="23" text-anchor="middle">{{BAR_3_VALUE}}</text>
+        <text class="chart-value" x="136" y="13" text-anchor="middle">{{BAR_4_VALUE}}</text>
+        <!-- Achsenlabels -->
+        <text class="chart-label" x="34"  y="74" text-anchor="middle">{{BAR_1_LABEL}}</text>
+        <text class="chart-label" x="68"  y="74" text-anchor="middle">{{BAR_2_LABEL}}</text>
+        <text class="chart-label" x="102" y="74" text-anchor="middle">{{BAR_3_LABEL}}</text>
+        <text class="chart-label" x="136" y="74" text-anchor="middle">{{BAR_4_LABEL}}</text>
+      </svg>
+      <p class="small" style="margin-top:2mm;">{{CHART_CAPTION}}</p>
+    </div>
+
+    <div class="statement">
+      <p>{{STATEMENT_TEXT}}</p>
+    </div>
+
+    <div class="section">
+      <table class="data">
+        <tr><th>{{TABLE_COL_1}}</th><th>{{TABLE_COL_2}}</th></tr>
+        {{TABLE_ROWS}}
+      </table>
+    </div>
+
+    <div class="page-footer">
+      <span>MSE Filterpressen &middot; {{TITLE_SHORT}}</span>
+      <span>Seite 3</span>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SCHLUSSSEITE — CTA + Kontakt + Rechtliches (dunkel; KEIN Fax)
+       ============================================================ -->
+  <div class="page page--closing">
+    <img class="corner-logo" src="{{LOGO_ICON}}" alt="">
+
+    <div style="position:absolute; left:20mm; right:20mm; top:40%; transform:translateY(-50%);">
+      <p class="eyebrow">{{CLOSING_EYEBROW}}</p>
+      <h2>{{CLOSING_HEADLINE}}</h2>
+      <p style="max-width:130mm;">{{CLOSING_BODY}}</p>
+
+      <div class="cta-line">
+        <div class="cta-line__circle">&#8599;</div>
+        <div class="cta-line__label">{{CLOSING_CTA_LABEL}}</div>
+      </div>
+
+      <p style="margin-bottom:1.5mm;"><strong>MSE Filterpressen GmbH</strong></p>
+      <p style="margin-bottom:1.5mm;">Am Eisengraben 3 &middot; 75196 Remchingen &middot; Deutschland</p>
+      <p style="margin-bottom:1.5mm;">Tel. +49 (0) 7232 3650-0 &middot; info@mse-filterpressen.de</p>
+      <p>mse-filterpressen.com</p>
+    </div>
+
+    <div class="closing__legal">
+      MSE Filterpressen GmbH &middot; Gesch&auml;ftsf&uuml;hrer: Giuseppe Rum&eacute;, Riccardo Valerio Rum&eacute; &middot;
+      Amtsgericht Mannheim HRB 502677 &middot; USt-IdNr. DE 144200297 &middot;
+      {{COPYRIGHT_LINE}}
+    </div>
+  </div>
+
+</body>
+</html>
