@@ -230,9 +230,15 @@ Landing-Page-Hero). Die finalen, extern erreichbaren Bild-URLs/-Pfade in `{{HERO
 (`class="site-footer relative block js-dark"`). Das Template enthält den Nachbau bereits —
 Struktur und Inhalte (verifiziert gegen mse-filterpressen.com am 2026-07-02):
 
-1. **Tagline-Block** oben, zentriert, groß/900: DE „Verstehen. Lösen. Vorantreiben. – Bereit, wenn
-   du es bist." / EN „Innovate. Solve. Accelerate. Ready when you are." — darunter helle Trennlinie
-   (`rgba(248,248,248,0.23)`).
+1. **Tagline-Block** oben, zentriert, groß/900 — **hinterlegt mit dem Original-Video**
+   (Filterplatten-Animation, gehostet auf der Kundendomain:
+   `https://mse-filterpressen.com/wp-content/uploads/2025/04/mse-filterpressen-filterplattenanimation.mp4`,
+   absolut positioniert, `object-fit: contain`, muted/loop/autoplay/playsinline). Die Tagline hat
+   **exakt die Zeilenumbrüche des Originals** (`.headline-row`-Blöcke, nicht per `data-de`/`data-en`
+   umschaltbar, sondern über `html[lang]`-CSS):
+   - DE: „Verstehen. Lösen." ⏎ „Vorantreiben. – Bereit," ⏎ „wenn du es bist."
+   - EN: „Innovate." ⏎ „Solve. Accelerate." ⏎ „– Ready when you are."
+   Darunter helle Trennlinie (`rgba(248,248,248,0.23)`).
 2. **Vier Spalten**: „MSE Filterpressen" (Adresse), „Up To Date" (Social: LinkedIn, Instagram,
    YouTube — echte Profil-URLs), „Kontakt" (Telefon + `info@mse-filterpressen.de`), „Themen"
    (Karriere, Impressum, Datenschutz, Zertifizierungen, Fachpresse, FAQ — Links auf die

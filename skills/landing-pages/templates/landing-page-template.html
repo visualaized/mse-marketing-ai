@@ -10,13 +10,14 @@
      MSE Filterpressen GmbH — Landing Page Template
      Selbstständige, responsive Single-File-HTML — inkl. DE/EN-Sprachumschalter
      (kein zweiter Domain-/Subdomain-Aufruf nötig, siehe .lang-switch unten).
-     Farben ausschließlich aus brand/color-palette.json:
+     Farben ausschließlich aus brand/color-palette.json bzw.
+     brand/website-design-system.md (verifizierte Website-Werte, 2026-07-02):
        Fast White      #FFFFFF
-       Light Grey      #F5F5F5
-       MSE Blue        #3498DB  (Akzent, max. 10-15%)
-       Anthracite Black #1B1B1B
-       Dark Grey       #3A3A3A
-       Medium Grey     #707070
+       Light Grey      #F8F8F8  (.bg--light der Website)
+       MSE Blue        #3D96D2  (Akzent/Hover, max. 10-15%)
+       Ink Black       #0D0E11  (Text UND dunkle Flächen)
+       Secondary Grey  #5D6A77  (Eyebrows, Sekundärtexte)
+       Footer-Schwarz  #000     (nur Site-Footer)
        Hairline        #E2E2E2
      Font: 'Nudica', Arial, sans-serif. Da diese Seite als EINZELNE, in sich
      geschlossene Datei auf eine Subdomain hochgeladen wird (kein Zugriff auf
@@ -102,7 +103,7 @@
   }
 
   .section--light { background-color: #FFFFFF; }
-  .section--grey  { background-color: #F5F5F5; }
+  .section--grey  { background-color: #F8F8F8; }
 
   /* Container wie Website: max-width 80rem, seitliches Padding 3rem */
   .container {
@@ -201,7 +202,7 @@
   .hero {
     position: relative;
     min-height: 100vh;
-    background-color: #1B1B1B;
+    background-color: #0D0E11;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -314,73 +315,81 @@
   }
 
   .feature-card {
-    background-color: #F5F5F5;
+    background-color: #F8F8F8;
     padding: 36px 28px;
     text-align: left;
   }
 
   .feature-card h3 { margin-bottom: 12px; }
 
-  .feature-card p { color: #3A3A3A; }
+  .feature-card p { color: #0D0E11; }
 
-  /* ---------- Buttons ---------- */
+  /* ---------- Buttons — Website-CTA-Stil (.btn der Live-Website, siehe
+     brand/website-design-system.md §3): KEINE Pille, transparenter Hintergrund,
+     uppercase/bold/ls .04em, links davor der 2rem-Pfeilkreis (1px currentColor,
+     50%). Hover: Website-Blau #3D96D2. ---------- */
 
   .btn-solid {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
-    background-color: #1B1B1B;
-    color: #FFFFFF;
-    font-size: 13px;
-    letter-spacing: 1.5px;
+    gap: 0.75rem;
+    background: transparent;
+    color: #0D0E11;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    font-weight: 700;
-    padding: 18px 30px;
-    border-radius: 999px;
+    font-weight: bold;
+    padding: 0.5rem 0;
+    border-radius: 0;
     border: none;
     cursor: pointer;
+    transition: color .3s cubic-bezier(0.17, 0.55, 0.44, 1.02);
   }
+
+  .btn-solid:hover { color: #3D96D2; }
 
   .btn-solid__arrow {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
+    width: 2rem;
+    height: 2rem;
     border-radius: 50%;
-    border: 1px solid #FFFFFF;
-    font-size: 13px;
+    border: 1px solid currentColor;
+    font-size: 0.8rem;
     line-height: 1;
+    flex-shrink: 0;
   }
 
   .btn-ghost {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
-    color: #1B1B1B;
-    font-size: 13px;
-    letter-spacing: 1.5px;
+    gap: 0.75rem;
+    color: #0D0E11;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    font-weight: 700;
-    padding: 10px 4px;
+    font-weight: bold;
+    padding: 0.5rem 0;
   }
 
   .btn-ghost__arrow {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
-    height: 30px;
+    width: 2rem;
+    height: 2rem;
     border-radius: 50%;
-    border: 1px solid #1B1B1B;
-    font-size: 14px;
+    border: 1px solid currentColor;
+    font-size: 0.8rem;
     line-height: 1;
+    flex-shrink: 0;
   }
 
   /* ---------- CTA Section ---------- */
 
   .cta-section {
-    background-color: #F5F5F5;
+    background-color: #F8F8F8;
     text-align: center;
     padding: 4.4rem 1.5rem;
   }
@@ -411,13 +420,30 @@
   .site-footer .eyebrow { color: #C9C9C9; margin-bottom: 0.9rem; }
 
   .footer__top {
+    position: relative;
     padding: 4.5rem 1.5rem 5rem 1.5rem;
     border-bottom: 1px solid rgba(248, 248, 248, 0.23);
     margin-bottom: 4rem;
     text-align: center;
+    overflow: hidden;
+  }
+
+  /* Hintergrund-Video wie im Original (Filterplatten-Animation): absolut hinter der
+     Tagline, object-fit: contain, stumm/loop/inline. Mobil wie die Website leicht
+     überbreit (left -25vw / width 140vw), damit die Animation die Fläche füllt. */
+  .footer__video {
+    position: absolute;
+    top: 0;
+    left: -25vw;
+    width: 140vw;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
   }
 
   .footer__tagline {
+    position: relative;
+    z-index: 2;
     font-size: 2rem;
     line-height: 1.2;
     font-weight: 900;
@@ -425,6 +451,15 @@
     max-width: 60rem;
     margin: 0 auto;
   }
+
+  /* Zeilenumbrüche der Tagline EXAKT wie im Original (.headline-row-Struktur):
+     jede Zeile ein eigener Block. Sprachumschaltung über html[lang] (die Tagline
+     braucht harte Umbrüche und kann deshalb nicht über data-de/data-en +
+     textContent laufen). */
+  .headline-row { display: block; }
+  .lang-en { display: none; }
+  html[lang="en"] .lang-de { display: none; }
+  html[lang="en"] .lang-en { display: block; }
 
   .footer__bottom {
     max-width: 80rem;
@@ -615,9 +650,23 @@
   <footer class="site-footer">
 
     <div class="footer__top">
-      <p class="footer__tagline"
-         data-de="Verstehen. L&ouml;sen. Vorantreiben. &ndash; Bereit, wenn du es bist."
-         data-en="Innovate. Solve. Accelerate. Ready when you are."></p>
+      <!-- Hintergrund-Video wie im Original (gehostet auf der Kunden-Website) -->
+      <video class="footer__video" muted loop autoplay playsinline preload="metadata">
+        <source src="https://mse-filterpressen.com/wp-content/uploads/2025/04/mse-filterpressen-filterplattenanimation.mp4" type="video/mp4">
+      </video>
+      <!-- Tagline mit den EXAKTEN Zeilenumbrüchen des Website-Originals -->
+      <p class="footer__tagline">
+        <span class="lang-de">
+          <span class="headline-row">Verstehen. L&ouml;sen.</span>
+          <span class="headline-row">Vorantreiben. &ndash; Bereit,</span>
+          <span class="headline-row">wenn du es bist.</span>
+        </span>
+        <span class="lang-en">
+          <span class="headline-row">Innovate.</span>
+          <span class="headline-row">Solve. Accelerate.</span>
+          <span class="headline-row">&ndash; Ready when you are.</span>
+        </span>
+      </p>
     </div>
 
     <div class="footer__bottom">
@@ -725,6 +774,11 @@
       var saved = null;
       try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) { /* ignore */ }
       applyLang(saved === 'en' ? 'en' : 'de');
+
+      // Footer-Video robust starten: manche Browser feuern autoplay bei muted-Videos nicht
+      // zuverlässig — play() explizit anstoßen (Fehler ignorieren, Video ist rein dekorativ).
+      var fv = document.querySelector('.footer__video');
+      if (fv) { var p = fv.play(); if (p && p.catch) { p.catch(function () {}); } }
     })();
   </script>
 

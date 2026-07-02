@@ -72,6 +72,22 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.11.0** (2026-07-02) — **Vollständiges Website-Design-System extrahiert und als verbindliche
+  CI-Grundlage verankert** (Theme-CSS + Seiten-HTML von mse-filterpressen.com komplett ausgewertet):
+  1. **Neues Brand-Dokument `brand/website-design-system.md`** im Marketing Hub: verifizierte
+     Farben, komplette Typo-Skala (1rem=20px, alpha–zeta), Formen/Elemente (eckig, 2rem-Pfeilkreis,
+     quadratische Karussell-Dots, Reveal-Animationssprache), Layout/Abstände (Container 80rem/3rem,
+     6rem-Rhythmus, Breakpoints), Sektions-Baukasten (alle block--Typen) und Footer-Spezifikation.
+     In `CLAUDE.md`, `color-palette.json` und `marketing-zentrale` (Pflichtlektüre, Schritt 0)
+     verankert. Bei Widerspruch zu älteren Dokumenten gewinnt das Design-System.
+  2. **Farbpalette korrigiert auf echte Website-Werte:** Text/Dunkel `#0D0E11` (statt `#1B1B1B`),
+     Sekundär-Grau `#5D6A77`, Hellgrau `#F8F8F8` (statt `#F5F5F5`), Blau `#3D96D2` (statt
+     `#3498DB`), Footer `#000` — in Templates und `compose_slide.py` durchgezogen.
+  3. **Landing-Page-Footer wie Original:** Tagline jetzt mit dem Original-Hintergrund-Video
+     (Filterplatten-Animation, gehostet auf der Kundendomain) und den EXAKTEN Zeilenumbrüchen der
+     Website (DE „Verstehen. Lösen." / „Vorantreiben. – Bereit," / „wenn du es bist.", EN analog).
+  4. **CTA im echten Website-Stil:** keine Pille mehr — transparenter uppercase-Button mit
+     2rem-Pfeilkreis (1px currentColor) und Hover in `#3D96D2`, wie `.btn` der Website.
 - **1.10.0** (2026-07-02) — **Design-Angleichung an die Live-Website** (Kundenvorgaben, Stil aus
   mse-filterpressen.com/Theme-CSS extrahiert und verifiziert):
   1. **Typografie-Verhältnisse wie Website** in Landing-Page- und Newsletter-Templates:

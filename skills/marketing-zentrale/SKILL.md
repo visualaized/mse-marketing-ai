@@ -16,9 +16,13 @@ Bevor du irgendeinen Inhalt erzeugst — unabhängig vom gewählten Baustein —
 Reihenfolge** (relativ zum aktuellen Arbeitsverzeichnis, dem Marketing-Hub-Root des Kunden):
 
 1. `CLAUDE.md` — kompaktes Master-Brand-Dokument (Markenkern, Tonalität, Sprache, Farben, Glossar).
-2. `brand/brand-guidelines.md` — vollständiges Regelwerk (Details zu Typografie, Bildsprache,
-   Kanal-Spezifika, Do's & Don'ts). Bei Widerspruch zwischen beiden gewinnt `CLAUDE.md`.
-3. `brand/color-palette.json` — maschinenlesbare, verbindliche Farbwerte.
+2. `brand/website-design-system.md` — **das aus der Live-Website extrahierte Design-System**
+   (verifizierte Farben, Typo-Skala, Formen, Abstände, Sektions-Baukasten, Footer-Spezifikation).
+   Die Website ist die primäre CI-Grundlage: Bei Widerspruch zu älteren Dokumenten gewinnt dieses
+   Design-System. Pflicht vor jedem gestalteten Output (Landing Page, Newsletter, Grafiken).
+3. `brand/brand-guidelines.md` — vollständiges Regelwerk (Details zu Typografie, Bildsprache,
+   Kanal-Spezifika, Do's & Don'ts). Bei Widerspruch gewinnt `CLAUDE.md` bzw. das Design-System.
+4. `brand/color-palette.json` — maschinenlesbare, verbindliche Farbwerte (Website-Werte).
 
 Falls diese Dateien nicht existieren oder das Arbeitsverzeichnis nicht der Marketing-Hub-Root ist:
 **stoppe und weise den Nutzer darauf hin**, dass Claude im Marketing-Hub-Ordner des Kunden gestartet

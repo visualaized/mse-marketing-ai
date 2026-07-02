@@ -18,8 +18,8 @@ Zwei Hintergrund-Modi:
   --background <Datei>     Fotografischer Hintergrund (Standardfall, object-fit:cover-Zuschnitt).
   --bg-color <#RRGGBB>     Flächiger Marken-Farbhintergrund für Diagramm-/Infografik-Slides (z. B.
                             ein Prozessschritt-Schaubild) — nur Marken-Farben verwenden (siehe
-                            brand/color-palette.json): Fast White #FFFFFF, Light Grey #F5F5F5,
-                            Anthracite Black #1B1B1B. Bei hellem --bg-color automatisch dunkle
+                            brand/color-palette.json): Fast White #FFFFFF, Light Grey #F8F8F8,
+                            Ink Black #0D0E11. Bei hellem --bg-color automatisch dunkle
                             Schrift verwenden (--dark-text), bei dunklem Hintergrund weiße Schrift
                             (Standard).
 Genau eines der beiden Argumente ist Pflicht.
@@ -62,7 +62,7 @@ def parse_args():
     p = argparse.ArgumentParser(description="Komponiert eine markenkonforme Social-/Signatur-Slide.")
     bg_group = p.add_mutually_exclusive_group(required=True)
     bg_group.add_argument("--background", help="Pfad zum fotografischen Hintergrundbild.")
-    bg_group.add_argument("--bg-color", help="Flächiger Marken-Farbhintergrund als Hex, z. B. '#1B1B1B' (fuer Diagramm-/Infografik-Slides ohne Foto).")
+    bg_group.add_argument("--bg-color", help="Flächiger Marken-Farbhintergrund als Hex, z. B. '#0D0E11' (fuer Diagramm-/Infografik-Slides ohne Foto).")
     p.add_argument("--dark-text", action="store_true", help="Dunkle (anthrazitfarbene) statt weisse Schrift verwenden — bei hellem --bg-color noetig.")
     p.add_argument("--font-dir", required=True, help="Ordner mit Nudica-Regular.otf und Nudica-Bold.otf.")
     p.add_argument("--logo", default=None, help="Pfad zum Logo/Bildzeichen (z. B. MSE Favicon.png). Optional, aber empfohlen — immer verwenden, wenn vorhanden.")
@@ -81,9 +81,9 @@ def parse_args():
 
 # MSE-Markenfarben (siehe brand/color-palette.json) — hier hart hinterlegt, damit das Skript
 # ohne JSON-Parsing lauffaehig ist; bei Aenderung der Farbpalette hier UND in color-palette.json pflegen.
-ANTHRACITE = (27, 27, 27)
+ANTHRACITE = (13, 14, 17)      # Ink Black #0D0E11 (Website-Wert, siehe brand/website-design-system.md)
 WHITE = (255, 255, 255)
-MEDIUM_GREY = (112, 112, 112)
+MEDIUM_GREY = (93, 106, 119)   # Secondary Grey #5D6A77 (Website-Eyebrow-Grau)
 LIGHT_GREY_TEXT = (226, 226, 226)
 
 
