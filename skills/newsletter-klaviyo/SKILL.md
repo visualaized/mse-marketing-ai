@@ -159,6 +159,25 @@ Kommentar im Template für das erwartete HTML-Fragment). Bild-Platzhalter (`{{HE
 durch finale, gehostete Bild-URLs ersetzen (z. B. aus Klaviyo-Bildbibliothek oder Outputs-Ablage,
 sobald ein extern erreichbarer Link vorliegt).
 
+**Verbindliche Design-Regeln (Kundenvorgaben, bereits in beide Templates eingebaut — beim Anpassen
+nie zurückbauen):**
+
+1. **Typografie exakt im Website-Verhältnis** (verifiziert gegen mse-filterpressen.com):
+   - Headline: 40px, `font-weight: bold`, `line-height: 1.2` (48px), `letter-spacing: -0.02em`
+     (-0.8px), Farbe `#0D0E11`.
+   - Body: 15px, `line-height: 1.4` (21px), `font-weight: normal`, Farbe `#0D0E11`.
+   - Eyebrow: 16px, `line-height: 1.2`, `text-transform: uppercase`, `letter-spacing: 0.05em`
+     (0.8px), `font-weight: 600`, Farbe `#5D6A77`.
+   - **Eine Headline steht NIEMALS ohne Eyebrow darüber.**
+2. **Footer-Bild (Pflicht):** Über dem rechtlichen Footer steht IMMER das Bild
+   `brand/elements/MSE Newsletter Footer.png` in **voller Breite** (`{{FOOTER_IMAGE_URL}}`).
+   Das Bild liegt beim Kunden auf dem eigenen Server mit **identischem Unterordnerpfad** —
+   die gehostete URL endet also auf `/brand/elements/MSE%20Newsletter%20Footer.png`.
+3. **Rechtlicher Footer nahtlos darunter:** Hintergrund exakt `#000000` (= Hintergrundfarbe des
+   Footer-Bilds, verifiziert), heller Text (`#C9C9C9`, Links `#FFFFFF`), kein Abstand zwischen
+   Bild und Footer (Bild `display:block`, direkt anschließende Zelle).
+4. **Keine Faxnummer** — Fax wird laut Kundenvorgabe nirgends genannt.
+
 ### Schritt 5 — Qualitätssicherung (siehe Checkliste unten)
 Vor dem Anlegen in Klaviyo den fertigen HTML-Inhalt gegen die Checkliste in Abschnitt 4 prüfen.
 
@@ -214,9 +233,13 @@ Onboarding-/Infrastruktur-Thema ist, statt es hier zu lösen.
 - [ ] Farben im HTML korrekt: Fast White dominant, MSE Blue `#3498DB` nur als Akzent (CTA/Link,
       max. 10–15 % der Fläche), Anthracite Black `#1B1B1B` nur als Akzent-Band/-Box, kein
       vollflächiges Schwarz, kein Grün/Rot außer bei Eco:LOGIC-Inhalten.
-- [ ] Typografie: `font-family: 'Nudica', Arial, sans-serif` für Headline und Body, Headline in
-      Sentence case (nicht GROSSBUCHSTABEN), Eyebrow als kleine, getrackte Großbuchstaben-Zeile in
-      Medium Grey. Falls eine gehostete Nudica-Font-URL vorliegt: `@font-face`-Block aktiviert?
+- [ ] Typografie: `font-family: 'Nudica', Arial, sans-serif`, **Website-Verhältnisse eingehalten**
+      (Headline 40px bold `#0D0E11` lh 1.2 ls -0.02em; Body 15px lh 1.4 `#0D0E11`; Eyebrow 16px 600
+      uppercase ls 0.05em `#5D6A77`), Headline in Sentence case (nicht GROSSBUCHSTABEN), **keine
+      Headline ohne Eyebrow**. Falls eine gehostete Nudica-Font-URL vorliegt: `@font-face` aktiviert?
+- [ ] **Footer-Bild** (`brand/elements/MSE Newsletter Footer.png`) in voller Breite über dem
+      rechtlichen Footer, rechtlicher Footer **nahtlos** darunter auf `#000000` mit hellem Text?
+- [ ] **Keine Faxnummer** irgendwo im Mailing?
 - [ ] **{{LOGO_URL}} zeigt auf das echte Logo-Asset aus `brand/logo/`** — kein Klartext-Ersatz, kein
       selbst nachgezeichnetes/generiertes Logo, Header-Hintergrund bleibt Light Grey (Kontrastgrund
       für das dunkle Logo)?

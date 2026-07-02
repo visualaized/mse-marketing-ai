@@ -7,10 +7,12 @@ Body-Text + optional CTA-Pille + Logo/Bildzeichen-Ecke) für Social-Media-Carous
 E-Mail-Signatur-Banner o. ä. — nach demselben Prinzip wie das Signatur-Banner der Marketing-Zentrale:
 echte Nudica-Schriftdatei statt System-Font, echtes Logo-Asset statt Klartext.
 
-Lesbarkeit: KEIN Schlagschatten/Umriss auf den Buchstaben (das sieht schnell nach Effekt-Spielerei
-aus und ist nicht on-brand) und KEIN flächiges Overlay über dem gesamten Bild. Stattdessen ein
-dezenter, nach oben ausblendender Verlaufs-Scrim NUR im Textbereich (unterer Bildbereich) — ein in
-der Editorial-/Poster-Gestaltung übliches, sauberes Mittel für Lesbarkeit ohne Schatten-Optik.
+Lesbarkeit — zwei Mittel, beide dezent (KEIN harter, versetzter Umriss und KEIN flächiges Overlay
+über dem gesamten Bild):
+1. Ein nach oben ausblendender Verlaufs-Scrim NUR im Textbereich (unterer Bildbereich).
+2. Bei hellem Text auf Foto-Hintergrund zusätzlich ein LEICHTER, WEICHER Schatten direkt hinter
+   den Buchstaben (Gaussian-Blur, minimaler Versatz) — Kundenvorgabe: landet helle Schrift auf
+   hellen Bildbereichen (z. B. Edelstahlflächen), muss sie sich per Soft-Schatten abheben.
 
 Zwei Hintergrund-Modi:
   --background <Datei>     Fotografischer Hintergrund (Standardfall, object-fit:cover-Zuschnitt).
@@ -53,7 +55,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 
 def parse_args():
@@ -220,41 +222,63 @@ def main():
         apply_text_scrim(canvas, zone_top=y_start - int(args.height * 0.05), width=args.width, height=args.height, dark_text=args.dark_text)
         draw = ImageDraw.Draw(canvas)  # neu binden, da alpha_composite ein neues Bildobjekt-Backing nutzt
 
+    # Der gesamte Textblock wird auf eine SEPARATE, transparente Ebene gezeichnet. Bei hellem
+    # Text auf Foto-Hintergrund wird darunter eine weich geblurte, dunkle Kopie der Ebene gelegt
+    # (dezenter Soft-Schatten) — Kundenvorgabe: landet helle Schrift auf hellen Bildbereichen,
+    # braucht sie einen leichten Schatten zum Abheben. Das ist bewusst KEIN harter, versetzter
+    # Umriss (der frühere Per-Buchstaben-Offset-Schatten sah nach Effekt-Spielerei aus), sondern
+    # ein weicher Blur direkt hinter den Buchstaben.
+    text_layer = Image.new("RGBA", (args.width, args.height), (0, 0, 0, 0))
+    tdraw = ImageDraw.Draw(text_layer)
+
     y = y_start
 
     if args.eyebrow:
-        draw_tracked_text(draw, (margin, y), args.eyebrow.upper(), eyebrow_font, eyebrow_color, tracking=3)
+        draw_tracked_text(tdraw, (margin, y), args.eyebrow.upper(), eyebrow_font, eyebrow_color, tracking=3)
         y += int(eyebrow_font.size * 1.8)
 
-    for line in wrap_text(draw, args.headline, bold, max_text_width):
-        draw.text((margin, y), line, font=bold, fill=text_color)
+    for line in wrap_text(tdraw, args.headline, bold, max_text_width):
+        tdraw.text((margin, y), line, font=bold, fill=text_color)
         y += int(bold.size * 1.18)
 
     if args.body:
         y += int(bold.size * 0.25)
-        for line in wrap_text(draw, args.body, regular, max_text_width):
-            draw.text((margin, y), line, font=regular, fill=secondary_text_color)
+        for line in wrap_text(tdraw, args.body, regular, max_text_width):
+            tdraw.text((margin, y), line, font=regular, fill=secondary_text_color)
             y += int(regular.size * 1.35)
 
     if args.cta:
         y += int(args.height * 0.03)
         pad_x, pad_y = int(args.width * 0.035), int(args.width * 0.022)
         circle_d = int(args.width * 0.045)
-        label_w = draw.textlength(args.cta.upper(), font=cta_font) + len(args.cta) * 1.5
+        label_w = tdraw.textlength(args.cta.upper(), font=cta_font) + len(args.cta) * 1.5
         pill_w = int(pad_x * 2 + label_w + 14 + circle_d)
         pill_h = int(circle_d + pad_y)
         pill_bg = WHITE if not args.dark_text else ANTHRACITE
         pill_fg = ANTHRACITE if not args.dark_text else WHITE
-        draw.rounded_rectangle([margin, y, margin + pill_w, y + pill_h], radius=pill_h // 2, fill=pill_bg)
-        draw_tracked_text(draw, (margin + pad_x, y + pill_h // 2 - cta_font.size // 2), args.cta.upper(), cta_font, pill_fg, tracking=1.5)
+        tdraw.rounded_rectangle([margin, y, margin + pill_w, y + pill_h], radius=pill_h // 2, fill=pill_bg)
+        draw_tracked_text(tdraw, (margin + pad_x, y + pill_h // 2 - cta_font.size // 2), args.cta.upper(), cta_font, pill_fg, tracking=1.5)
         cx0 = margin + pill_w - pad_x - circle_d
         cy0 = y + (pill_h - circle_d) // 2
-        draw.ellipse([cx0, cy0, cx0 + circle_d, cy0 + circle_d], outline=pill_fg, width=2)
+        tdraw.ellipse([cx0, cy0, cx0 + circle_d, cy0 + circle_d], outline=pill_fg, width=2)
         acx, acy = cx0 + circle_d // 2, cy0 + circle_d // 2
         r = circle_d * 0.22
-        draw.line([acx - r, acy + r, acx + r, acy - r], fill=pill_fg, width=2)
-        draw.line([acx + r, acy - r, acx, acy - r], fill=pill_fg, width=2)
-        draw.line([acx + r, acy - r, acx + r, acy], fill=pill_fg, width=2)
+        tdraw.line([acx - r, acy + r, acx + r, acy - r], fill=pill_fg, width=2)
+        tdraw.line([acx + r, acy - r, acx, acy - r], fill=pill_fg, width=2)
+        tdraw.line([acx + r, acy - r, acx + r, acy], fill=pill_fg, width=2)
+
+    # Soft-Schatten: nur bei hellem Text auf Foto-Hintergrund (dort kann die Schrift auf helle
+    # Bildbereiche treffen — z. B. Edelstahlflächen); auf flächigen Marken-Farben ist der
+    # Kontrast ohnehin garantiert.
+    if args.background and not args.dark_text:
+        shadow_alpha = text_layer.split()[3].point(lambda a: int(a * 0.55))
+        shadow = Image.new("RGBA", text_layer.size, (0, 0, 0, 0))
+        shadow.paste((13, 14, 17, 255), mask=shadow_alpha)
+        shadow = shadow.filter(ImageFilter.GaussianBlur(radius=max(3, args.width // 300)))
+        offset = max(1, args.width // 550)
+        canvas.alpha_composite(shadow, (0, offset))
+
+    canvas.alpha_composite(text_layer)
 
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)

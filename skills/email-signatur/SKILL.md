@@ -39,8 +39,8 @@ statt Dunkel/Hell:
 2. **Zweisprachige Grußzeile**: "Mit freundlichen Grüßen / Best regards".
 3. **Name** fett, groß; darunter **zweisprachige Funktionsbezeichnung** (DE | EN), z. B. „Technische
    Geschäftsführung | Chief Technical Officer"; darunter Abteilung/Bereich | „MSE Filterpressen GmbH".
-4. Dünne Trennlinie in **MSE Blue** (`#3498DB`) — einziger Farbakzent im Textblock, wie in der
-   generischen Baseline vorgesehen.
+4. Dünne Trennlinie in **dunkler Farbe** (Anthrazit `#1B1B1B`) — **Trennstriche sind laut
+   Kundenvorgabe NIEMALS blau** (gilt überall, nicht nur in der Signatur).
 5. **Kontaktzeilen mit kleinem Icon** links (Telefon, E-Mail, Website, Standort) — jede Zeile mit Icon
    + klickbarem Link (`tel:`, `mailto:`, Website-Link); Icons **anthrazitfarben** (nicht weiß), im
    Material-Symbols-Outlined-Stil (siehe `brand-guidelines.md` §7 zur Icon-Sprache).
@@ -293,7 +293,7 @@ zieht — es muss dann **nicht** pro Mitarbeiter eine eigene HTML-Datei erzeugt 
 | `department` | Abteilung/Bereich | `{{DEPARTMENT_DE}}` |
 | `telephoneNumber` | Direktdurchwahl | `{{PHONE}}` |
 | `mobile` | Mobiltelefon (optional) | — (neue optionale Zeile) |
-| `facsimileTelephoneNumber` | Fax (optional, falls benötigt) | — |
+| ~~`facsimileTelephoneNumber`~~ | Fax — **NICHT verwenden**: Faxnummern werden laut Kundenvorgabe nirgends genannt (gilt für alle Bausteine) | — |
 | `mail` | persönliche E-Mail-Adresse | `{{EMAIL}}` |
 | `streetAdress` | Straße/Hausnummer (**exakt diese Schreibweise**, kein Tippfehler — offizielle CI-Sign-Attributbezeichnung) | Teil von `{{ADDRESS}}` |
 | `postalCode` | PLZ | Teil von `{{ADDRESS}}` |
@@ -335,6 +335,11 @@ Sonderzeichen/Umlaute ausschreiben (z. B. "Jürgen Müller" → `juergen-mueller
       unsichtbar)? Durchgängig **anthrazitfarbene** (`#1B1B1B`) Schrift und Icons — nicht Weiß-auf-Dunkel?
 - [ ] **{{LOGO_URL}} zeigt auf das echte Logo-Asset aus `brand/logo/`** — nicht weggelassen, kein
       Klartext-Ersatz, kein selbst nachgezeichnetes/generiertes Logo?
+- [ ] **Trennlinie unter dem Namensblock in dunkler Farbe (`#1B1B1B`), NIEMALS blau** (Kundenvorgabe
+      für Trennstriche überall)?
+- [ ] **Keine Faxnummer** irgendwo in der Signatur (Kundenvorgabe: Fax wird nirgends genannt)?
+- [ ] **Banner-Bild: heller Text hebt sich auch über hellen Bildbereichen ab** (weicher Schatten,
+      macht `compose_slide.py` automatisch) — Sichtprüfung am fertigen Banner?
 - [ ] Zweisprachige Grußzeile und zweisprachige Funktionsbezeichnung (DE | EN) vorhanden?
 - [ ] Schriftart `'Nudica', Arial, sans-serif` (oder gleichwertiger Safe-Fallback-Stack) durchgängig?
 - [ ] Alle vier Kontaktzeilen (Telefon, E-Mail, Website, Standort) mit Icon **und** funktionierendem

@@ -73,10 +73,30 @@ Die Seite folgt dem MSE-Baukasten aus Modular-Block-Sections. Basis-Template:
 | **Lösung/Produkt** | Split Layout | 50/50 Text (weiß) / Bild (Vollbild, real). Zeigt, wie MSE das Problem löst — technisch, konkret. |
 | **Benefits/Features** | 3-Spalten-Cards | Hellgraue Karten, je ein technischer Vorteil/Spec mit kurzem Subhead + Text. |
 | **CTA** | Solid CTA + Kontaktverweis | Anthrazit-Pille, weißer getrackter Text, Pfeil ↗. CTA-Label = Verb + Outcome. |
-| **Footer** | — | Gesetzlicher Pflichttext (siehe Abschnitt 9). |
+| **Footer** | site-footer (dunkel) | **Immer derselbe Footer wie die Website** (`class="site-footer relative block js-dark"`-Nachbau, siehe Abschnitt 9). |
 
-Text-Fluss innerhalb jeder Sektion konsequent nach MSE-Muster: **große Headline → kurze Erklärung →
-technisches Wertversprechen → CTA** (sofern die Sektion einen CTA enthält).
+Text-Fluss innerhalb jeder Sektion konsequent nach MSE-Muster: **Eyebrow → große Headline → kurze
+Erklärung → technisches Wertversprechen → CTA** (sofern die Sektion einen CTA enthält).
+**Verbindlich: Eine Headline steht NIEMALS ohne Eyebrow darüber** — jede Sektion mit Headline hat
+einen Eyebrow-Platzhalter (`{{..._EYEBROW_DE}}`/`{{..._EYEBROW_EN}}`), auch Split- und CTA-Sektion.
+
+### 4a. Typografie & Abstände — exakt im Website-Verhältnis (Kundenvorgabe, verbindlich)
+
+Das Template setzt `html { font-size: 20px }` — dieselbe rem-Basis wie die Live-Website
+(mse-filterpressen.com, Theme-CSS verifiziert 2026-07-02). Dadurch entsprechen alle rem-Werte 1:1
+den Website-Proportionen. Nicht ändern und nicht auf px-Werte zurückbauen:
+
+| Element | Spezifikation |
+|---|---|
+| Headline (h2, Standard) | `2.5rem`, `font-weight: bold`, `line-height: 1.2`, `letter-spacing: -0.02em`, `color: #0D0E11` |
+| Hero-Headline (h1) | `4rem`, `font-weight: 900`, sonst wie h2 (Website `.alpha`); weiß auf dem dunklen Hero |
+| Body | `15px`, `line-height: 1.4`, `font-weight: normal`, `color: #0D0E11` |
+| Eyebrow (h5/.epsilon) | `1rem`, `line-height: 1.2`, `uppercase`, `letter-spacing: 0.05em`, `font-weight: 600`, `color: #5D6A77` |
+| Container | `max-width: 80rem`, seitliches Padding `3rem` (Desktop) |
+| Sektions-Padding | `6rem` vertikal (Desktop) |
+
+Textfarbe ist `#0D0E11` (Website-Wert), nicht `#1B1B1B`; Eyebrow-Grau ist `#5D6A77`. Link-Hover im
+Footer nutzt das Website-Blau `#3D96D2`.
 
 Inhaltliche Leitplanken:
 - Immer Sie-Ansprache.
@@ -184,8 +204,8 @@ Das Template setzt das Logo an zwei Stellen ein — beide sind Pflicht, nicht op
   (`brand/logo/MSE Favicon.png`) verwendet statt der vollen Wortmarke, weil dieses Icon auf jedem
   Hintergrund (hell wie dunkel) funktioniert — die volle Wortmarke ist dunkel/transparent und hätte
   auf dem dunklen Hero keinen Kontrast (kein freigegebenes Weiß-Logo-Asset vorhanden).
-- **`{{LOGO_URL}}`** — die volle Wortmarke (`brand/logo/Logo_06.10.2020_ohne Hintergrund.png`) im
-  hellen Footer, wo sie ausreichend Kontrast hat.
+- **`{{LOGO_URL}}`** — die volle Wortmarke (`brand/logo/Logo_06.10.2020_ohne Hintergrund.png`) für
+  helle Fl&auml;chen (der Footer ist inzwischen dunkel und kommt ohne Logo aus, siehe Abschnitt 9).
 
 Beide Pfade müssen auf **gehostete, öffentlich erreichbare URLs** zeigen (gleiche Logik wie bei
 Bildern, siehe Abschnitt 6/11) — niemals Klartext ("MSE Filterpressen" als Wort) als Ersatz einsetzen,
@@ -204,14 +224,30 @@ Hero-/Split-Bild im passenden Querformat generieren lassen (siehe dortige Format
 Landing-Page-Hero). Die finalen, extern erreichbaren Bild-URLs/-Pfade in `{{HERO_IMAGE_URL}}` und
 `{{SOLUTION_IMAGE_URL}}` einsetzen — niemals generische Stockfoto- oder Cartoon-Platzhalter.
 
-## 9. Footer (gesetzlicher Pflichttext, exakt und vollständig übernehmen)
+## 9. Footer — immer der Website-Footer (site-footer, dunkel)
+
+**Kundenvorgabe, verbindlich:** Jede Landing Page trägt denselben Footer wie die Live-Website
+(`class="site-footer relative block js-dark"`). Das Template enthält den Nachbau bereits —
+Struktur und Inhalte (verifiziert gegen mse-filterpressen.com am 2026-07-02):
+
+1. **Tagline-Block** oben, zentriert, groß/900: DE „Verstehen. Lösen. Vorantreiben. – Bereit, wenn
+   du es bist." / EN „Innovate. Solve. Accelerate. Ready when you are." — darunter helle Trennlinie
+   (`rgba(248,248,248,0.23)`).
+2. **Vier Spalten**: „MSE Filterpressen" (Adresse), „Up To Date" (Social: LinkedIn, Instagram,
+   YouTube — echte Profil-URLs), „Kontakt" (Telefon + `info@mse-filterpressen.de`), „Themen"
+   (Karriere, Impressum, Datenschutz, Zertifizierungen, Fachpresse, FAQ — Links auf die
+   Live-Website).
+3. **Rechtliche Zeile** darunter (klein, hell auf Schwarz), exakt und vollständig:
 
 ```
 MSE Filterpressen GmbH · Am Eisengraben 3 · 75196 Remchingen · Deutschland ·
-Tel. +49 (0) 7232 3650-0 · info@mse-filterpressen.de · mse-filterpressen.com ·
 Geschäftsführer: Giuseppe Rumé, Riccardo Valerio Rumé · Amtsgericht Mannheim HRB 502677 ·
 USt-IdNr. DE 144200297.
 ```
+
+Hintergrund `#000`, ALLE Texte weiß (rechtliche Zeile `#C9C9C9`), Link-Hover `#3D96D2`. **Keine
+Faxnummer** (Kundenvorgabe: Fax wird nirgends genannt). Den Footer niemals durch einen hellen
+Minimal-Footer ersetzen.
 
 ## 10. Ablage
 
@@ -267,7 +303,11 @@ damit die Zuordnung beim Hochladen stimmt.
 - [ ] Durchgehend korrekte Sie-Ansprache.
 - [ ] Schreibweise CellTRON® / MSE Filterpressen® korrekt.
 - [ ] Keine Wettbewerber namentlich genannt.
-- [ ] Gesetzlicher Footer vollständig und unverändert vorhanden.
+- [ ] **Typografie im Website-Verhältnis** (Abschnitt 4a): Headline 2.5rem bold `#0D0E11`, Body 15px
+      lh 1.4, Eyebrow 1rem 600 `#5D6A77`, `html { font-size: 20px }` unverändert?
+- [ ] **Keine Headline ohne Eyebrow** — jede Sektion mit Headline hat einen befüllten Eyebrow?
+- [ ] **Website-Footer (site-footer, dunkel) vorhanden** — Tagline, vier Spalten, Themen-Links,
+      rechtliche Zeile auf `#000` mit hellem Text (Abschnitt 9)? Keine Faxnummer?
 - [ ] Keine erfundenen Statistiken, Studien oder Claims — alles auf `CLAUDE.md`/`brand-guidelines.md`
       bzw. Nutzerangaben rückführbar.
 - [ ] Subdomain-Slot (A/B) mit dem Nutzer geklärt und in Dateiname/Notiz vermerkt.

@@ -235,7 +235,9 @@ exakt gleich aus.
 `bild-video-generierung/scripts/compose_slide.py`) — ein fertiges, getestetes Python-Skript (nur
 Pillow, bereits in dieser Umgebung installiert), das genau das macht: echte Nudica-Schriftdatei
 laden, Foto auf Zielformat zuschneiden (`object-fit: cover`-Logik), Eyebrow/Headline/Body mit
-Schlagschatten (kein flächiges Overlay, siehe `landing-pages`-Konvention) und optional eine
+dezentem Text-Scrim plus — bei hellem Text auf Foto — einem leichten, WEICHEN Schatten hinter den
+Buchstaben (Kundenvorgabe: helle Schrift auf hellen Bildbereichen muss sich abheben; kein harter
+Umriss, kein flächiges Overlay, siehe `landing-pages`-Konvention) und optional eine
 CTA-Pille sowie eine Fortschrittsanzeige ("2/5") zeichnen, echtes Logo/Bildzeichen einbetten, als
 PNG speichern. **Dieses Skript verwenden, nicht selbst neu erfinden** — bei Bedarf Parameter
 anpassen, aber die Kernlogik (echte Fonts, echtes Logo, kein Overlay) beibehalten.

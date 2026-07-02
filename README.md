@@ -72,6 +72,24 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.10.0** (2026-07-02) — **Design-Angleichung an die Live-Website** (Kundenvorgaben, Stil aus
+  mse-filterpressen.com/Theme-CSS extrahiert und verifiziert):
+  1. **Typografie-Verhältnisse wie Website** in Landing-Page- und Newsletter-Templates:
+     Headline 2.5rem/bold/`#0D0E11`/lh 1.2/ls -0.02em (Hero 4rem/900), Body 15px/lh 1.4/`#0D0E11`,
+     Eyebrow 1rem/600/uppercase/ls 0.05em/`#5D6A77`; Landing Page mit Website-rem-Basis
+     (`html{font-size:20px}`), Container 80rem/3rem, Sektions-Padding 6rem. **Nie eine Headline
+     ohne Eyebrow** (neue Eyebrow-Slots in Split- und CTA-Sektion, Pflichtregel in allen Skills).
+  2. **Landing Pages: Website-Footer** — Nachbau des `site-footer js-dark` (schwarz, Tagline
+     „Verstehen. Lösen. Vorantreiben. …", vier Spalten mit echten Social-/Themen-Links,
+     rechtliche Zeile, Hover-Blau `#3D96D2`).
+  3. **Newsletter: Footer-Bild + nahtloser Rechtsfooter** — `brand/elements/MSE Newsletter
+     Footer.png` immer in voller Breite über dem rechtlichen Footer; dieser nahtlos darunter auf
+     `#000000` mit hellem Text (neuer Platzhalter `{{FOOTER_IMAGE_URL}}`).
+  4. **Keine Faxnummer mehr, nirgends** (aus Templates/Doku entfernt, als Verbotsregel verankert);
+     **Trennstriche immer dunkel, nie blau** (Signatur-Templates umgestellt).
+  5. **`compose_slide.py`: leichter, weicher Schatten** hinter hellem Text auf Foto-Hintergründen
+     (Gaussian-Blur, kein harter Umriss) — helle Schrift hebt sich jetzt auch auf hellen
+     Bildbereichen ab; Signatur-Banner neu erzeugt.
 - **1.9.0** (2026-07-02) — Kampagnen-Dashboard: Inhalte-Anzeige + Bearbeiten/Löschen + Datenbereinigung:
   1. **Generierte Inhalte pro Kampagne sichtbar:** neues optionales `meta.json`-Feld
      `inhalte: [{label, pfad}]` — das Dashboard zeigt pro Kampagne eine ausklappbare Link-Liste

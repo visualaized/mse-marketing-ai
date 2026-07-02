@@ -39,7 +39,7 @@
   @media only screen and (max-width: 640px) {
     .mse-container { width: 100% !important; max-width: 100% !important; }
     .mse-px { padding-left: 20px !important; padding-right: 20px !important; }
-    .mse-headline { font-size: 24px !important; line-height: 32px !important; }
+    .mse-headline { font-size: 28px !important; line-height: 34px !important; }
     .mse-hero-img { width: 100% !important; height: auto !important; }
     .mse-split-col { display: block !important; width: 100% !important; }
     .mse-split-img, .mse-split-text { display: block !important; width: 100% !important; padding: 0 !important; }
@@ -89,10 +89,10 @@
             <!-- Eyebrow + Headline -->
             <tr>
               <td class="mse-px" style="padding: 40px 40px 0 40px; background-color:#FFFFFF;">
-                <p style="margin:0 0 12px 0; font-family:'Nudica', Arial, sans-serif; font-size:12px; line-height:16px; letter-spacing:2px; text-transform:uppercase; color:#707070;">
+                <p style="margin:0 0 14px 0; font-family:'Nudica', Arial, sans-serif; font-size:16px; line-height:19px; letter-spacing:0.8px; text-transform:uppercase; font-weight:600; color:#5D6A77;">
                   {{EYEBROW}}
                 </p>
-                <h1 class="mse-headline" style="margin:0; font-family:'Nudica', Arial, sans-serif; font-size:30px; line-height:38px; font-weight:700; color:#1B1B1B;">
+                <h1 class="mse-headline" style="margin:0; font-family:'Nudica', Arial, sans-serif; font-size:40px; line-height:48px; font-weight:bold; letter-spacing:-0.8px; color:#0D0E11;">
                   {{HEADLINE}}
                 </h1>
               </td>
@@ -101,7 +101,7 @@
             <!-- Body text -->
             <tr>
               <td class="mse-px" style="padding: 20px 40px 8px 40px; background-color:#FFFFFF;">
-                <p style="margin:0; font-family:'Nudica', Arial, sans-serif; font-size:16px; line-height:26px; color:#3A3A3A;">
+                <p style="margin:0; font-family:'Nudica', Arial, sans-serif; font-size:15px; line-height:21px; color:#0D0E11;">
                   {{BODY_TEXT}}
                 </p>
               </td>
@@ -128,10 +128,10 @@
                 <table role="presentation" class="mse-split-col" width="260" cellpadding="0" cellspacing="0" border="0" style="display:inline-block; width:260px; vertical-align:top;">
                   <tr>
                     <td class="mse-split-text" style="padding: 0 0 16px 16px;">
-                      <p style="margin:0 0 8px 0; font-family:'Nudica', Arial, sans-serif; font-size:12px; line-height:16px; letter-spacing:1.5px; text-transform:uppercase; color:#707070;">
+                      <p style="margin:0 0 8px 0; font-family:'Nudica', Arial, sans-serif; font-size:14px; line-height:17px; letter-spacing:0.7px; text-transform:uppercase; font-weight:600; color:#5D6A77;">
                         {{PRODUCT_EYEBROW}}
                       </p>
-                      <p style="margin:0; font-family:'Nudica', Arial, sans-serif; font-size:15px; line-height:24px; color:#3A3A3A;">
+                      <p style="margin:0; font-family:'Nudica', Arial, sans-serif; font-size:15px; line-height:21px; color:#0D0E11;">
                         {{PRODUCT_HIGHLIGHT_TEXT}}
                       </p>
                     </td>
@@ -192,32 +192,31 @@
               </td>
             </tr>
 
-            <!-- Thin divider -->
+            <!-- Footer-Bild (Kundenvorgabe: IMMER dieses Bild in voller Breite über dem
+                 rechtlichen Footer): brand/elements/MSE Newsletter Footer.png — {{FOOTER_IMAGE_URL}}
+                 zeigt auf die gehostete Kopie mit identischem Unterordnerpfad. -->
             <tr>
-              <td style="padding: 0 40px; background-color:#FFFFFF;">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                  <tr>
-                    <td style="border-top:1px solid #F5F5F5; font-size:1px; line-height:1px;">&nbsp;</td>
-                  </tr>
-                </table>
+              <td style="background-color:#000000; padding:0; font-size:0; line-height:0;">
+                <img src="{{FOOTER_IMAGE_URL}}" alt="Innovate. Solve. Accelerate. Ready when you are." width="640" class="mse-hero-img" style="display:block; width:100%; max-width:640px; height:auto; border:0;">
               </td>
             </tr>
 
-            <!-- Footer -->
+            <!-- Rechtlicher Footer — nahtlos unter dem Footer-Bild: gleiche Hintergrundfarbe
+                 (#000000 = Bildhintergrund) und heller Text. Keine Faxnummer (Kundenvorgabe). -->
             <tr>
-              <td class="mse-px" style="padding: 28px 40px 36px 40px; background-color:#FFFFFF;">
-                <p style="margin:0 0 16px 0; font-family:'Nudica', Arial, sans-serif; font-size:11px; line-height:18px; color:#707070;">
+              <td class="mse-px" bgcolor="#000000" style="padding: 28px 40px 36px 40px; background-color:#000000;">
+                <p style="margin:0 0 16px 0; font-family:'Nudica', Arial, sans-serif; font-size:11px; line-height:18px; color:#C9C9C9;">
                   MSE Filterpressen GmbH &middot; Am Eisengraben 3 &middot; 75196 Remchingen &middot; Deutschland &middot;
-                  Tel. +49 (0) 7232 3650-0 &middot; Fax -80 &middot;
-                  <a href="mailto:info@mse-filterpressen.de" style="color:#707070; text-decoration:underline;">info@mse-filterpressen.de</a>
-                  (Vertrieb: <a href="mailto:vertrieb@mse-filterpressen.de" style="color:#707070; text-decoration:underline;">vertrieb@mse-filterpressen.de</a>) &middot;
-                  <a href="https://mse-filterpressen.com" style="color:#707070; text-decoration:underline;">mse-filterpressen.com</a> &middot;
+                  Tel. +49 (0) 7232 3650-0 &middot;
+                  <a href="mailto:info@mse-filterpressen.de" style="color:#FFFFFF; text-decoration:underline;">info@mse-filterpressen.de</a>
+                  (Vertrieb: <a href="mailto:vertrieb@mse-filterpressen.de" style="color:#FFFFFF; text-decoration:underline;">vertrieb@mse-filterpressen.de</a>) &middot;
+                  <a href="https://mse-filterpressen.com" style="color:#FFFFFF; text-decoration:underline;">mse-filterpressen.com</a> &middot;
                   Gesch&auml;ftsf&uuml;hrer: Giuseppe Rum&eacute;, Riccardo Valerio Rum&eacute; &middot;
                   Amtsgericht Mannheim HRB 502677 &middot; USt-IdNr. DE 144200297.
                 </p>
-                <p style="margin:0; font-family:'Nudica', Arial, sans-serif; font-size:11px; line-height:18px; color:#707070;">
+                <p style="margin:0; font-family:'Nudica', Arial, sans-serif; font-size:11px; line-height:18px; color:#C9C9C9;">
                   Sie m&ouml;chten diese E-Mails nicht mehr erhalten?
-                  <a href="{{ unsubscribe_link }}" style="color:#707070; text-decoration:underline;">Hier abmelden</a>.
+                  <a href="{{ unsubscribe_link }}" style="color:#FFFFFF; text-decoration:underline;">Hier abmelden</a>.
                 </p>
               </td>
             </tr>

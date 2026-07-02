@@ -42,55 +42,71 @@
 
   * { box-sizing: border-box; }
 
-  html { scroll-behavior: smooth; }
+  /* Typografie-Basis EXAKT wie die Live-Website (styles.css des _mse-Themes, verifiziert
+     2026-07-02): html { font-size: 20px } — dadurch entsprechen alle rem-Werte unten 1:1 den
+     Website-Verhältnissen. Diese Werte sind Kundenvorgabe und nicht verhandelbar. */
+  html {
+    scroll-behavior: smooth;
+    font-size: 20px;
+  }
 
   body {
     margin: 0;
     padding: 0;
     font-family: 'Nudica', Arial, sans-serif;
-    color: #3A3A3A;
+    font-size: 15px;          /* Body laut Vorgabe: 15px */
+    line-height: 1.4;
+    font-weight: normal;
+    color: #0D0E11;           /* Website-Textfarbe (nicht #1B1B1B) */
     background-color: #FFFFFF;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   img { max-width: 100%; display: block; }
 
-  a { text-decoration: none; }
+  a { text-decoration: none; color: inherit; }
 
+  /* Eyebrow = h5/.epsilon der Website — IMMER über jeder Headline (Pflicht, nie Headline ohne
+     Eyebrow) */
   .eyebrow {
-    font-size: 12px;
-    line-height: 16px;
-    letter-spacing: 2.5px;
+    font-size: 1rem;
+    line-height: 1.2;
     text-transform: uppercase;
-    color: #707070;
-    margin: 0 0 16px 0;
-    font-weight: 700;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    color: #5D6A77;
+    margin: 0 0 1.2rem 0;
   }
 
   .eyebrow--on-dark { color: #C9C9C9; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
 
   h1, h2, h3 {
     font-family: 'Nudica', Arial, sans-serif;
-    font-weight: 700;
+    font-weight: bold;
     margin: 0;
+    color: #0D0E11;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
   }
 
-  /* Sentence case enforced by content, never uppercase via CSS on headlines */
-  h1 { font-size: 34px; line-height: 42px; color: #1B1B1B; }
-  h2 { font-size: 30px; line-height: 38px; color: #1B1B1B; }
-  h3 { font-size: 19px; line-height: 26px; color: #1B1B1B; }
+  /* Headline-Skala wie Website: h1/.alpha = 4rem/900 (Hero), Standard-Headline = 2.5rem bold */
+  h1 { font-size: 4rem; font-weight: 900; }
+  h2 { font-size: 2.5rem; }
+  h3 { font-size: 1.2rem; }
 
-  p { margin: 0; font-size: 16px; line-height: 27px; color: #3A3A3A; }
+  p { margin: 0; font-size: 15px; line-height: 1.4; color: #0D0E11; }
 
   .section {
-    padding: 72px 24px;
+    padding: 6rem 1.5rem;
   }
 
   .section--light { background-color: #FFFFFF; }
   .section--grey  { background-color: #F5F5F5; }
 
+  /* Container wie Website: max-width 80rem, seitliches Padding 3rem */
   .container {
-    max-width: 1080px;
+    max-width: 80rem;
     margin: 0 auto;
   }
 
@@ -216,8 +232,10 @@
 
   .hero__headline {
     color: #FFFFFF;
-    font-size: 40px;
-    line-height: 50px;
+    font-size: 2.5rem;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: -0.02em;
     text-shadow: 0 2px 16px rgba(0,0,0,0.55);
   }
 
@@ -364,27 +382,73 @@
   .cta-section {
     background-color: #F5F5F5;
     text-align: center;
-    padding: 88px 24px;
+    padding: 4.4rem 1.5rem;
   }
 
-  .cta-section h2 { margin-bottom: 32px; }
+  .cta-section h2 { margin-bottom: 1.6rem; }
 
-  /* ---------- Footer ---------- */
+  /* ============================================================
+     Footer — Nachbau des Website-Footers (class="site-footer relative
+     block js-dark", verifiziert gegen mse-filterpressen.com am
+     2026-07-02): schwarzer Hintergrund (#000), ALLE Texte weiß,
+     Link-Hover in Website-Blau #3D96D2, große Tagline oben mit
+     heller Trennlinie (rgba(248,248,248,0.23)), darunter vier
+     Spalten (Firma/Adresse, Up To Date + Social, Kontakt, Themen).
+     Landing Pages tragen laut Kundenvorgabe IMMER diesen Footer.
+     ============================================================ */
 
-  .footer {
-    background-color: #FFFFFF;
-    padding: 40px 24px 48px 24px;
-    border-top: 1px solid #E2E2E2;
+  .site-footer {
+    background: #000;
+    padding-bottom: 3rem;
+    overflow: hidden;
   }
 
-  .footer p {
-    max-width: 1080px;
-    margin: 0 auto;
-    font-size: 12px;
-    line-height: 20px;
-    color: #707070;
+  .site-footer, .site-footer p, .site-footer a, .site-footer span { color: #FFF; }
+
+  .site-footer a { transition: color .3s cubic-bezier(0.17, 0.55, 0.44, 1.02); }
+  .site-footer a:hover { color: #3D96D2; }
+
+  .site-footer .eyebrow { color: #C9C9C9; margin-bottom: 0.9rem; }
+
+  .footer__top {
+    padding: 4.5rem 1.5rem 5rem 1.5rem;
+    border-bottom: 1px solid rgba(248, 248, 248, 0.23);
+    margin-bottom: 4rem;
     text-align: center;
   }
+
+  .footer__tagline {
+    font-size: 2rem;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    max-width: 60rem;
+    margin: 0 auto;
+  }
+
+  .footer__bottom {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.4rem;
+  }
+
+  .footer__col p { font-size: 15px; line-height: 1.5; color: #FFF; }
+  .footer__col ul { list-style: none; margin: 0; padding: 0; }
+  .footer__col li { margin-bottom: 0.5rem; font-size: 15px; }
+
+  .footer__legal {
+    max-width: 80rem;
+    margin: 3.5rem auto 0 auto;
+    padding: 1.6rem 1.5rem 0 1.5rem;
+    border-top: 1px solid rgba(248, 248, 248, 0.23);
+    font-size: 12px;
+    line-height: 1.7;
+    color: #C9C9C9;
+  }
+  .footer__legal p { font-size: 12px; color: #C9C9C9; }
 
   /* ============================================================
      Responsive — Desktop breakpoint ab 768px
@@ -392,12 +456,14 @@
 
   @media (min-width: 768px) {
 
-    .section { padding: 100px 40px; }
+    .section { padding: 6rem 3rem; }
 
-    h1 { font-size: 52px; line-height: 62px; }
-    h2 { font-size: 38px; line-height: 46px; }
+    .hero__headline { font-size: 4rem; }
 
-    .hero__headline { font-size: 56px; line-height: 66px; }
+    .footer__top { padding: 7rem 3rem 8rem 3rem; margin-bottom: 6rem; }
+    .footer__tagline { font-size: 3rem; }
+    .footer__bottom { grid-template-columns: repeat(4, 1fr); padding: 0 3rem; }
+    .footer__legal { padding-left: 3rem; padding-right: 3rem; }
 
     .split {
       flex-direction: row;
@@ -485,6 +551,7 @@
   <section class="split">
     <div class="split__text">
       <div class="split__text-inner">
+        <p class="eyebrow" data-de="{{SOLUTION_EYEBROW_DE}}" data-en="{{SOLUTION_EYEBROW_EN}}"></p>
         <h2 data-de="{{SOLUTION_HEADLINE_DE}}" data-en="{{SOLUTION_HEADLINE_EN}}"></h2>
         <p style="margin-top: 20px;" data-de="{{SOLUTION_BODY_DE}}" data-en="{{SOLUTION_BODY_EN}}"></p>
       </div>
@@ -526,6 +593,7 @@
        ============================================================ -->
   <section class="cta-section">
     <div class="container center-block">
+      <p class="eyebrow" data-de="{{CTA_EYEBROW_DE}}" data-en="{{CTA_EYEBROW_EN}}"></p>
       <h2 data-de="{{CTA_HEADLINE_DE}}" data-en="{{CTA_HEADLINE_EN}}"></h2>
       <div style="margin-top: 36px;">
         <a class="btn-solid" href="{{CTA_BUTTON_URL_DE}}" data-href-de="{{CTA_BUTTON_URL_DE}}" data-href-en="{{CTA_BUTTON_URL_EN}}">
@@ -537,18 +605,73 @@
   </section>
 
   <!-- ============================================================
-       FOOTER (gesetzlicher Pflichttext — Firmierung/Adresse/Register
-       bleiben sprachunabhängig identisch, nur die Rollen-Bezeichnung
-       "Geschäftsführer" wird übersetzt)
+       FOOTER — Nachbau des Website-Footers (site-footer js-dark):
+       Landing Pages tragen laut Kundenvorgabe IMMER denselben Footer
+       wie die Website. Struktur, Texte und Links entsprechen dem
+       Live-Stand von mse-filterpressen.com (verifiziert 2026-07-02):
+       Tagline → 4 Spalten (Firma, Up To Date, Kontakt, Themen) →
+       rechtliche Zeile. Alle Links zeigen auf die Live-Website.
        ============================================================ -->
-  <footer class="footer">
-    <img src="{{LOGO_URL}}" alt="MSE Filterpressen" style="width:140px; height:auto; margin:0 auto 20px auto;">
-    <p>
-      MSE Filterpressen GmbH &middot; Am Eisengraben 3 &middot; 75196 Remchingen &middot; Deutschland &middot;
-      Tel. +49 (0) 7232 3650-0 &middot; info@mse-filterpressen.de &middot; mse-filterpressen.com &middot;
-      <span data-de="Gesch&auml;ftsf&uuml;hrer" data-en="Managing Directors"></span>: Giuseppe Rum&eacute;, Riccardo Valerio Rum&eacute; &middot;
-      Amtsgericht Mannheim HRB 502677 &middot; USt-IdNr. DE 144200297.
-    </p>
+  <footer class="site-footer">
+
+    <div class="footer__top">
+      <p class="footer__tagline"
+         data-de="Verstehen. L&ouml;sen. Vorantreiben. &ndash; Bereit, wenn du es bist."
+         data-en="Innovate. Solve. Accelerate. Ready when you are."></p>
+    </div>
+
+    <div class="footer__bottom">
+
+      <div class="footer__col">
+        <p class="eyebrow">MSE Filterpressen</p>
+        <p>Am Eisengraben 3<br>75196 Remchingen</p>
+      </div>
+
+      <div class="footer__col">
+        <p class="eyebrow">Up To Date</p>
+        <p data-de="Mehr von uns gibt&rsquo;s auf unseren Social Media Plattformen."
+           data-en="Find more from us on our social media channels."></p>
+        <ul style="margin-top: 0.8rem;">
+          <li><a href="https://www.linkedin.com/company/mse-filterpressen/" target="_blank" rel="noopener">LinkedIn</a></li>
+          <li><a href="https://www.instagram.com/msefilterpressen/" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="https://www.youtube.com/channel/UCepcUxpttwH0VA7mH9vR42w" target="_blank" rel="noopener">YouTube</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <p class="eyebrow" data-de="Kontakt" data-en="Contact"></p>
+        <p data-de="Wie k&ouml;nnen wir Ihnen helfen? Wir unterst&uuml;tzen Sie entlang des kompletten Lebenszyklus Ihrer Filterpresse."
+           data-en="How can we help? We support you along the entire life cycle of your filter press."></p>
+        <p style="margin-top: 0.8rem;">
+          Tel. +49 (0) 7232 3650-0<br>
+          <a href="mailto:info@mse-filterpressen.de">info@mse-filterpressen.de</a>
+        </p>
+      </div>
+
+      <div class="footer__col">
+        <p class="eyebrow" data-de="Themen" data-en="Topics"></p>
+        <ul>
+          <li><a href="https://mse-filterpressen.com/unternehmen/#karriere" data-de="Karriere" data-en="Careers"></a></li>
+          <li><a href="https://mse-filterpressen.com/impressum/" data-de="Impressum" data-en="Legal Notice"></a></li>
+          <li><a href="https://mse-filterpressen.com/datenschutz/" data-de="Datenschutz" data-en="Privacy Policy"></a></li>
+          <li><a href="https://mse-filterpressen.com/zertifizierungen/" data-de="Zertifizierungen" data-en="Certifications"></a></li>
+          <li><a href="https://mse-filterpressen.com/fachpresse/" data-de="Fachpresse" data-en="Trade Press"></a></li>
+          <li><a href="https://mse-filterpressen.com/faq/">FAQ</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Rechtliche Zeile (Firmierung/Register bleiben sprachunabhängig identisch, nur die
+         Rollen-Bezeichnung "Geschäftsführer" wird übersetzt) -->
+    <div class="footer__legal">
+      <p>
+        MSE Filterpressen GmbH &middot; Am Eisengraben 3 &middot; 75196 Remchingen &middot; Deutschland &middot;
+        <span data-de="Gesch&auml;ftsf&uuml;hrer" data-en="Managing Directors"></span>: Giuseppe Rum&eacute;, Riccardo Valerio Rum&eacute; &middot;
+        Amtsgericht Mannheim HRB 502677 &middot; USt-IdNr. DE 144200297.
+      </p>
+    </div>
+
   </footer>
 
   <!-- ============================================================

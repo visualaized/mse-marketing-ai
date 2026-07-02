@@ -132,6 +132,18 @@ jeweiligen Skills, aber immer mindestens):
   kein Grün/Rot außer Eco:LOGIC, Kontrastregel Schrift auf Hell/Dunkel)?
 - CellTRON®/MSE®-Schreibweisen korrekt, Wettbewerber nicht namentlich genannt?
 - CTA-Stil = Verb + Outcome?
+- **Kundenvorgaben Design (gelten für ALLE Bausteine, Stand 2026-07-02):**
+  - **Keine Faxnummer** — Fax wird nirgends genannt, in keinem Baustein.
+  - **Trennstriche/Divider immer in dunkler Farbe** (Anthrazit/Schwarz), **niemals blau**.
+  - **Nie eine Headline ohne Eyebrow** darüber — in jedem Baustein, jeder Sektion.
+  - **Typografie-Verhältnisse wie die Website**: Headline `2.5rem`/bold/`#0D0E11`/lh 1.2/ls -0.02em;
+    Body 15px/lh 1.4/`#0D0E11`; Eyebrow `1rem`/600/uppercase/ls 0.05em/`#5D6A77` (Details je
+    Baustein: `landing-pages` Abschnitt 4a, `newsletter-klaviyo` Schritt 4).
+  - **Heller Text auf hellen Bildbereichen** bekommt einen leichten, weichen Schatten zum Abheben
+    (macht `compose_slide.py` automatisch — keinen harten Umriss bauen).
+  - Landing Pages tragen **immer den Website-Footer** (site-footer, dunkel); Newsletter tragen
+    **immer das Footer-Bild** `brand/elements/MSE Newsletter Footer.png` + nahtlosen schwarzen
+    Rechtsfooter.
 - **Echtes Logo aus `brand/logo/` und echte Nudica-Schrift tatsächlich eingebunden** — niemals
   Klartext statt Logo, niemals stillschweigend nur beim Arial-Fallback bleiben, ohne die
   Font-Einbindung (Base64/gehostete URL, je nach Baustein) versucht zu haben. Nur bei E-Mail-Inhalten
