@@ -66,6 +66,10 @@ def parse_args():
     p.add_argument("--dark-text", action="store_true", help="Dunkle (anthrazitfarbene) statt weisse Schrift verwenden — bei hellem --bg-color noetig.")
     p.add_argument("--font-dir", required=True, help="Ordner mit Nudica-Regular.otf und Nudica-Bold.otf.")
     p.add_argument("--logo", default=None, help="Pfad zum Logo/Bildzeichen (z. B. MSE Favicon.png). Optional, aber empfohlen — immer verwenden, wenn vorhanden.")
+    p.add_argument("--logo-pos", default="tl", choices=["tl", "tr", "bl", "br", "headline"],
+                   help="Logo-Platzierung (Kundenvorgabe: NIE frei im Raum): eine der vier Bildecken "
+                        "(tl/tr/bl/br, mit einheitlichem Eckabstand) oder 'headline' = linksbündig "
+                        "mit passendem Abstand direkt über dem Headline-Block. Standard: tl.")
     p.add_argument("--eyebrow", default="", help="Kurzes, getracktes Label ueber der Headline (z. B. Kampagnen-/Serienname).")
     p.add_argument("--headline", required=True, help="Haupttext der Slide (kurz, 1-2 Zeilen).")
     p.add_argument("--body", default="", help="Optionaler kurzer Fliesstext unter der Headline (max. ~2-3 Zeilen).")
@@ -159,10 +163,18 @@ def main():
     args = parse_args()
     font_dir = Path(args.font_dir)
 
-    bold = ImageFont.truetype(str(font_dir / "Nudica-Bold.otf"), max(28, args.width // 22))
-    regular = ImageFont.truetype(str(font_dir / "Nudica-Regular.otf"), max(20, args.width // 34))
-    eyebrow_font = ImageFont.truetype(str(font_dir / "Nudica-Bold.otf"), max(16, args.width // 55))
-    cta_font = ImageFont.truetype(str(font_dir / "Nudica-Bold.otf"), max(16, args.width // 55))
+    # Schriftgroessen im WEBSITE-VERHAELTNIS (siehe brand/website-design-system.md §2):
+    # Eyebrow : Headline : Body = 1rem : 2.5rem : 15px = 0.4 : 1 : 0.3 — grosse, fette Headline,
+    # deutlich kleinerer Body, Eyebrow dazwischen. Gewichte wie Website: Headline bold (Nudica hat
+    # kein 900er-Schnitt, Bold ist das Maximum), Eyebrow 600 -> Nudica-Medium, Body Regular,
+    # CTA-Label bold in Eyebrow-Groesse (Website .btn = 1rem/bold).
+    headline_size = max(40, args.width // 13)
+    bold = ImageFont.truetype(str(font_dir / "Nudica-Bold.otf"), headline_size)
+    regular = ImageFont.truetype(str(font_dir / "Nudica-Regular.otf"), max(18, int(headline_size * 0.3)))
+    medium_path = font_dir / "Nudica-Medium.otf"
+    eyebrow_font = ImageFont.truetype(str(medium_path if medium_path.exists() else font_dir / "Nudica-Bold.otf"),
+                                      max(20, int(headline_size * 0.4)))
+    cta_font = ImageFont.truetype(str(font_dir / "Nudica-Bold.otf"), max(18, int(headline_size * 0.33)))
     index_font = ImageFont.truetype(str(font_dir / "Nudica-Regular.otf"), max(14, args.width // 65))
 
     if args.background:
@@ -182,29 +194,16 @@ def main():
     margin = int(args.width * 0.08)
     max_text_width = args.width - 2 * margin
 
-    # Logo/Bildzeichen oben links — IMMER einsetzen, wenn --logo angegeben ist (Markenpflicht).
-    if args.logo:
-        logo_img = Image.open(args.logo).convert("RGBA")
-        logo_w = int(args.width * 0.07)
-        ratio = logo_w / logo_img.width
-        logo_img = logo_img.resize((logo_w, int(logo_img.height * ratio)), Image.LANCZOS)
-        canvas.alpha_composite(logo_img, (margin, margin))
-
-    # Fortschrittsanzeige oben rechts (z. B. "2/5")
-    if args.index:
-        idx_w = draw.textlength(args.index, font=index_font)
-        draw.text((args.width - margin - idx_w, margin), args.index, font=index_font, fill=index_color)
-
     # Gesamthoehe des Textblocks VORAB messen, damit der Block bei flachen Formaten (z. B.
     # Signatur-Banner 1184x420) nach oben verschoben werden kann statt unten aus dem Bild zu
     # laufen — der CTA-Button darf NIE abgeschnitten werden.
     block_height = 0
     if args.eyebrow:
-        block_height += int(eyebrow_font.size * 1.8)
-    block_height += len(wrap_text(draw, args.headline, bold, max_text_width)) * int(bold.size * 1.18)
+        block_height += int(eyebrow_font.size * 1.6)
+    block_height += len(wrap_text(draw, args.headline, bold, max_text_width)) * int(bold.size * 1.2)
     if args.body:
         block_height += int(bold.size * 0.25)
-        block_height += len(wrap_text(draw, args.body, regular, max_text_width)) * int(regular.size * 1.35)
+        block_height += len(wrap_text(draw, args.body, regular, max_text_width)) * int(regular.size * 1.4)
     if args.cta:
         circle_d_probe = int(args.width * 0.045)
         pad_y_probe = int(args.width * 0.022)
@@ -222,6 +221,37 @@ def main():
         apply_text_scrim(canvas, zone_top=y_start - int(args.height * 0.05), width=args.width, height=args.height, dark_text=args.dark_text)
         draw = ImageDraw.Draw(canvas)  # neu binden, da alpha_composite ein neues Bildobjekt-Backing nutzt
 
+    # Logo/Bildzeichen — IMMER einsetzen, wenn --logo angegeben ist (Markenpflicht).
+    # PLATZIERUNGSREGEL (Kundenvorgabe): das Bildzeichen steht NIE frei im Raum — entweder in
+    # einer der vier Bildecken mit einheitlichem Eckabstand (unabhaengig vom Seitenverhaeltnis
+    # an der KLEINEREN Kante bemessen, damit es auch bei flachen Bannern optisch in der Ecke
+    # sitzt) oder linksbuendig mit passendem Abstand direkt UEBER dem Headline-Block.
+    if args.logo:
+        logo_img = Image.open(args.logo).convert("RGBA")
+        logo_w = int(args.width * 0.07)
+        ratio = logo_w / logo_img.width
+        logo_img = logo_img.resize((logo_w, int(logo_img.height * ratio)), Image.LANCZOS)
+        logo_h = logo_img.height
+        corner_pad = max(24, int(min(args.width, args.height) * 0.08))
+        if args.logo_pos == "tl":
+            pos = (corner_pad, corner_pad)
+        elif args.logo_pos == "tr":
+            pos = (args.width - corner_pad - logo_w, corner_pad)
+        elif args.logo_pos == "bl":
+            pos = (corner_pad, args.height - corner_pad - logo_h)
+        elif args.logo_pos == "br":
+            pos = (args.width - corner_pad - logo_w, args.height - corner_pad - logo_h)
+        else:  # headline: auf der Headline-Kante, mit Abstand direkt ueber dem Textblock
+            pos = (margin, max(corner_pad, y_start - logo_h - int(eyebrow_font.size * 0.9)))
+        canvas.alpha_composite(logo_img, pos)
+        draw = ImageDraw.Draw(canvas)
+
+    # Fortschrittsanzeige oben rechts — gleicher Eckabstand wie das Logo (Ecken-Regel).
+    if args.index:
+        corner_pad = max(24, int(min(args.width, args.height) * 0.08))
+        idx_w = draw.textlength(args.index, font=index_font)
+        draw.text((args.width - corner_pad - idx_w, corner_pad), args.index, font=index_font, fill=index_color)
+
     # Der gesamte Textblock wird auf eine SEPARATE, transparente Ebene gezeichnet. Bei hellem
     # Text auf Foto-Hintergrund wird darunter eine weich geblurte, dunkle Kopie der Ebene gelegt
     # (dezenter Soft-Schatten) — Kundenvorgabe: landet helle Schrift auf hellen Bildbereichen,
@@ -235,37 +265,37 @@ def main():
 
     if args.eyebrow:
         draw_tracked_text(tdraw, (margin, y), args.eyebrow.upper(), eyebrow_font, eyebrow_color, tracking=3)
-        y += int(eyebrow_font.size * 1.8)
+        y += int(eyebrow_font.size * 1.6)
 
     for line in wrap_text(tdraw, args.headline, bold, max_text_width):
         tdraw.text((margin, y), line, font=bold, fill=text_color)
-        y += int(bold.size * 1.18)
+        y += int(bold.size * 1.2)
 
     if args.body:
         y += int(bold.size * 0.25)
         for line in wrap_text(tdraw, args.body, regular, max_text_width):
             tdraw.text((margin, y), line, font=regular, fill=secondary_text_color)
-            y += int(regular.size * 1.35)
+            y += int(regular.size * 1.4)
 
     if args.cta:
+        # CTA im WEBSITE-STIL (.btn, siehe brand/website-design-system.md §3): KEINE Pille —
+        # 2rem-Pfeilkreis (1px currentColor, transparent gefuellt) LINKS, daneben das Label in
+        # GROSSBUCHSTABEN/bold. Farbe = Textfarbe (weiss auf Dunkel, Ink Black auf Hell).
         y += int(args.height * 0.03)
-        pad_x, pad_y = int(args.width * 0.035), int(args.width * 0.022)
-        circle_d = int(args.width * 0.045)
-        label_w = tdraw.textlength(args.cta.upper(), font=cta_font) + len(args.cta) * 1.5
-        pill_w = int(pad_x * 2 + label_w + 14 + circle_d)
-        pill_h = int(circle_d + pad_y)
-        pill_bg = WHITE if not args.dark_text else ANTHRACITE
-        pill_fg = ANTHRACITE if not args.dark_text else WHITE
-        tdraw.rounded_rectangle([margin, y, margin + pill_w, y + pill_h], radius=pill_h // 2, fill=pill_bg)
-        draw_tracked_text(tdraw, (margin + pad_x, y + pill_h // 2 - cta_font.size // 2), args.cta.upper(), cta_font, pill_fg, tracking=1.5)
-        cx0 = margin + pill_w - pad_x - circle_d
-        cy0 = y + (pill_h - circle_d) // 2
-        tdraw.ellipse([cx0, cy0, cx0 + circle_d, cy0 + circle_d], outline=pill_fg, width=2)
-        acx, acy = cx0 + circle_d // 2, cy0 + circle_d // 2
-        r = circle_d * 0.22
-        tdraw.line([acx - r, acy + r, acx + r, acy - r], fill=pill_fg, width=2)
-        tdraw.line([acx + r, acy - r, acx, acy - r], fill=pill_fg, width=2)
-        tdraw.line([acx + r, acy - r, acx + r, acy], fill=pill_fg, width=2)
+        circle_d = max(36, int(cta_font.size * 2.0))
+        cta_fg = text_color
+        cy0 = y
+        cx0 = margin
+        line_w = max(2, circle_d // 20)
+        tdraw.ellipse([cx0, cy0, cx0 + circle_d, cy0 + circle_d], outline=cta_fg, width=line_w)
+        acx, acy = cx0 + circle_d / 2, cy0 + circle_d / 2
+        r = circle_d * 0.2
+        tdraw.line([acx - r, acy + r, acx + r, acy - r], fill=cta_fg, width=line_w)
+        tdraw.line([acx + r, acy - r, acx + r - 2 * r * 0.9, acy - r], fill=cta_fg, width=line_w)
+        tdraw.line([acx + r, acy - r, acx + r, acy - r + 2 * r * 0.9], fill=cta_fg, width=line_w)
+        label_x = cx0 + circle_d + int(circle_d * 0.45)
+        label_y = cy0 + circle_d // 2 - cta_font.size // 2
+        draw_tracked_text(tdraw, (label_x, label_y), args.cta.upper(), cta_font, cta_fg, tracking=max(1.5, cta_font.size * 0.04))
 
     # Soft-Schatten: nur bei hellem Text auf Foto-Hintergrund (dort kann die Schrift auf helle
     # Bildbereiche treffen — z. B. Edelstahlflächen); auf flächigen Marken-Farben ist der

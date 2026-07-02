@@ -145,6 +145,9 @@ jeweiligen Skills, aber immer mindestens):
     Baustein: `landing-pages` Abschnitt 4a, `newsletter-klaviyo` Schritt 4).
   - **Heller Text auf hellen Bildbereichen** bekommt einen leichten, weichen Schatten zum Abheben
     (macht `compose_slide.py` automatisch — keinen harten Umriss bauen).
+  - **Bildzeichen nie frei im Raum**: nur in einer der vier Bildecken (einheitlicher Eckabstand)
+    oder horizontal auf der Headline-Kante mit Abstand darüber — bei jeder Verwendung
+    (`compose_slide.py`: `--logo-pos tl|tr|bl|br|headline`).
   - Landing Pages tragen **immer den Website-Footer** (site-footer, dunkel); Newsletter tragen
     **immer das Footer-Bild** `brand/elements/MSE Newsletter Footer.png` + nahtlosen schwarzen
     Rechtsfooter.

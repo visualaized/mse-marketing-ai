@@ -237,7 +237,12 @@ Pillow, bereits in dieser Umgebung installiert), das genau das macht: echte Nudi
 laden, Foto auf Zielformat zuschneiden (`object-fit: cover`-Logik), Eyebrow/Headline/Body mit
 dezentem Text-Scrim plus — bei hellem Text auf Foto — einem leichten, WEICHEN Schatten hinter den
 Buchstaben (Kundenvorgabe: helle Schrift auf hellen Bildbereichen muss sich abheben; kein harter
-Umriss, kein flächiges Overlay, siehe `landing-pages`-Konvention) und optional eine
+Umriss, kein flächiges Overlay, siehe `landing-pages`-Konvention). Schriftgrößen im
+**Website-Verhältnis** (Eyebrow : Headline : Body = 0.4 : 1 : 0.3, Eyebrow in Nudica-Medium wie
+das 600er-Gewicht der Website), CTA im **Website-.btn-Stil** (Pfeilkreis + Uppercase-Label, keine
+Pille). **Bildzeichen-Platzierung:** nie frei im Raum — `--logo-pos tl|tr|bl|br` (Bildecke mit
+einheitlichem Eckabstand, Standard `tl`) oder `--logo-pos headline` (mit Abstand direkt über dem
+Headline-Block); Details in `brand/website-design-system.md` §3. Optional eine
 CTA-Pille sowie eine Fortschrittsanzeige ("2/5") zeichnen, echtes Logo/Bildzeichen einbetten, als
 PNG speichern. **Dieses Skript verwenden, nicht selbst neu erfinden** — bei Bedarf Parameter
 anpassen, aber die Kernlogik (echte Fonts, echtes Logo, kein Overlay) beibehalten.

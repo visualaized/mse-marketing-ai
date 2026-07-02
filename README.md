@@ -72,6 +72,18 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.12.0** (2026-07-02) — Grafik-Kompositionen (compose_slide.py) exakt on Brand:
+  1. **Bildzeichen-Platzierungsregel (Kundenvorgabe):** Das Favicon-Bildzeichen steht nie mehr
+     frei im Raum — neue Option `--logo-pos tl|tr|bl|br|headline` (vier Bildecken mit
+     einheitlichem, an der kürzeren Kante bemessenem Eckabstand, oder mit Abstand direkt über
+     dem Headline-Block); Regel in `brand/website-design-system.md` §3 und der zentralen QA
+     verankert. Behebt das frei schwebende Logo auf flachen Bannern.
+  2. **Schriftgrößen/-gewichte im Website-Verhältnis:** Eyebrow : Headline : Body jetzt
+     0.4 : 1 : 0.3 wie die Website (statt Body fast in Headline-Größe); Headline deutlich größer
+     (width/13), Eyebrow in **Nudica-Medium** (Website-Gewicht 600 statt Bold), Body Regular.
+  3. **CTA im echten Website-Stil auch in Grafiken:** Pfeilkreis (1px currentColor) + Uppercase-
+     Bold-Label statt der bisherigen weißen Pille.
+  4. Signatur-Banner und Instagram-Carousel-Demo mit allen Fixes neu erzeugt.
 - **1.11.0** (2026-07-02) — **Vollständiges Website-Design-System extrahiert und als verbindliche
   CI-Grundlage verankert** (Theme-CSS + Seiten-HTML von mse-filterpressen.com komplett ausgewertet):
   1. **Neues Brand-Dokument `brand/website-design-system.md`** im Marketing Hub: verifizierte
