@@ -72,6 +72,10 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.13.2** (2026-07-03) — Landing-Page-Template: Haupt-CTA exakt im Website-.btn-Stil — der
+  Pfeilkreis steht jetzt LINKS vom Label (wie auf der Live-Website und konsistent zur
+  Whitepaper-Download-Zeile); Label-Span-Regression aus der Umstellung behoben.
+
 - **1.13.1** (2026-07-02) — Fix Whitepaper-Titelseite: **`text-shadow` wird von Chrome beim
   PDF-Export als eckige dunkle Kästen hinter den Textzeilen gerastert** (bekannter
   `--print-to-pdf`-Bug). Schatten aus der Druckvorlage entfernt; Lesbarkeit der Titelseite kommt
