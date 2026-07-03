@@ -133,6 +133,12 @@ Das Whitepaper ist das Download-Asset der Kampagne — genau dafür verlinken:
       keine Torten, Quellenzeile)?
 - [ ] Keine erfundenen Zahlen/Quellen; alle Fakten rückführbar; Umlaute nativ korrekt?
 - [ ] Kein Fax; Rechtsblock auf der Schlussseite korrekt; kein sichtbarer Platzhaltertext?
+- [ ] **Kein `text-shadow` irgendwo in der Vorlage** — Chrome rastert geblurte text-shadows beim
+      PDF-Export als eckige dunkle Kästen hinter den Textzeilen (bekannter Bug). Lesbarkeit auf
+      der Titelseite kommt ausschließlich vom `cover__scrim`-Verlauf (ein einziger linearer
+      Gradient ohne Zwischenstops — Zwischenstops erzeugen sichtbare Banding-Kanten im PDF)?
+- [ ] Cover-Foto geprüft: unteres Drittel ruhig genug für Titel/Subtitle (harte Hell-Dunkel-Kanten
+      im Motiv liegen idealerweise oberhalb des Textbereichs)?
 - [ ] PDF über `build_whitepaper.py` erzeugt und **jede Seite visuell geprüft** (Fonts echt,
       Umbrüche sauber, nichts abgeschnitten)?
 - [ ] Bei Kampagne: `meta.json` (`kanaele` + `inhalte`) aktualisiert; Newsletter-/Landing-Page-

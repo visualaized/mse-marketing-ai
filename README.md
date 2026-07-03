@@ -72,6 +72,12 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.13.1** (2026-07-02) — Fix Whitepaper-Titelseite: **`text-shadow` wird von Chrome beim
+  PDF-Export als eckige dunkle Kästen hinter den Textzeilen gerastert** (bekannter
+  `--print-to-pdf`-Bug). Schatten aus der Druckvorlage entfernt; Lesbarkeit der Titelseite kommt
+  jetzt von einem `cover__scrim`-Verlauf (EIN linearer Gradient ohne Zwischenstops —
+  Zwischenstops erzeugen im PDF sichtbare Banding-Kanten). Regel „kein text-shadow in
+  Druckvorlagen" + Cover-Foto-Check in der QA verankert; Demo-PDF neu gebaut und abgenommen.
 - **1.13.0** (2026-07-02) — **Neuer Baustein: PDF-Whitepaper** (Skill `whitepaper`):
   1. **A4-Druckvorlage** (`templates/whitepaper-template.html`) nach dem Website-Design-System:
      dunkle Titelseite mit Cover-Foto + „Whitepaper"-Badge, Sections mit Eyebrow→Headline→Body im
