@@ -237,8 +237,78 @@ Markdown-Posts etc.).
 | `POST /api/campaigns` | Neue geplante Kampagne. Body: `{thema, kanaele[], zeitraum_start, zeitraum_ende?, notiz?, verantwortlich?}`. Antwort `201` mit `{ok, slug, meta}`. |
 | `PUT /api/campaigns/<slug>` | Geplante Kampagne bearbeiten (gleicher Body wie POST; nur Status `"geplant"`, sonst 409). Vorhandene `inhalte`/`quelle` bleiben erhalten. |
 | `DELETE /api/campaigns/<slug>` | Geplante Kampagne löschen (nur Status `"geplant"`, sonst 409). Entfernt den Kampagnen-Ordner. |
+| `PATCH /api/campaigns/<slug>/termin` | Kalender-Drag&Drop: `{zeitraum_start}` verschieben (nur `"geplant"`); `zeitraum_ende` wandert um dieselbe Differenz mit. |
+| `GET /api/ideen` | Ideen-Sammlung + Themen-Tage (legt `Campaigns/ideen.json` mit Standard-Themen-Tagen an, falls fehlend). |
+| `POST /api/ideen` | Eigene Idee/Notiz erfassen: `{titel, beschreibung?, themen_tag?}` → `status:"offen"`, `quelle:"kunde"`. |
+| `PATCH /api/ideen/<id>` | Idee aktualisieren (`status` offen/akzeptiert/abgelehnt/umgesetzt, `titel`, `beschreibung`, `themen_tag`). |
+| `DELETE /api/ideen/<id>` | Idee löschen. |
 | `GET /campaigns-index.json` | Live generierter Kampagnen-Index (inkl. `slug` je Eintrag). |
 | `GET /hub/<pfad>` | Lesender Zugriff auf Dateien im Marketing-Hub-Root (für die Inhalte-Links; Traversal-geschützt, nur GET). Hub-Root = eine Ebene über dem App-Ordner, Override via `HUB_DIR`. |
+
+## 4a. Ideen-Sammlung & KI-Themenvorschläge (`Campaigns/ideen.json`)
+
+Das Dashboard ist auch **Ideen-Zentrale**: eine dritte Ansicht („Ideen") sammelt Themenideen für
+künftige Kampagnen — vom Kunden selbst erfasst oder **von Claude vorgeschlagen**.
+
+**Datenmodell (`Campaigns/ideen.json`):**
+
+```json
+{
+  "hinweis": "Themen-Tage sind Orientierung, nicht fix — Abweichungen sind ausdrücklich erlaubt.",
+  "themen_tage": [
+    { "tag": "Dienstag",   "fokus": "Tech / Produkt / Engineering" },
+    { "tag": "Donnerstag", "fokus": "Branchenbezug / Use Case / Kundenprojekt" },
+    { "tag": "Freitag",    "fokus": "Menschliches, Marke, Team" }
+  ],
+  "ideen": [
+    {
+      "id": "idee-<eindeutig>",
+      "titel": "…", "beschreibung": "…",
+      "themen_tag": "Dienstag — Tech / Produkt / Engineering",
+      "status": "offen", "quelle": "claude", "erfasst_am": "YYYY-MM-DD"
+    }
+  ]
+}
+```
+
+- `status`: `offen` → `akzeptiert` | `abgelehnt`; `akzeptiert` → `umgesetzt` (sobald daraus eine
+  Kampagne entstanden ist). `quelle`: `"claude"` (KI-Vorschlag) oder `"kunde"` (selbst erfasst).
+- Die Datei liegt bewusst als **Datei** in `Campaigns/` (der Kampagnen-Scanner liest nur Ordner).
+  `server.mjs` legt sie mit den Standard-Themen-Tagen an, falls sie fehlt.
+
+**Dashboard-Funktionen (Ideen-Ansicht):** Themen-Tage-Karten mit Hinweis „Orientierung, nicht
+fix"; offene Vorschläge mit **Akzeptieren/Ablehnen**; akzeptierte Ideen mit **„Als Kampagne
+einplanen"** (öffnet das Planungsformular vorbefüllt mit Titel + Beschreibung); eigenes Formular
+„+ Idee / Notiz erfassen"; abgelehnte Ideen reaktivieren oder löschen. Der Ideen-Tab zeigt eine
+Badge mit der Zahl offener Vorschläge.
+
+**Pflicht-Verhalten für Claude beim Vorschlagen von Themenideen** (Trigger: „Schlag mir
+Themenideen vor", „Ideen für nächste Woche/den Content-Plan" o. ä.):
+
+1. Markenkern laden (Themenfelder, Zielgruppen, laufende Kampagnen aus `Campaigns/` als Kontext —
+   keine Dubletten zu vorhandenen Ideen/Kampagnen vorschlagen).
+2. Vorschläge **entlang der `themen_tage`** aus `ideen.json` entwickeln (typisch 3–6 Stück, gern
+   je Themen-Tag mindestens einer). Die Themen-Tage sind **Orientierung, nicht fix** — ein starker
+   Vorschlag außerhalb des Rasters ist erlaubt und wird dann ohne `themen_tag` bzw. mit passender
+   Begründung in der Beschreibung eingetragen.
+3. Jede Idee als Eintrag mit `status: "offen"`, `quelle: "claude"`, eindeutiger `id`
+   (`idee-<timestamp/slug>`), kurzem `titel` (Kampagnen-tauglich) und 1–2 Sätzen `beschreibung`
+   (Kerngedanke, ggf. Kanal-Idee) **oben in das `ideen`-Array von `Campaigns/ideen.json`
+   schreiben** — vorhandene Einträge und `themen_tage` unverändert lassen.
+4. Dem Nutzer kurz melden, dass die Vorschläge im Dashboard (Ideen-Tab) zum
+   Akzeptieren/Ablehnen bereitliegen. **Niemals selbst akzeptieren/ablehnen** — das entscheidet
+   der Kunde im Dashboard.
+
+## 4b. Kalender-Ansicht
+
+Zweite Ansicht „Kalender": Monatsraster (Mo–So, Navigation ‹ ›), Kampagnen erscheinen als Chip an
+ihrem `zeitraum_start` (Statusfarben wie die Badges). **Klick auf einen Chip** öffnet das
+Detail-Modal (Status, Zeitraum, Kanäle, Verantwortlich/Notiz, klickbare Inhalte-Links, bei
+geplanten Kampagnen ein Bearbeiten-Shortcut). **Geplante Kampagnen** lassen sich **per Drag &
+Drop** auf einen anderen Tag ziehen — das ruft `PATCH /api/campaigns/<slug>/termin` auf,
+verschiebt `zeitraum_start` und wandert ein vorhandenes `zeitraum_ende` um dieselbe Differenz mit
+(Dauer bleibt erhalten). Kampagnen mit anderem Status sind im Kalender nur lesend. Die Spalten
+Di/Do/Fr tragen die Themen-Tage-Fokusse als dezente Orientierung.
 
 ## 5. Planungsabgleich durch die Marketing-Zentrale (Pflicht-Verhalten)
 

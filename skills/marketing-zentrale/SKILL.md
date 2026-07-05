@@ -63,6 +63,14 @@ Beschreibung, geplantem Veröffentlichungsdatum, Kanälen und Notizen — siehe
 4. **Bei mehreren möglichen Treffern**: die Kandidaten kurz zur Auswahl stellen. **Kein Treffer**:
    normal mit Schritt 2 fortfahren.
 
+**Zusätzlich: akzeptierte Themenideen einbeziehen** (`Campaigns/ideen.json`, siehe
+`kampagnen-dashboard`-Skill Abschnitt 4a): Der Kunde akzeptiert dort KI-Themenvorschläge im
+Dashboard. Passt das Briefing zu einer Idee mit `status: "akzeptiert"` (oder sagt der Nutzer
+„arbeite die Idee … aus"), diese Idee als Kampagnengrundlage übernehmen (Titel → Thema,
+Beschreibung → Kontext, `themen_tag` als inhaltliche Orientierung) und die Idee nach dem Anlegen
+der Kampagne auf `status: "umgesetzt"` setzen. Fragt der Nutzer allgemein „Was steht an?"/"Welche
+Ideen liegen bereit?", die akzeptierten Ideen auflisten und anbieten, eine davon auszuarbeiten.
+
 Niemals stillschweigend eine geplante Kampagne übernehmen, ohne den Nutzer bestätigen zu lassen —
 und niemals eine zweite `meta.json` für dieselbe Kampagne anlegen.
 

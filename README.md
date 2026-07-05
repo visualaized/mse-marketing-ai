@@ -72,6 +72,21 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.14.0** (2026-07-03) — **Kampagnen-Dashboard wird echte Zentrale: Ideen + KI-Vorschläge +
+  Kalender mit Drag & Drop** (drei Ansichten: Liste | Kalender | Ideen):
+  1. **Ideen-Sammlung** (`Campaigns/ideen.json`): Themenideen erfassen (eigenes Formular) und
+     **KI-Themenvorschläge von Claude** entlang der Themen-Tage des Kunden (Di: Tech/Produkt/
+     Engineering, Do: Branchenbezug/Use Case/Kundenprojekt, Fr: Menschliches/Marke/Team —
+     ausdrücklich Orientierung, nicht fix). Vorschläge werden im Dashboard **akzeptiert oder
+     abgelehnt**; akzeptierte Ideen per Klick **als Kampagne eingeplant** (Formular vorbefüllt)
+     und von der Zentrale beim Kampagnenstart ausgearbeitet (Status → „umgesetzt").
+     Claude-Verhalten beim Vorschlagen verbindlich dokumentiert (nie selbst akzeptieren).
+  2. **Kalender-Ansicht**: Monatsraster mit Kampagnen-Chips in Statusfarben, Themen-Tage-Fokusse
+     unter Di/Do/Fr; **Klick öffnet Detail-Modal** (Zeitraum, Kanäle, Notiz, klickbare
+     Inhalte-Links, Bearbeiten-Shortcut); **geplante Kampagnen per Drag & Drop verschieben**
+     (neuer Endpoint `PATCH /api/campaigns/<slug>/termin`, Ende wandert mit — Dauer bleibt).
+  3. Neue Ideen-API (`GET/POST /api/ideen`, `PATCH/DELETE /api/ideen/<id>`), Ideen-Badge im Tab.
+     Läuft wie gehabt komplett lokal im Marketing Hub (`node server.mjs`).
 - **1.13.2** (2026-07-03) — Landing-Page-Template: Haupt-CTA exakt im Website-.btn-Stil — der
   Pfeilkreis steht jetzt LINKS vom Label (wie auf der Live-Website und konsistent zur
   Whitepaper-Download-Zeile); Label-Span-Regression aus der Umstellung behoben.

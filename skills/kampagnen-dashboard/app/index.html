@@ -25,6 +25,16 @@
 
   <main class="main">
 
+    <!-- Ansichten: Liste (Übersicht) | Kalender (Monatsansicht mit Drag & Drop) | Ideen
+         (Themenideen-Sammlung mit KI-Vorschlägen) -->
+    <nav class="views" aria-label="Ansicht wählen">
+      <button type="button" class="views__tab views__tab--active" data-view="liste">Liste</button>
+      <button type="button" class="views__tab" data-view="kalender">Kalender</button>
+      <button type="button" class="views__tab" data-view="ideen">Ideen <span class="views__badge" id="ideen-badge" hidden></span></button>
+    </nav>
+
+    <div id="view-liste">
+
     <section class="toolbar" aria-label="Filter und Sortierung">
       <div class="toolbar__group">
         <label class="eyebrow" for="filter-status">Status</label>
@@ -118,6 +128,77 @@
     <section id="content-area" aria-live="polite">
       <p class="state-message">Lade Kampagnen…</p>
     </section>
+
+    </div><!-- /view-liste -->
+
+    <!-- ============================================================
+         KALENDER-ANSICHT — Monatsraster: Kampagnen erscheinen an ihrem
+         Starttag; Klick öffnet die Kampagnen-Details (Modal), GEPLANTE
+         Kampagnen lassen sich per Drag & Drop auf einen anderen Tag
+         ziehen (verschiebt zeitraum_start, Ende wandert mit).
+         Di/Do/Fr tragen die Themen-Tage-Fokusse als Orientierung.
+         ============================================================ -->
+    <div id="view-kalender" hidden>
+      <div class="cal__head">
+        <button type="button" class="cal__nav" id="cal-prev" aria-label="Vorheriger Monat">&#8249;</button>
+        <h2 class="cal__title" id="cal-title"></h2>
+        <button type="button" class="cal__nav" id="cal-next" aria-label="Nächster Monat">&#8250;</button>
+      </div>
+      <div class="cal__grid" id="cal-grid"></div>
+      <p class="cal__hint">Geplante Kampagnen lassen sich per Drag &amp; Drop verschieben &middot; Klick auf eine Kampagne &ouml;ffnet die Details &middot; Di/Do/Fr zeigen die Themen-Tage (Orientierung, nicht fix).</p>
+    </div>
+
+    <!-- ============================================================
+         IDEEN-ANSICHT — Themenideen-Sammlung: Claude schlägt Ideen
+         entlang der Themen-Tage vor (Campaigns/ideen.json), der Kunde
+         akzeptiert/lehnt ab, erfasst eigene Ideen/Notizen und plant
+         akzeptierte Ideen direkt als Kampagne ein.
+         ============================================================ -->
+    <div id="view-ideen" hidden>
+
+      <div class="themen-tage" id="themen-tage"></div>
+
+      <div class="idee-neu">
+        <button type="button" class="plan__toggle" id="idee-toggle" aria-expanded="false">+ Idee / Notiz erfassen</button>
+        <form class="plan__form" id="idee-form" hidden>
+          <h2 class="plan__title">Neue Idee / Notiz</h2>
+          <div class="plan__grid">
+            <div class="plan__field plan__field--wide">
+              <label class="eyebrow" for="idee-titel">Titel *</label>
+              <input class="control" type="text" id="idee-titel" required placeholder="z. B. Einblick in die Filterplattenfertigung">
+            </div>
+            <div class="plan__field">
+              <label class="eyebrow" for="idee-tag">Themen-Tag (optional)</label>
+              <select class="control" id="idee-tag"><option value="">—</option></select>
+            </div>
+          </div>
+          <div class="plan__field plan__field--wide">
+            <label class="eyebrow" for="idee-beschreibung">Beschreibung / Notizen (optional)</label>
+            <textarea class="control plan__textarea" id="idee-beschreibung" rows="3" placeholder="Kerngedanke, Anlass, mögliche Kanäle …"></textarea>
+          </div>
+          <div class="plan__actions">
+            <button type="submit" class="plan__submit">Idee speichern</button>
+            <button type="button" class="plan__cancel" id="idee-cancel">Abbrechen</button>
+            <span class="plan__feedback" id="idee-feedback" aria-live="polite"></span>
+          </div>
+        </form>
+      </div>
+
+      <div id="ideen-liste"><p class="state-message">Lade Ideen…</p></div>
+      <p class="cal__hint">Neue KI-Vorschl&auml;ge: in Claude einfach &bdquo;Schlag mir Themenideen f&uuml;r Kampagnen vor&ldquo; sagen &mdash; die Vorschl&auml;ge erscheinen hier zum Akzeptieren/Ablehnen.</p>
+
+    </div>
+
+    <!-- Kampagnen-Detail-Modal (Kalender-Klick) -->
+    <div class="modal" id="camp-modal" hidden>
+      <div class="modal__backdrop" data-close-modal></div>
+      <div class="modal__card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <button type="button" class="modal__close" data-close-modal aria-label="Schließen">&times;</button>
+        <p class="eyebrow" id="modal-eyebrow"></p>
+        <h2 class="modal__title" id="modal-title"></h2>
+        <div class="modal__body" id="modal-body"></div>
+      </div>
+    </div>
 
   </main>
 
@@ -553,6 +634,361 @@
         planFeedback.className = "plan__feedback plan__feedback--error";
       });
   });
+
+  /* ==================================================================
+     ANSICHTEN-UMSCHALTUNG (Liste | Kalender | Ideen)
+     ================================================================== */
+
+  var views = { liste: document.getElementById("view-liste"),
+                kalender: document.getElementById("view-kalender"),
+                ideen: document.getElementById("view-ideen") };
+
+  function switchView(name) {
+    Object.keys(views).forEach(function (k) { views[k].hidden = (k !== name); });
+    document.querySelectorAll(".views__tab").forEach(function (t) {
+      t.classList.toggle("views__tab--active", t.getAttribute("data-view") === name);
+    });
+    if (name === "kalender") renderCalendar();
+    if (name === "ideen") loadIdeen();
+  }
+
+  document.querySelectorAll(".views__tab").forEach(function (t) {
+    t.addEventListener("click", function () { switchView(t.getAttribute("data-view")); });
+  });
+
+  /* ==================================================================
+     KALENDER — Monatsraster, Klick = Details-Modal, Drag & Drop für
+     GEPLANTE Kampagnen (verschiebt zeitraum_start via PATCH /termin).
+     ================================================================== */
+
+  var calCursor = new Date();
+  calCursor.setDate(1);
+  var MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+  var DAY_HEADS = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+  var themenTageByDay = {}; // z. B. {2:"Tech / Produkt / Engineering"} (JS getDay: 2=Di,4=Do,5=Fr)
+  var DAYNAME_TO_JS = { "Montag":1, "Dienstag":2, "Mittwoch":3, "Donnerstag":4, "Freitag":5, "Samstag":6, "Sonntag":0 };
+
+  function iso(d) {
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+
+  function renderCalendar() {
+    var grid = document.getElementById("cal-grid");
+    var title = document.getElementById("cal-title");
+    title.textContent = MONTHS[calCursor.getMonth()] + " " + calCursor.getFullYear();
+    grid.innerHTML = "";
+
+    DAY_HEADS.forEach(function (h, idx) {
+      var jsDay = idx === 6 ? 0 : idx + 1;
+      var cell = document.createElement("div");
+      cell.className = "cal__dayhead";
+      var focus = themenTageByDay[jsDay];
+      cell.innerHTML = "<span>" + h + "</span>" + (focus ? '<span class="cal__focus">' + escapeHtml(focus) + "</span>" : "");
+      grid.appendChild(cell);
+    });
+
+    var first = new Date(calCursor);
+    var offset = (first.getDay() + 6) % 7; // Montag = 0
+    var daysInMonth = new Date(calCursor.getFullYear(), calCursor.getMonth() + 1, 0).getDate();
+    var today = iso(new Date());
+
+    var byDate = {};
+    state.campaigns.forEach(function (c) {
+      if (!c.zeitraum_start) return;
+      (byDate[c.zeitraum_start] = byDate[c.zeitraum_start] || []).push(c);
+    });
+
+    for (var i = 0; i < offset; i++) {
+      var pad = document.createElement("div");
+      pad.className = "cal__cell cal__cell--pad";
+      grid.appendChild(pad);
+    }
+
+    for (var day = 1; day <= daysInMonth; day++) {
+      (function (day) {
+        var date = iso(new Date(calCursor.getFullYear(), calCursor.getMonth(), day));
+        var cell = document.createElement("div");
+        cell.className = "cal__cell" + (date === today ? " cal__cell--today" : "");
+        cell.setAttribute("data-date", date);
+        var num = document.createElement("div");
+        num.className = "cal__daynum";
+        num.textContent = day;
+        cell.appendChild(num);
+
+        (byDate[date] || []).forEach(function (c) {
+          var chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = "cal__chip cal__chip--" + (c.status || "geplant").replace(/[^a-z]/gi, "").toLowerCase();
+          chip.textContent = c.thema || c.slug;
+          chip.title = (c.thema || "") + " (" + (c.status || "") + ")";
+          chip.addEventListener("click", function () { openCampaignModal(c); });
+          if (c.status === "geplant" && state.planningEnabled) {
+            chip.draggable = true;
+            chip.addEventListener("dragstart", function (ev) {
+              ev.dataTransfer.setData("text/plain", c.slug);
+              ev.dataTransfer.effectAllowed = "move";
+            });
+          }
+          cell.appendChild(chip);
+        });
+
+        if (state.planningEnabled) {
+          cell.addEventListener("dragover", function (ev) { ev.preventDefault(); cell.classList.add("cal__cell--over"); });
+          cell.addEventListener("dragleave", function () { cell.classList.remove("cal__cell--over"); });
+          cell.addEventListener("drop", function (ev) {
+            ev.preventDefault();
+            cell.classList.remove("cal__cell--over");
+            var slug = ev.dataTransfer.getData("text/plain");
+            if (!slug) return;
+            fetch("./api/campaigns/" + encodeURIComponent(slug) + "/termin", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ zeitraum_start: date })
+            })
+              .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+              .then(function (result) {
+                if (!result.ok) {
+                  window.alert((result.d.errors || ["Verschieben fehlgeschlagen."]).join(" "));
+                  return;
+                }
+                loadCampaigns().then(renderCalendar);
+              })
+              .catch(function () { window.alert("Server nicht erreichbar."); });
+          });
+        }
+        grid.appendChild(cell);
+      })(day);
+    }
+  }
+
+  document.getElementById("cal-prev").addEventListener("click", function () {
+    calCursor.setMonth(calCursor.getMonth() - 1); renderCalendar();
+  });
+  document.getElementById("cal-next").addEventListener("click", function () {
+    calCursor.setMonth(calCursor.getMonth() + 1); renderCalendar();
+  });
+
+  /* ---------- Kampagnen-Detail-Modal ---------- */
+
+  var modal = document.getElementById("camp-modal");
+
+  function openCampaignModal(c) {
+    document.getElementById("modal-eyebrow").textContent = (c.status || "") + " · " + formatZeitraum(c.zeitraum_start, c.zeitraum_ende);
+    document.getElementById("modal-title").textContent = c.thema || c.slug;
+    var body = document.getElementById("modal-body");
+    body.innerHTML = "";
+
+    var kanaele = document.createElement("div");
+    (c.kanaele || []).forEach(function (k) {
+      var pill = document.createElement("span");
+      pill.className = "pill";
+      pill.textContent = k;
+      kanaele.appendChild(pill);
+    });
+    body.appendChild(kanaele);
+
+    if (c.verantwortlich || c.notiz) {
+      var meta = document.createElement("p");
+      meta.className = "modal__meta";
+      meta.textContent = [c.verantwortlich, c.notiz].filter(Boolean).join(" — ");
+      body.appendChild(meta);
+    }
+
+    if (Array.isArray(c.inhalte) && c.inhalte.length) {
+      var h = document.createElement("p");
+      h.className = "eyebrow";
+      h.style.marginTop = "14px";
+      h.textContent = "Inhalte";
+      body.appendChild(h);
+      var ul = document.createElement("ul");
+      ul.className = "inhalte__list";
+      c.inhalte.forEach(function (item) {
+        if (!item || !item.pfad) return;
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        a.className = "inhalte__link";
+        a.href = "./hub/" + String(item.pfad).replace(/^\/+/, "");
+        a.target = "_blank"; a.rel = "noopener";
+        a.textContent = item.label || item.pfad;
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
+      body.appendChild(ul);
+    }
+
+    if (c.status === "geplant" && state.planningEnabled) {
+      var actions = document.createElement("div");
+      actions.className = "row-actions";
+      var edit = document.createElement("button");
+      edit.type = "button"; edit.className = "row-actions__btn"; edit.textContent = "Bearbeiten";
+      edit.addEventListener("click", function () {
+        closeModal(); switchView("liste"); startEditCampaign(c);
+        planSection.scrollIntoView({ behavior: "smooth" });
+      });
+      actions.appendChild(edit);
+      body.appendChild(actions);
+    }
+
+    modal.hidden = false;
+  }
+
+  function closeModal() { modal.hidden = true; }
+  modal.querySelectorAll("[data-close-modal]").forEach(function (el) {
+    el.addEventListener("click", closeModal);
+  });
+  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") closeModal(); });
+
+  /* ==================================================================
+     IDEEN — Themen-Tage anzeigen, Ideen laden, akzeptieren/ablehnen,
+     eigene Ideen erfassen, akzeptierte Ideen direkt einplanen.
+     ================================================================== */
+
+  var ideenData = null;
+
+  function loadIdeen() {
+    return fetch("./api/ideen", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+      .then(function (data) {
+        ideenData = data;
+        themenTageByDay = {};
+        (data.themen_tage || []).forEach(function (t) {
+          var js = DAYNAME_TO_JS[t.tag];
+          if (js !== undefined) themenTageByDay[js] = t.fokus;
+        });
+        renderThemenTage();
+        renderIdeen();
+        updateIdeenBadge();
+      })
+      .catch(function () {
+        document.getElementById("ideen-liste").innerHTML =
+          '<p class="state-message">Ideen sind nur mit laufendem Dashboard-Server verf&uuml;gbar (node server.mjs).</p>';
+      });
+  }
+
+  function updateIdeenBadge() {
+    var badge = document.getElementById("ideen-badge");
+    var offen = (ideenData && ideenData.ideen || []).filter(function (i) { return i.status === "offen"; }).length;
+    badge.hidden = !offen;
+    badge.textContent = offen;
+  }
+
+  function renderThemenTage() {
+    var wrap = document.getElementById("themen-tage");
+    wrap.innerHTML = "";
+    (ideenData.themen_tage || []).forEach(function (t) {
+      var card = document.createElement("div");
+      card.className = "themen-tage__card";
+      card.innerHTML = '<span class="themen-tage__tag">' + escapeHtml(t.tag) + "</span>" +
+                       '<span class="themen-tage__fokus">' + escapeHtml(t.fokus) + "</span>";
+      wrap.appendChild(card);
+    });
+    var hint = document.createElement("p");
+    hint.className = "themen-tage__hinweis";
+    hint.textContent = ideenData.hinweis || "Themen-Tage sind Orientierung, nicht fix.";
+    wrap.appendChild(hint);
+
+    var sel = document.getElementById("idee-tag");
+    sel.innerHTML = '<option value="">—</option>';
+    (ideenData.themen_tage || []).forEach(function (t) {
+      var opt = document.createElement("option");
+      opt.value = t.tag + " — " + t.fokus;
+      opt.textContent = t.tag + " — " + t.fokus;
+      sel.appendChild(opt);
+    });
+  }
+
+  function ideeAction(id, patch) {
+    fetch("./api/ideen/" + encodeURIComponent(id), {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch)
+    }).then(function () { loadIdeen(); });
+  }
+
+  function renderIdeen() {
+    var wrap = document.getElementById("ideen-liste");
+    wrap.innerHTML = "";
+    var groups = [["offen", "Offene Vorschläge"], ["akzeptiert", "Akzeptiert — zur Ausarbeitung"], ["abgelehnt", "Abgelehnt"], ["umgesetzt", "Umgesetzt"]];
+    var ideen = ideenData.ideen || [];
+    if (!ideen.length) {
+      wrap.innerHTML = '<p class="state-message">Noch keine Ideen — in Claude „Schlag mir Themenideen vor" sagen oder oben selbst eine Idee erfassen.</p>';
+      return;
+    }
+    groups.forEach(function (g) {
+      var items = ideen.filter(function (i) { return i.status === g[0]; });
+      if (!items.length) return;
+      var h = document.createElement("p");
+      h.className = "eyebrow ideen__group";
+      h.textContent = g[1] + " (" + items.length + ")";
+      wrap.appendChild(h);
+      items.forEach(function (i) {
+        var card = document.createElement("div");
+        card.className = "idee idee--" + i.status;
+        var tags = '<span class="idee__quelle">' + (i.quelle === "claude" ? "KI-Vorschlag" : "Eigene Idee") + "</span>" +
+                   (i.themen_tag ? '<span class="idee__tag">' + escapeHtml(i.themen_tag) + "</span>" : "");
+        card.innerHTML = '<div class="idee__head"><strong>' + escapeHtml(i.titel) + "</strong><span>" + tags + "</span></div>" +
+                         (i.beschreibung ? '<p class="idee__desc">' + escapeHtml(i.beschreibung) + "</p>" : "");
+        var actions = document.createElement("div");
+        actions.className = "row-actions";
+        function btn(label, cls, fn) {
+          var b = document.createElement("button");
+          b.type = "button"; b.className = "row-actions__btn" + (cls || ""); b.textContent = label;
+          b.addEventListener("click", fn);
+          return b;
+        }
+        if (i.status === "offen") {
+          actions.appendChild(btn("Akzeptieren", "", function () { ideeAction(i.id, { status: "akzeptiert" }); }));
+          actions.appendChild(btn("Ablehnen", " row-actions__btn--danger", function () { ideeAction(i.id, { status: "abgelehnt" }); }));
+        }
+        if (i.status === "akzeptiert") {
+          actions.appendChild(btn("Als Kampagne einplanen", "", function () {
+            switchView("liste");
+            resetPlanForm();
+            setFormVisible(true);
+            document.getElementById("plan-thema").value = i.titel;
+            document.getElementById("plan-notiz").value = (i.beschreibung ? i.beschreibung + " " : "") + "(aus Idee: " + i.id + ")";
+            planSection.scrollIntoView({ behavior: "smooth" });
+          }));
+          actions.appendChild(btn("Zurück zu offen", "", function () { ideeAction(i.id, { status: "offen" }); }));
+        }
+        if (i.status === "abgelehnt") {
+          actions.appendChild(btn("Doch akzeptieren", "", function () { ideeAction(i.id, { status: "akzeptiert" }); }));
+          actions.appendChild(btn("Löschen", " row-actions__btn--danger", function () {
+            fetch("./api/ideen/" + encodeURIComponent(i.id), { method: "DELETE" }).then(function () { loadIdeen(); });
+          }));
+        }
+        if (actions.children.length) card.appendChild(actions);
+        wrap.appendChild(card);
+      });
+    });
+  }
+
+  var ideeForm = document.getElementById("idee-form");
+  var ideeToggle = document.getElementById("idee-toggle");
+  ideeToggle.addEventListener("click", function () { ideeForm.hidden = false; ideeToggle.hidden = true; });
+  document.getElementById("idee-cancel").addEventListener("click", function () {
+    ideeForm.reset(); ideeForm.hidden = true; ideeToggle.hidden = false;
+  });
+  ideeForm.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    fetch("./api/ideen", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        titel: document.getElementById("idee-titel").value.trim(),
+        beschreibung: document.getElementById("idee-beschreibung").value.trim(),
+        themen_tag: document.getElementById("idee-tag").value
+      })
+    }).then(function () {
+      ideeForm.reset(); ideeForm.hidden = true; ideeToggle.hidden = false;
+      loadIdeen();
+    });
+  });
+
+  // Ideen-Badge + Themen-Tage direkt beim Start laden (falls Server läuft)
+  fetch("./api/ping", { cache: "no-store" })
+    .then(function (r) { return r.ok ? loadIdeen() : null; })
+    .catch(function () {});
 
 })();
 </script>

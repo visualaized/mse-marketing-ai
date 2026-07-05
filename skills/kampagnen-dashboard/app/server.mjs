@@ -24,6 +24,17 @@
  *                                Nur für Einträge mit status "geplant" erlaubt — laufende/
  *                                abgeschlossene Kampagnen werden über die Bausteine gepflegt.
  *   DELETE /api/campaigns/<slug> GEPLANTE Kampagne löschen (nur status "geplant").
+ *   PATCH /api/campaigns/<slug>/termin   GEPLANTE Kampagne im Kalender verschieben (Drag & Drop):
+ *                                Body {zeitraum_start: "YYYY-MM-DD"} — ein vorhandenes
+ *                                zeitraum_ende wird um dieselbe Differenz mitverschoben.
+ *   GET  /api/ideen              Ideen-Sammlung + Themen-Tage-Plan (Campaigns/ideen.json; wird
+ *                                mit Standard-Themen-Tagen angelegt, falls noch nicht vorhanden).
+ *   POST /api/ideen              Neue Idee/Notiz erfassen: {titel, beschreibung?, themen_tag?}.
+ *                                quelle:"kunde"; Claude schreibt seine Vorschläge mit
+ *                                quelle:"claude" direkt in die Datei (siehe SKILL.md).
+ *   PATCH /api/ideen/<id>        Idee aktualisieren (status: offen|akzeptiert|abgelehnt|umgesetzt,
+ *                                titel, beschreibung, themen_tag).
+ *   DELETE /api/ideen/<id>       Idee löschen.
  *   GET  /hub/<pfad>             Liest Dateien aus dem Marketing-Hub-Root (eine Ebene über dem
  *                                App-Ordner) NUR lesend aus — damit die Inhalte-Links der
  *                                Kampagnen (meta.json-Feld "inhalte", Pfade relativ zum Hub-Root
@@ -294,6 +305,153 @@ function handleUpdateCampaign(req, res, slug) {
   });
 }
 
+function handleMoveCampaign(req, res, slug) {
+  // Kalender-Drag&Drop: zeitraum_start verschieben (nur geplante Kampagnen); ein vorhandenes
+  // zeitraum_ende wird um dieselbe Tages-Differenz mitverschoben, damit die Dauer erhalten bleibt.
+  const loaded = loadPlannedMeta(slug);
+  if (loaded.error) return sendJson(res, loaded.error[0], { ok: false, errors: [loaded.error[1]] });
+
+  readBody(req, (raw) => {
+    let body;
+    try {
+      body = JSON.parse(raw);
+    } catch {
+      return sendJson(res, 400, { ok: false, errors: ["Body ist kein gültiges JSON."] });
+    }
+    const newStart = String(body.zeitraum_start || "");
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(newStart)) {
+      return sendJson(res, 400, { ok: false, errors: ["zeitraum_start muss das Format YYYY-MM-DD haben."] });
+    }
+    const meta = loaded.meta;
+    const oldStart = meta.zeitraum_start;
+    if (meta.zeitraum_ende && oldStart) {
+      const diffDays = Math.round((new Date(newStart) - new Date(oldStart)) / 86400000);
+      const ende = new Date(meta.zeitraum_ende);
+      ende.setDate(ende.getDate() + diffDays);
+      meta.zeitraum_ende = ende.toISOString().slice(0, 10);
+    }
+    meta.zeitraum_start = newStart;
+    try {
+      fs.writeFileSync(loaded.metaPath, JSON.stringify(meta, null, 2) + "\n", "utf-8");
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, errors: ["Konnte meta.json nicht schreiben: " + err.message] });
+    }
+    writeStaticIndex(buildIndex());
+    sendJson(res, 200, { ok: true, slug, meta });
+  });
+}
+
+/* ------------------------------------------------------------------ *
+ *  Ideen-Sammlung (Campaigns/ideen.json): Themen-Tage-Plan + Ideen,
+ *  die Claude vorschlaegt (quelle:"claude") oder der Kunde selbst
+ *  erfasst (quelle:"kunde"). Status: offen -> akzeptiert/abgelehnt,
+ *  akzeptiert -> umgesetzt (sobald daraus eine Kampagne entsteht).
+ * ------------------------------------------------------------------ */
+
+const IDEEN_PATH = () => path.join(CAMPAIGNS_DIR, "ideen.json");
+
+const DEFAULT_THEMEN_TAGE = [
+  { tag: "Dienstag", fokus: "Tech / Produkt / Engineering" },
+  { tag: "Donnerstag", fokus: "Branchenbezug / Use Case / Kundenprojekt" },
+  { tag: "Freitag", fokus: "Menschliches, Marke, Team" },
+];
+
+function loadIdeen() {
+  try {
+    const data = JSON.parse(fs.readFileSync(IDEEN_PATH(), "utf-8"));
+    if (!Array.isArray(data.ideen)) data.ideen = [];
+    if (!Array.isArray(data.themen_tage) || !data.themen_tage.length) data.themen_tage = DEFAULT_THEMEN_TAGE;
+    return data;
+  } catch {
+    return {
+      hinweis: "Themen-Tage sind Orientierung, nicht fix — Abweichungen sind ausdrücklich erlaubt.",
+      themen_tage: DEFAULT_THEMEN_TAGE,
+      ideen: [],
+    };
+  }
+}
+
+function saveIdeen(data) {
+  fs.mkdirSync(CAMPAIGNS_DIR, { recursive: true });
+  fs.writeFileSync(IDEEN_PATH(), JSON.stringify(data, null, 2) + "\n", "utf-8");
+}
+
+function handleCreateIdee(req, res) {
+  readBody(req, (raw) => {
+    let body;
+    try {
+      body = JSON.parse(raw);
+    } catch {
+      return sendJson(res, 400, { ok: false, errors: ["Body ist kein gültiges JSON."] });
+    }
+    if (!body.titel || !String(body.titel).trim()) {
+      return sendJson(res, 400, { ok: false, errors: ["Feld 'titel' ist Pflicht."] });
+    }
+    const data = loadIdeen();
+    const idee = {
+      id: "idee-" + Date.now().toString(36) + "-" + slugify(body.titel).slice(0, 24),
+      titel: String(body.titel).trim(),
+      beschreibung: String(body.beschreibung || "").trim(),
+      themen_tag: String(body.themen_tag || "").trim(),
+      status: "offen",
+      quelle: "kunde",
+      erfasst_am: new Date().toISOString().slice(0, 10),
+    };
+    data.ideen.unshift(idee);
+    try {
+      saveIdeen(data);
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, errors: ["Konnte ideen.json nicht schreiben: " + err.message] });
+    }
+    sendJson(res, 201, { ok: true, idee });
+  });
+}
+
+function handlePatchIdee(req, res, id) {
+  readBody(req, (raw) => {
+    let body;
+    try {
+      body = JSON.parse(raw);
+    } catch {
+      return sendJson(res, 400, { ok: false, errors: ["Body ist kein gültiges JSON."] });
+    }
+    const data = loadIdeen();
+    const idee = data.ideen.find((i) => i.id === id);
+    if (!idee) return sendJson(res, 404, { ok: false, errors: ["Idee nicht gefunden: " + id] });
+    const VALID_STATUS = ["offen", "akzeptiert", "abgelehnt", "umgesetzt"];
+    if (body.status !== undefined) {
+      if (!VALID_STATUS.includes(body.status)) {
+        return sendJson(res, 400, { ok: false, errors: ["Ungültiger Status. Erlaubt: " + VALID_STATUS.join(", ")] });
+      }
+      idee.status = body.status;
+    }
+    for (const field of ["titel", "beschreibung", "themen_tag"]) {
+      if (body[field] !== undefined) idee[field] = String(body[field]).trim();
+    }
+    try {
+      saveIdeen(data);
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, errors: ["Konnte ideen.json nicht schreiben: " + err.message] });
+    }
+    sendJson(res, 200, { ok: true, idee });
+  });
+}
+
+function handleDeleteIdee(res, id) {
+  const data = loadIdeen();
+  const before = data.ideen.length;
+  data.ideen = data.ideen.filter((i) => i.id !== id);
+  if (data.ideen.length === before) {
+    return sendJson(res, 404, { ok: false, errors: ["Idee nicht gefunden: " + id] });
+  }
+  try {
+    saveIdeen(data);
+  } catch (err) {
+    return sendJson(res, 500, { ok: false, errors: ["Konnte ideen.json nicht schreiben: " + err.message] });
+  }
+  sendJson(res, 200, { ok: true, id });
+}
+
 function handleDeleteCampaign(res, slug) {
   const loaded = loadPlannedMeta(slug);
   if (loaded.error) return sendJson(res, loaded.error[0], { ok: false, errors: [loaded.error[1]] });
@@ -323,11 +481,30 @@ const server = http.createServer((req, res) => {
     return handleCreateCampaign(req, res);
   }
 
+  const terminMatch = urlPath.match(/^\/api\/campaigns\/([^/]+)\/termin$/);
+  if (terminMatch && req.method === "PATCH") {
+    return handleMoveCampaign(req, res, decodeURIComponent(terminMatch[1]));
+  }
+
   const slugMatch = urlPath.match(/^\/api\/campaigns\/([^/]+)$/);
   if (slugMatch) {
     const slug = decodeURIComponent(slugMatch[1]);
     if (req.method === "PUT") return handleUpdateCampaign(req, res, slug);
     if (req.method === "DELETE") return handleDeleteCampaign(res, slug);
+    return sendJson(res, 405, { ok: false, errors: ["Methode nicht erlaubt."] });
+  }
+
+  if (urlPath === "/api/ideen") {
+    if (req.method === "GET") return sendJson(res, 200, loadIdeen());
+    if (req.method === "POST") return handleCreateIdee(req, res);
+    return sendJson(res, 405, { ok: false, errors: ["Methode nicht erlaubt."] });
+  }
+
+  const ideeMatch = urlPath.match(/^\/api\/ideen\/([^/]+)$/);
+  if (ideeMatch) {
+    const id = decodeURIComponent(ideeMatch[1]);
+    if (req.method === "PATCH") return handlePatchIdee(req, res, id);
+    if (req.method === "DELETE") return handleDeleteIdee(res, id);
     return sendJson(res, 405, { ok: false, errors: ["Methode nicht erlaubt."] });
   }
 
