@@ -874,3 +874,16 @@ body {
   .cal__cell { min-height: 64px; }
   .cal__focus { display: none; }
 }
+
+/* Recherche-Quellen an KI-Ideen */
+.idee__quellen {
+  font-size: 11px;
+  color: var(--color-medium-grey);
+  margin: 8px 0 0 0;
+}
+.idee__quellen a {
+  color: var(--color-medium-grey);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-hairline);
+}
+.idee__quellen a:hover { color: var(--color-blue); border-bottom-color: var(--color-blue); }

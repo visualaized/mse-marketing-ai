@@ -928,6 +928,22 @@
                    (i.themen_tag ? '<span class="idee__tag">' + escapeHtml(i.themen_tag) + "</span>" : "");
         card.innerHTML = '<div class="idee__head"><strong>' + escapeHtml(i.titel) + "</strong><span>" + tags + "</span></div>" +
                          (i.beschreibung ? '<p class="idee__desc">' + escapeHtml(i.beschreibung) + "</p>" : "");
+        // Recherche-Fundstellen (KI-Vorschläge tragen ihre Quellen aus der Online-Recherche)
+        if (Array.isArray(i.quellen) && i.quellen.length) {
+          var q = document.createElement("p");
+          q.className = "idee__quellen";
+          q.appendChild(document.createTextNode("Quellen: "));
+          i.quellen.forEach(function (src, idx) {
+            if (!src || !src.url) return;
+            if (idx > 0) q.appendChild(document.createTextNode(" · "));
+            var a = document.createElement("a");
+            a.href = src.url;
+            a.target = "_blank"; a.rel = "noopener";
+            a.textContent = src.titel || src.url;
+            q.appendChild(a);
+          });
+          card.appendChild(q);
+        }
         var actions = document.createElement("div");
         actions.className = "row-actions";
         function btn(label, cls, fn) {

@@ -72,6 +72,15 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.14.1** (2026-07-03) — **Themenvorschläge mit Pflicht-Online-Recherche:** Beim Vorschlagen
+  von Kampagnen-Themenideen recherchiert Claude jetzt verbindlich zuerst online, was die Branche
+  aktuell beschäftigt (Websuche/News, LinkedIn-Fachdiskussionen, Branchenmagazine wie PROCESS/
+  CHEManager/cav/Recycling Magazin, Messen/Regulatorik wie ACHEMA oder EU-Batterieverordnung) —
+  Suchfelder: Filtration, Batterierecycling/-produktion, Hydrometallurgie, Spezialchemie/Pharma,
+  Verfahrenstechnik. Der aktuelle Aufhänger gehört in die Ideen-Beschreibung, Fundstellen als
+  neues optionales `quellen`-Feld (`{titel, url}`) — das Dashboard zeigt sie als klickbare
+  Quellenzeile unter der Idee. Aktualität vor Allgemeinplätzen; ohne echten Fund kein fingierter
+  Anlass.
 - **1.14.0** (2026-07-03) — **Kampagnen-Dashboard wird echte Zentrale: Ideen + KI-Vorschläge +
   Kalender mit Drag & Drop** (drei Ansichten: Liste | Kalender | Ideen):
   1. **Ideen-Sammlung** (`Campaigns/ideen.json`): Themenideen erfassen (eigenes Formular) und

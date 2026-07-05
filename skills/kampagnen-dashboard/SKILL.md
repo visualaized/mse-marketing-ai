@@ -265,11 +265,15 @@ künftige Kampagnen — vom Kunden selbst erfasst oder **von Claude vorgeschlage
       "id": "idee-<eindeutig>",
       "titel": "…", "beschreibung": "…",
       "themen_tag": "Dienstag — Tech / Produkt / Engineering",
-      "status": "offen", "quelle": "claude", "erfasst_am": "YYYY-MM-DD"
+      "status": "offen", "quelle": "claude", "erfasst_am": "YYYY-MM-DD",
+      "quellen": [ { "titel": "Kurztitel der Fundstelle", "url": "https://…" } ]
     }
   ]
 }
 ```
+
+`quellen` ist optional (v. a. bei KI-Vorschlägen aus der Online-Recherche, siehe unten) — das
+Dashboard zeigt die Fundstellen als kleine Linkliste unter der Idee an.
 
 - `status`: `offen` → `akzeptiert` | `abgelehnt`; `akzeptiert` → `umgesetzt` (sobald daraus eine
   Kampagne entstanden ist). `quelle`: `"claude"` (KI-Vorschlag) oder `"kunde"` (selbst erfasst).
@@ -287,17 +291,32 @@ Themenideen vor", „Ideen für nächste Woche/den Content-Plan" o. ä.):
 
 1. Markenkern laden (Themenfelder, Zielgruppen, laufende Kampagnen aus `Campaigns/` als Kontext —
    keine Dubletten zu vorhandenen Ideen/Kampagnen vorschlagen).
-2. Vorschläge **entlang der `themen_tage`** aus `ideen.json` entwickeln (typisch 3–6 Stück, gern
-   je Themen-Tag mindestens einer). Die Themen-Tage sind **Orientierung, nicht fix** — ein starker
-   Vorschlag außerhalb des Rasters ist erlaubt und wird dann ohne `themen_tag` bzw. mit passender
-   Begründung in der Beschreibung eingetragen.
-3. Jede Idee als Eintrag mit `status: "offen"`, `quelle: "claude"`, eindeutiger `id`
-   (`idee-<timestamp/slug>`), kurzem `titel` (Kampagnen-tauglich) und 1–2 Sätzen `beschreibung`
-   (Kerngedanke, ggf. Kanal-Idee) **oben in das `ideen`-Array von `Campaigns/ideen.json`
-   schreiben** — vorhandene Einträge und `themen_tage` unverändert lassen.
-4. Dem Nutzer kurz melden, dass die Vorschläge im Dashboard (Ideen-Tab) zum
-   Akzeptieren/Ablehnen bereitliegen. **Niemals selbst akzeptieren/ablehnen** — das entscheidet
-   der Kunde im Dashboard.
+2. **Online-Recherche (Pflicht):** Vor dem Formulieren aktiv recherchieren, was die Branche
+   AKTUELL beschäftigt — per Websuche (WebSearch/WebFetch bzw. verfügbare Browser-Tools), nicht
+   nur aus dem eigenen Wissen:
+   - **Suchfelder:** Filtration/Fest-Flüssig-Trennung, Batterierecycling & Batteriezellproduktion,
+     Hydrometallurgie, Spezialchemie/Pharma, Verfahrenstechnik allgemein — plus aktuelle Anlässe
+     (Messen wie ACHEMA/POWTECH, Regulatorik wie EU-Batterieverordnung, Rohstoff-/Energiethemen).
+   - **Quellentypen:** Google/News-Suche, LinkedIn (Fachbeiträge/Diskussionen der Branche),
+     Branchenmagazine und Fachportale (z. B. PROCESS, CHEManager, cav/Chemie Technik, Recycling
+     Magazin, Filtration + Separation) sowie Verbands-/Messemeldungen.
+   - **Aktualität vor Allgemeinplätzen:** bevorzugt Themen mit konkretem, datierbarem Aufhänger
+     aus den letzten Wochen/Monaten. Nichts erfinden — wird zu einem Suchfeld nichts Aktuelles
+     gefunden, den Vorschlag ohne fingierten Anlass formulieren oder weglassen.
+3. Vorschläge **entlang der `themen_tage`** aus `ideen.json` entwickeln (typisch 3–6 Stück, gern
+   je Themen-Tag mindestens einer) und dabei die Recherche-Funde einarbeiten: Der aktuelle
+   Branchen-Aufhänger gehört in die `beschreibung` („Aufhänger: …"), die Fundstellen als
+   `quellen`-Einträge (`{titel, url}`) an die Idee. Die Themen-Tage sind **Orientierung, nicht
+   fix** — ein starker Vorschlag außerhalb des Rasters ist erlaubt und wird dann ohne
+   `themen_tag` bzw. mit passender Begründung in der Beschreibung eingetragen.
+4. Jede Idee als Eintrag mit `status: "offen"`, `quelle: "claude"`, eindeutiger `id`
+   (`idee-<timestamp/slug>`), kurzem `titel` (Kampagnen-tauglich), 1–2 Sätzen `beschreibung`
+   (Kerngedanke + Aufhänger, ggf. Kanal-Idee) und ggf. `quellen` **oben in das `ideen`-Array von
+   `Campaigns/ideen.json` schreiben** — vorhandene Einträge und `themen_tage` unverändert lassen.
+5. Dem Nutzer kurz melden, dass die Vorschläge im Dashboard (Ideen-Tab) zum
+   Akzeptieren/Ablehnen bereitliegen — mit einem Satz, welche aktuellen Branchenthemen die
+   Recherche ergeben hat. **Niemals selbst akzeptieren/ablehnen** — das entscheidet der Kunde
+   im Dashboard.
 
 ## 4b. Kalender-Ansicht
 
