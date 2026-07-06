@@ -20,11 +20,10 @@
  *                                { thema, kanaele: [...], zeitraum_start: "YYYY-MM-DD",
  *                                  zeitraum_ende?, notiz?, verantwortlich? }
  *                                Schreibt Campaigns/<slug>/meta.json mit status "geplant".
- *   PUT  /api/campaigns/<slug>   GEPLANTE Kampagne bearbeiten (gleicher Body wie POST).
- *                                Nur für Einträge mit status "geplant" erlaubt — laufende/
- *                                abgeschlossene Kampagnen werden über die Bausteine gepflegt.
- *   DELETE /api/campaigns/<slug> GEPLANTE Kampagne löschen (nur status "geplant").
- *   PATCH /api/campaigns/<slug>/termin   GEPLANTE Kampagne im Kalender verschieben (Drag & Drop):
+ *   PUT  /api/campaigns/<slug>   Kampagne bearbeiten (gleicher Body wie POST + optional status)
+ *                                — für ALLE Statuswerte erlaubt.
+ *   DELETE /api/campaigns/<slug> Kampagne löschen (alle Statuswerte; UI fragt vorher nach).
+ *   PATCH /api/campaigns/<slug>/termin   Kampagne im Kalender verschieben (Drag & Drop):
  *                                Body {zeitraum_start: "YYYY-MM-DD"} — ein vorhandenes
  *                                zeitraum_ende wird um dieselbe Differenz mitverschoben.
  *   GET  /api/ideen              Ideen-Sammlung + Themen-Tage-Plan (Campaigns/ideen.json; wird
@@ -206,11 +205,16 @@ function readBody(req, callback) {
   req.on("end", () => callback(raw));
 }
 
+const VALID_CAMPAIGN_STATUS = ["geplant", "in Arbeit", "veröffentlicht", "abgeschlossen"];
+
 function buildMetaFromPayload(body, existingMeta) {
+  const status = VALID_CAMPAIGN_STATUS.includes(body.status)
+    ? body.status
+    : (existingMeta && existingMeta.status) || "geplant";
   const meta = {
     thema: String(body.thema).trim(),
     kanaele: body.kanaele,
-    status: "geplant",
+    status: status,
     zeitraum_start: String(body.zeitraum_start),
   };
   if (body.zeitraum_ende) meta.zeitraum_ende = String(body.zeitraum_ende);
@@ -261,8 +265,10 @@ function handleCreateCampaign(req, res) {
   });
 }
 
-function loadPlannedMeta(slug) {
-  // Nur saubere Slugs akzeptieren (kein Traversal), nur existierende geplante Kampagnen liefern.
+function loadCampaignMeta(slug) {
+  // Nur saubere Slugs akzeptieren (kein Traversal). Bearbeiten/Löschen/Verschieben ist für
+  // ALLE Kampagnen erlaubt (Kundenwunsch) — destruktive Aktionen sichert die Oberfläche
+  // per Bestätigungsdialog ab.
   if (!/^[a-z0-9-]+$/.test(slug)) return { error: [400, "Ungültiger Kampagnen-Slug."] };
   const metaPath = path.join(CAMPAIGNS_DIR, slug, "meta.json");
   if (!fs.existsSync(metaPath)) return { error: [404, "Kampagne nicht gefunden: " + slug] };
@@ -272,14 +278,11 @@ function loadPlannedMeta(slug) {
   } catch {
     return { error: [500, "meta.json ist nicht lesbar/kein gültiges JSON."] };
   }
-  if (meta.status !== "geplant") {
-    return { error: [409, "Nur Kampagnen mit Status 'geplant' können über das Dashboard bearbeitet oder gelöscht werden."] };
-  }
   return { meta, metaPath };
 }
 
 function handleUpdateCampaign(req, res, slug) {
-  const loaded = loadPlannedMeta(slug);
+  const loaded = loadCampaignMeta(slug);
   if (loaded.error) return sendJson(res, loaded.error[0], { ok: false, errors: [loaded.error[1]] });
 
   readBody(req, (raw) => {
@@ -310,7 +313,7 @@ function handleUpdateCampaign(req, res, slug) {
 function handleMoveCampaign(req, res, slug) {
   // Kalender-Drag&Drop: zeitraum_start verschieben (nur geplante Kampagnen); ein vorhandenes
   // zeitraum_ende wird um dieselbe Tages-Differenz mitverschoben, damit die Dauer erhalten bleibt.
-  const loaded = loadPlannedMeta(slug);
+  const loaded = loadCampaignMeta(slug);
   if (loaded.error) return sendJson(res, loaded.error[0], { ok: false, errors: [loaded.error[1]] });
 
   readBody(req, (raw) => {
@@ -455,7 +458,7 @@ function handleDeleteIdee(res, id) {
 }
 
 function handleDeleteCampaign(res, slug) {
-  const loaded = loadPlannedMeta(slug);
+  const loaded = loadCampaignMeta(slug);
   if (loaded.error) return sendJson(res, loaded.error[0], { ok: false, errors: [loaded.error[1]] });
 
   try {

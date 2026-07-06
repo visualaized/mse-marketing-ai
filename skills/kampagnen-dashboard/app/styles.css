@@ -266,6 +266,19 @@ body {
   white-space: nowrap;
 }
 
+/* Erledigt-Haken: Kanal hat bereits registrierte Inhalte (meta.json "inhalte").
+   Kein Grün — Markenregel: nur Anthrazit/Blau-Abstufungen. */
+.pill--done {
+  border-color: var(--color-anthracite);
+  color: var(--color-anthracite);
+}
+
+.pill__check {
+  color: var(--color-blue);
+  font-weight: 700;
+  margin-right: 5px;
+}
+
 /* Status badges — nur Grau/Anthrazit/Blau-Abstufungen, keine Ampelfarben */
 .status {
   display: inline-block;

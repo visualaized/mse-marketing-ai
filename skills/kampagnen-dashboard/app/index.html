@@ -94,6 +94,16 @@
             <label class="eyebrow" for="plan-ende">Ende (optional)</label>
             <input class="control" type="date" id="plan-ende">
           </div>
+
+          <div class="plan__field">
+            <label class="eyebrow" for="plan-status">Status</label>
+            <select class="control" id="plan-status">
+              <option value="geplant">geplant</option>
+              <option value="in Arbeit">in Arbeit</option>
+              <option value="veröffentlicht">veröffentlicht</option>
+              <option value="abgeschlossen">abgeschlossen</option>
+            </select>
+          </div>
         </div>
 
         <fieldset class="plan__kanaele">
@@ -147,7 +157,7 @@
         <button type="button" class="cal__nav" id="cal-next" aria-label="Nächster Monat">&#8250;</button>
       </div>
       <div class="cal__grid" id="cal-grid"></div>
-      <p class="cal__hint">Geplante Kampagnen lassen sich per Drag &amp; Drop verschieben &middot; Klick auf eine Kampagne &ouml;ffnet die Details &middot; Di/Do/Fr zeigen die Themen-Tage (Orientierung, nicht fix).</p>
+      <p class="cal__hint">Kampagnen lassen sich per Drag &amp; Drop verschieben &middot; Klick auf eine Kampagne &ouml;ffnet die Details &middot; Di/Do/Fr zeigen die Themen-Tage (Orientierung, nicht fix).</p>
     </div>
 
     <!-- ============================================================
@@ -256,6 +266,46 @@
       case "abgeschlossen": return "status status--faded";
       default: return "status status--outline";
     }
+  }
+
+  // Erledigt-Erkennung: prüft anhand der registrierten Inhalte (meta.json "inhalte"),
+  // ob für einen Kanal bereits mindestens ein Inhalt existiert. Muster matchen auf
+  // label + pfad (dokumentiert in SKILL.md — Bausteine führen den Kanalnamen im Label).
+  var KANAL_MATCHER = {
+    "Bild/Video": /bild|video|hero|detail|foto/i,
+    "Instagram": /instagram/i,
+    "LinkedIn": /linkedin/i,
+    "X": /(^|[^a-z0-9])x-post|-x\//i,
+    "Newsletter-DE": /newsletter.*(\(de\)|-de\b|-de\/)/i,
+    "Newsletter-EN": /newsletter.*(\(en\)|-en\b|-en\/)/i,
+    "Landing Page": /landing/i,
+    "E-Mail-Signatur": /signatur/i,
+    "Whitepaper": /whitepaper/i,
+    "Google Business": /google.?business/i,
+    "Google Ads": /google.?ads/i
+  };
+
+  function kanalErledigt(kanal, inhalte) {
+    var rx = KANAL_MATCHER[kanal];
+    if (!rx || !Array.isArray(inhalte)) return false;
+    return inhalte.some(function (i) {
+      return i && rx.test(String(i.label || "") + " " + String(i.pfad || ""));
+    });
+  }
+
+  function kanalPill(kanal, campaign) {
+    var pill = document.createElement("span");
+    var done = kanalErledigt(kanal, campaign.inhalte);
+    pill.className = "pill" + (done ? " pill--done" : "");
+    if (done) {
+      var check = document.createElement("span");
+      check.className = "pill__check";
+      check.textContent = "\u2713";
+      pill.appendChild(check);
+      pill.title = "Inhalt vorhanden";
+    }
+    pill.appendChild(document.createTextNode(kanal));
+    return pill;
   }
 
   function escapeHtml(value) {
@@ -389,9 +439,9 @@
         tdThema.appendChild(details);
       }
 
-      // Bearbeiten/Löschen — nur für GEPLANTE Kampagnen und nur bei laufendem Server
+      // Bearbeiten/Löschen — für ALLE Kampagnen, sobald der Server läuft
       // (planningEnabled wird nach erfolgreichem /api/ping gesetzt).
-      if (c.status === "geplant" && state.planningEnabled && c.slug) {
+      if (state.planningEnabled && c.slug) {
         var actions = document.createElement("div");
         actions.className = "row-actions";
         var editBtn = document.createElement("button");
@@ -412,10 +462,7 @@
 
       var tdKanaele = document.createElement("td");
       (c.kanaele || []).forEach(function (k) {
-        var pill = document.createElement("span");
-        pill.className = "pill";
-        pill.textContent = k;
-        tdKanaele.appendChild(pill);
+        tdKanaele.appendChild(kanalPill(k, c));
       });
       if (!c.kanaele || !c.kanaele.length) {
         tdKanaele.textContent = "—";
@@ -537,9 +584,10 @@
 
   function startEditCampaign(c) {
     state.editingSlug = c.slug;
-    document.getElementById("plan-form-title").textContent = "Geplante Kampagne bearbeiten";
+    document.getElementById("plan-form-title").textContent = "Kampagne bearbeiten";
     document.querySelector(".plan__submit").textContent = "Änderungen speichern";
     document.getElementById("plan-thema").value = c.thema || "";
+    document.getElementById("plan-status").value = c.status || "geplant";
     document.getElementById("plan-start").value = c.zeitraum_start || "";
     document.getElementById("plan-ende").value = c.zeitraum_ende || "";
     document.getElementById("plan-notiz").value = c.notiz || "";
@@ -553,7 +601,7 @@
   }
 
   function deleteCampaign(c) {
-    if (!window.confirm('Geplante Kampagne "' + (c.thema || c.slug) + '" wirklich löschen?')) {
+    if (!window.confirm('Kampagne "' + (c.thema || c.slug) + '" wirklich löschen? (Die Inhalte in Outputs/ bleiben erhalten.)')) {
       return;
     }
     fetch("./api/campaigns/" + encodeURIComponent(c.slug), { method: "DELETE" })
@@ -603,6 +651,7 @@
     var payload = {
       thema: document.getElementById("plan-thema").value.trim(),
       kanaele: kanaele,
+      status: document.getElementById("plan-status").value,
       zeitraum_start: document.getElementById("plan-start").value,
       zeitraum_ende: document.getElementById("plan-ende").value || undefined,
       notiz: document.getElementById("plan-notiz").value.trim() || undefined
@@ -724,7 +773,7 @@
           chip.textContent = c.thema || c.slug;
           chip.title = (c.thema || "") + " (" + (c.status || "") + ")";
           chip.addEventListener("click", function () { openCampaignModal(c); });
-          if (c.status === "geplant" && state.planningEnabled) {
+          if (state.planningEnabled) {
             chip.draggable = true;
             chip.addEventListener("dragstart", function (ev) {
               ev.dataTransfer.setData("text/plain", c.slug);
@@ -782,10 +831,7 @@
 
     var kanaele = document.createElement("div");
     (c.kanaele || []).forEach(function (k) {
-      var pill = document.createElement("span");
-      pill.className = "pill";
-      pill.textContent = k;
-      kanaele.appendChild(pill);
+      kanaele.appendChild(kanalPill(k, c));
     });
     body.appendChild(kanaele);
 
@@ -818,7 +864,7 @@
       body.appendChild(ul);
     }
 
-    if (c.status === "geplant" && state.planningEnabled) {
+    if (state.planningEnabled) {
       var actions = document.createElement("div");
       actions.className = "row-actions";
       var edit = document.createElement("button");

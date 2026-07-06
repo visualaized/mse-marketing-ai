@@ -75,6 +75,17 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.16.0** (2026-07-06) — Kampagnen-Dashboard: Bearbeiten/Löschen für alle Kampagnen + Erledigt-Haken:
+  1. **Bearbeiten & Löschen für jeden Status:** Die Buttons erscheinen jetzt in jeder Kampagnenzeile
+     (nicht mehr nur bei Status „geplant"); das Formular hat eine Status-Auswahl (geplant / in Arbeit /
+     veröffentlicht / abgeschlossen), der Server validiert den Wert. Löschen mit Bestätigungsdialog
+     (Outputs bleiben erhalten), Kalender-Drag&Drop ebenfalls für alle Status.
+  2. **✓-Haken an Kanal-Badges:** Das Dashboard erkennt automatisch anhand der in `meta.json`
+     registrierten `inhalte`, für welche Kanäle bereits Inhalte vorliegen, und markiert die Badges
+     in Liste und Detail-Modal mit einem kleinen Haken (blau/anthrazit, kein Grün). Verbindliche
+     Regel für alle Bausteine: `inhalte`-Labels führen den Kanalnamen (Muster-Katalog in
+     `kampagnen-dashboard` SKILL.md, Abschnitt 4c).
+
 - **1.15.1** (2026-07-03) — Fix Kampagnen-Dashboard: Die Tabellenüberschriften (Thema/Kanäle/
   Status/Zeitraum/Verantwortlich) saßen nicht über den Spalten, sondern stapelten sich links —
   Ursache: die `.eyebrow`-Klasse setzt global `display:inline-block` und hebelte auf den

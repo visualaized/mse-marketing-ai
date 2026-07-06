@@ -19,17 +19,16 @@ Das Kampagnen-Dashboard hat **zwei Aufgaben**:
    übernimmt deren Daten (siehe Abschnitt 5).
 
 Zusätzlich zeigt das Dashboard pro Kampagne die **generierten Inhalte** an (ausklappbare Liste mit
-Links zu Bildern, Newslettern, Landing Page etc. — siehe `inhalte`-Feld in Abschnitt 2), und
-**geplante** Kampagnen lassen sich über die Oberfläche **bearbeiten und löschen** (Abschnitt 4).
+Links zu Bildern, Newslettern, Landing Page etc. — siehe `inhalte`-Feld in Abschnitt 2), markiert
+Kanal-Badges mit einem **✓-Haken**, sobald für den Kanal ein Inhalt registriert ist (Abschnitt 4c),
+und **alle** Kampagnen lassen sich über die Oberfläche **bearbeiten und löschen** (Abschnitt 4).
 
 Bewusst **nicht** Teil dieses Bausteins:
 - **Keine Freigabe-/Genehmigungsworkflows.** Das Dashboard zeigt Status an, es steuert ihn nicht.
   Auch das Planungsformular ist reine Datenerfassung, kein Genehmigungsschritt.
-- **Kein Bearbeiten/Löschen von Kampagnen, die über den Status `"geplant"` hinaus sind** —
-  Bearbeiten/Löschen über die Oberfläche gilt ausschließlich für geplante Kampagnen (der Server
-  weist alles andere mit HTTP 409 ab). Laufende/veröffentlichte/abgeschlossene Kampagnen werden
-  weiterhin über die `meta.json`-Dateien gepflegt (vom Nutzer selbst oder automatisch durch andere
-  Bausteine).
+- **Keine Inhalts-Erstellung.** Bearbeiten im Dashboard ändert nur die Kampagnen-Metadaten
+  (Thema, Kanäle, Status, Zeitraum, Notiz) — die eigentlichen Inhalte entstehen weiterhin über die
+  Bausteine der CIDES-Zentrale und werden dort im `inhalte`-Feld registriert.
 - **Kein Login/Zugriffsschutz.** Falls der Kunde den Zugriff auf das Dashboard einschränken möchte,
   ist das Aufgabe seiner bestehenden Server-/Netzwerk-Infrastruktur (z. B. Basic-Auth in Apache/Nginx,
   VPN, internes Netz) — nicht Teil dieses Bausteins.
@@ -222,13 +221,13 @@ schreibt `Campaigns/<slug>/meta.json` mit `status: "geplant"` und `quelle: "dash
 Die Liste aktualisiert sich sofort (Live-Index). Der **Inhalt** der `meta.json` behält echte
 Umlaute — nur der Ordnername ist ASCII.
 
-**Bearbeiten & Löschen geplanter Kampagnen:** In der Zeile jeder Kampagne mit Status `"geplant"`
-erscheinen (nur bei laufendem Server) die Buttons **Bearbeiten** und **Löschen**. Bearbeiten öffnet
-das Planungsformular vorbefüllt (Speichern per `PUT`); Löschen fragt per Bestätigungsdialog nach
-und entfernt den kompletten `Campaigns/<slug>/`-Ordner. Beides ist **serverseitig auf Status
-`"geplant"` beschränkt** (HTTP 409 sonst) — laufende oder abgeschlossene Kampagnen können über die
-Oberfläche weder geändert noch gelöscht werden. Beim Bearbeiten bleiben Felder erhalten, die das
-Formular nicht kennt (z. B. bereits registrierte `inhalte`).
+**Bearbeiten & Löschen:** In der Zeile **jeder** Kampagne erscheinen (nur bei laufendem Server)
+die Buttons **Bearbeiten** und **Löschen** — unabhängig vom Status. Bearbeiten öffnet das
+Planungsformular vorbefüllt inklusive Status-Auswahl (geplant / in Arbeit / veröffentlicht /
+abgeschlossen; Speichern per `PUT`); Löschen fragt per Bestätigungsdialog nach und entfernt den
+kompletten `Campaigns/<slug>/`-Ordner (bereits generierte Dateien unter `Outputs/` bleiben
+unberührt). Beim Bearbeiten bleiben Felder erhalten, die das Formular nicht kennt (z. B. bereits
+registrierte `inhalte` und `quelle`).
 
 **Generierte Inhalte anzeigen:** Enthält eine `meta.json` das `inhalte`-Feld (Abschnitt 2), zeigt
 die Kampagnenzeile eine ausklappbare Liste („n Inhalte anzeigen") — jeder Eintrag öffnet die Datei
@@ -241,9 +240,9 @@ Markdown-Posts etc.).
 |---|---|
 | `GET /api/ping` | Feature-Detection: antwortet nur der Server (`{ok, planning: true}`); bei statischem Hosting 404 → Formular/Buttons bleiben versteckt. |
 | `POST /api/campaigns` | Neue geplante Kampagne. Body: `{thema, kanaele[], zeitraum_start, zeitraum_ende?, notiz?, verantwortlich?}`. Antwort `201` mit `{ok, slug, meta}`. |
-| `PUT /api/campaigns/<slug>` | Geplante Kampagne bearbeiten (gleicher Body wie POST; nur Status `"geplant"`, sonst 409). Vorhandene `inhalte`/`quelle` bleiben erhalten. |
-| `DELETE /api/campaigns/<slug>` | Geplante Kampagne löschen (nur Status `"geplant"`, sonst 409). Entfernt den Kampagnen-Ordner. |
-| `PATCH /api/campaigns/<slug>/termin` | Kalender-Drag&Drop: `{zeitraum_start}` verschieben (nur `"geplant"`); `zeitraum_ende` wandert um dieselbe Differenz mit. |
+| `PUT /api/campaigns/<slug>` | Kampagne bearbeiten (gleicher Body wie POST + optional `status`; alle Statuswerte erlaubt). Vorhandene `inhalte`/`quelle` bleiben erhalten. |
+| `DELETE /api/campaigns/<slug>` | Kampagne löschen (alle Statuswerte; die Oberfläche fragt vorher per Dialog nach). Entfernt den Kampagnen-Ordner. |
+| `PATCH /api/campaigns/<slug>/termin` | Kalender-Drag&Drop: `{zeitraum_start}` verschieben (alle Statuswerte); `zeitraum_ende` wandert um dieselbe Differenz mit. |
 | `GET /api/ideen` | Ideen-Sammlung + Themen-Tage (legt `Campaigns/ideen.json` mit Standard-Themen-Tagen an, falls fehlend). |
 | `POST /api/ideen` | Eigene Idee/Notiz erfassen: `{titel, beschreibung?, themen_tag?}` → `status:"offen"`, `quelle:"kunde"`. |
 | `PATCH /api/ideen/<id>` | Idee aktualisieren (`status` offen/akzeptiert/abgelehnt/umgesetzt, `titel`, `beschreibung`, `themen_tag`). |
@@ -328,12 +327,34 @@ Themenideen vor", „Ideen für nächste Woche/den Content-Plan" o. ä.):
 
 Zweite Ansicht „Kalender": Monatsraster (Mo–So, Navigation ‹ ›), Kampagnen erscheinen als Chip an
 ihrem `zeitraum_start` (Statusfarben wie die Badges). **Klick auf einen Chip** öffnet das
-Detail-Modal (Status, Zeitraum, Kanäle, Verantwortlich/Notiz, klickbare Inhalte-Links, bei
-geplanten Kampagnen ein Bearbeiten-Shortcut). **Geplante Kampagnen** lassen sich **per Drag &
-Drop** auf einen anderen Tag ziehen — das ruft `PATCH /api/campaigns/<slug>/termin` auf,
-verschiebt `zeitraum_start` und wandert ein vorhandenes `zeitraum_ende` um dieselbe Differenz mit
-(Dauer bleibt erhalten). Kampagnen mit anderem Status sind im Kalender nur lesend. Die Spalten
-Di/Do/Fr tragen die Themen-Tage-Fokusse als dezente Orientierung.
+Detail-Modal (Status, Zeitraum, Kanäle mit ✓-Haken, Verantwortlich/Notiz, klickbare
+Inhalte-Links, Bearbeiten-Shortcut). **Alle Kampagnen** lassen sich **per Drag & Drop** auf einen
+anderen Tag ziehen — das ruft `PATCH /api/campaigns/<slug>/termin` auf, verschiebt
+`zeitraum_start` und wandert ein vorhandenes `zeitraum_ende` um dieselbe Differenz mit (Dauer
+bleibt erhalten). Die Spalten Di/Do/Fr tragen die Themen-Tage-Fokusse als dezente Orientierung.
+
+## 4c. Erledigt-Haken an Kanal-Badges
+
+Das Dashboard erkennt automatisch, für welche Kanäle einer Kampagne bereits Inhalte vorliegen, und
+setzt einen kleinen **✓-Haken** in das jeweilige Kanal-Badge (Liste UND Detail-Modal, Tooltip
+„Inhalt vorhanden"). Grundlage sind ausschließlich die in `meta.json` unter `inhalte` registrierten
+Einträge: pro Kanal wird per Muster gegen `label + pfad` jedes Eintrags geprüft. Die Muster (Datei
+`index.html`, Objekt `KANAL_MATCHER`):
+
+| Kanal | erkennt (label oder pfad enthält) |
+|---|---|
+| Bild/Video | „bild", „video", „hero", „detail", „foto" |
+| Instagram / LinkedIn / Whitepaper | Kanalname |
+| X | „x-post" oder Pfadsegment `…-x/` |
+| Newsletter-DE / -EN | „newsletter" + „(DE)"/„-de" bzw. „(EN)"/„-en" |
+| Landing Page | „landing" |
+| E-Mail-Signatur | „signatur" |
+| Google Business / Google Ads | „google business" / „google ads" (auch mit `-`) |
+
+**Konsequenz für alle Bausteine:** Beim Registrieren von Outputs im `inhalte`-Feld MUSS das `label`
+mit dem Kanalnamen beginnen bzw. ihn enthalten (z. B. „Instagram-Carousel (Slide 1)",
+„Newsletter (DE)", „Google-Ads-Entwurf") — sonst bleibt der Haken aus. Ein Haken bedeutet „mindestens
+ein Inhalt vorhanden", nicht „vollständig freigegeben/veröffentlicht".
 
 ## 5. Planungsabgleich durch die CIDES-Zentrale (Pflicht-Verhalten)
 
@@ -358,11 +379,13 @@ Datenmodell; die Abgleichslogik lebt in der Zentrale.
       (Feature-Detection funktioniert)?
 - [ ] Testweise eingeplante Kampagne erscheint sofort in der Liste UND als
       `Campaigns/<slug>/meta.json` auf der Platte?
-- [ ] Bearbeiten/Löschen funktioniert für geplante Kampagnen — und wird für Kampagnen mit anderem
-      Status serverseitig abgewiesen (409)?
+- [ ] Bearbeiten/Löschen funktioniert für Kampagnen **jedes** Status (Buttons in jeder Zeile,
+      Status-Auswahl im Formular, Löschen mit Bestätigungsdialog)?
+- [ ] Kanal-Badges zeigen ✓-Haken für Kanäle mit registrierten `inhalte`-Einträgen (Labels führen
+      den Kanalnamen)?
 - [ ] Generierte Outputs der Kampagne im `inhalte`-Feld registriert, Links öffnen über `/hub/`
       tatsächlich die Dateien?
 - [ ] `verantwortlich` enthält eine kundeninterne Angabe (Standard „Marketing-Team"), **niemals**
       den Namen eines externen Dienstleisters/einer Agentur?
-- [ ] Keine Freigabe-Buttons, keine Login-Maske, kein Bearbeiten/Löschen für Kampagnen jenseits von
-      Status „geplant" in der Weboberfläche ergänzt — das widerspricht dem Scope dieses Bausteins.
+- [ ] Keine Freigabe-Buttons und keine Login-Maske in der Weboberfläche ergänzt — das widerspricht
+      dem Scope dieses Bausteins.

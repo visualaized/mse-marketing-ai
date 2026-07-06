@@ -183,7 +183,10 @@ automatisch aus. Dabei verbindlich:
 - **Jeden fertigen Output im `inhalte`-Feld der `meta.json` registrieren** (`{label, pfad}`, Pfad
   relativ zum Hub-Root, an das Array anhängen) — das Dashboard zeigt diese Liste dem Kunden als
   klickbare „Inhalte anzeigen"-Links pro Kampagne. Ein Output ohne `inhalte`-Eintrag ist für den
-  Kunden im Dashboard unsichtbar und gilt als nicht fertig abgelegt.
+  Kunden im Dashboard unsichtbar und gilt als nicht fertig abgelegt. Das `label` MUSS den
+  Kanalnamen führen (z. B. „Instagram-Carousel (Slide 1)", „Newsletter (DE)", „Google-Ads-Entwurf"),
+  denn das Dashboard erkennt daran automatisch erledigte Kanäle und setzt ✓-Haken an die
+  Kanal-Badges (Muster-Katalog im `kampagnen-dashboard`-Skill, Abschnitt 4c).
 - **`verantwortlich` ist immer eine kundeninterne Angabe** (Standard: `"Marketing-Team"`) — niemals
   den Namen eines externen Dienstleisters/einer Agentur eintragen; das Dashboard ist eine
   kundeninterne Ansicht.
