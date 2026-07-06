@@ -141,41 +141,30 @@ li { font-size: 10pt; line-height: 1.5; margin-bottom: 1.5mm; }
   color: #5D6A77;
 }
 
-/* ---------- Titelseite (dunkel, wie Website-Hero/-Footer) ---------- */
+/* ---------- Titelseite (HELL — Kundenvorgabe: Whitepaper werden auch gedruckt,
+   deshalb KEINE großflächig dunklen Seitenhintergründe; das Foto bleibt als
+   Bild-Block im oberen Seitendrittel, der Titelbereich liegt auf Weiß) ---------- */
 .page--cover {
-  background: #0D0E11;
-  color: #FFF;
+  background: #FFFFFF;
+  color: #0D0E11;
   padding: 0;
 }
 
 .cover__image {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.85;
-}
-
-/* Lesbarkeits-Scrim für den Titelbereich: weicher Verlauf von transparent auf gedecktes
-   Ink Black am unteren Seitenrand — NUR im Textbereich, kein Overlay über die ganze Seite.
-   WICHTIG: In Druckvorlagen NIEMALS text-shadow verwenden — Chrome rastert geblurte
-   text-shadows beim --print-to-pdf als eckige dunkle Kästen hinter den Zeilen (bekannter
-   Export-Bug). CSS-Verläufe rendern dagegen zuverlässig. */
-.cover__scrim {
-  position: absolute;
+  top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  height: 60%;
-  background: linear-gradient(to bottom, rgba(13,14,17,0) 0%, rgba(13,14,17,0.92) 100%);
+  height: 150mm;
+  width: 100%;
+  object-fit: cover;
 }
 
 .cover__content {
   position: absolute;
   left: 20mm;
   right: 20mm;
-  bottom: 30mm;
+  top: 165mm;
 }
 
 .cover__eyebrow {
@@ -183,7 +172,7 @@ li { font-size: 10pt; line-height: 1.5; margin-bottom: 1.5mm; }
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
-  color: #C9CDD1;
+  color: #5D6A77;
   margin: 0 0 5mm 0;
 }
 
@@ -192,18 +181,19 @@ li { font-size: 10pt; line-height: 1.5; margin-bottom: 1.5mm; }
   line-height: 1.15;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #FFF;
+  color: #0D0E11;
   margin: 0 0 6mm 0;
 }
 
 .cover__subtitle {
   font-size: 11pt;
   line-height: 1.5;
-  color: #E4E6E8;
+  color: #0D0E11;
   max-width: 130mm;
   margin: 0;
 }
 
+/* Badge liegt auf dem Foto (dunkle Editorial-Bilder) — weißer Rahmen dort korrekt */
 .cover__badge {
   position: absolute;
   top: 14mm;
@@ -213,7 +203,7 @@ li { font-size: 10pt; line-height: 1.5; margin-bottom: 1.5mm; }
   text-transform: uppercase;
   font-weight: 600;
   color: #FFF;
-  border: 0.6pt solid rgba(255,255,255,0.6);
+  border: 0.6pt solid rgba(255,255,255,0.7);
   padding: 2.2mm 4.5mm;
 }
 
@@ -230,12 +220,12 @@ li { font-size: 10pt; line-height: 1.5; margin-bottom: 1.5mm; }
   left: 20mm;
   right: 20mm;
   bottom: 12mm;
-  border-top: 0.4pt solid rgba(248,248,248,0.23);
+  border-top: 0.4pt solid #D9DCDF;
   padding-top: 3mm;
   font-size: 7pt;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #C9CDD1;
+  color: #5D6A77;
   display: flex;
   justify-content: space-between;
 }
@@ -279,15 +269,18 @@ li { font-size: 10pt; line-height: 1.5; margin-bottom: 1.5mm; }
   color: #5D6A77;
 }
 
-/* Dunkle Statement-/Quote-Box (wie block--black) */
+/* Statement-/Quote-Box — HELL (Druckvorgabe: keine dunklen Vollflächen im PDF).
+   Light Grey wie .bg--light, kräftige dunkle Typo, dünner dunkler Balken links
+   als eckiges Akzent-Element (statt Flächen-Schwarz). */
 .statement {
-  background: #0D0E11;
-  color: #FFF;
+  background: #F8F8F8;
+  border-left: 1.2mm solid #0D0E11;
+  color: #0D0E11;
   padding: 8mm 9mm;
   margin: 0 0 5mm 0;
 }
 .statement p {
-  color: #FFF;
+  color: #0D0E11;
   font-size: 13pt;
   line-height: 1.35;
   font-weight: 700;
@@ -333,56 +326,74 @@ table.data td {
 
 /* ---------- Diagramm-Stile (SVG) — 100 % on brand ----------
    Regeln (siehe SKILL.md Abschnitt "Schaubilder"):
-   - Farben NUR: #0D0E11 (Primärreihe), #5D6A77 (Sekundärreihe), #3D96D2 (EINE
-     hervorgehobene Reihe/Wert, sparsam), #F8F8F8/#D9DCDF (Flächen/Gitter).
-   - Eckige Balken (kein rx), hairline-Gitterlinien, Beschriftung Nudica.
-   - Achsen-/Wertelabels wie Eyebrow (klein, uppercase, 600, #5D6A77). ---------- */
-.chart { margin: 0 0 5mm 0; }
+   - Farben NUR: #0D0E11 (Primär), #5D6A77 (Sekundär), #3D96D2 (EIN Akzentwert,
+     sparsam), #D9DCDF/#F8F8F8 (weitere Anteile/Flächen/Gitter).
+   - Formen eckig/flach, hairline-Gitter, kein 3D, keine Verläufe/Schatten.
+   - Beschriftung ZURÜCKHALTEND (Kundenvorgabe): Labels/Werte kleiner als der
+     Body-Text (~6–7pt im Druck), nie dominanter als der Inhalt. Das viewBox des
+     Muster-SVGs entspricht bei .chart-Standardbreite (130mm) ca. 1 unit ≈ 0,76mm —
+     die px-Werte unten sind darauf kalibriert; bei eigenem viewBox entsprechend
+     umrechnen, Zielgröße im Druck IMMER ~6–7pt. ---------- */
+.chart { margin: 0 0 5mm 0; max-width: 130mm; }
 .chart svg { width: 100%; height: auto; display: block; }
 .chart .chart-label {
   font-family: 'Nudica', Arial, sans-serif;
-  font-size: 6.5px;
+  font-size: 3px;               /* ≈ 6.5pt im Druck bei 130mm Breite */
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   fill: #5D6A77;
 }
 .chart .chart-value {
   font-family: 'Nudica', Arial, sans-serif;
-  font-size: 7px;
+  font-size: 3.2px;             /* ≈ 7pt im Druck */
   font-weight: 700;
   fill: #0D0E11;
 }
-.chart .chart-grid { stroke: #D9DCDF; stroke-width: 0.3; }
-.chart .chart-axis { stroke: #0D0E11; stroke-width: 0.6; }
+.chart .chart-grid { stroke: #D9DCDF; stroke-width: 0.25; }
+.chart .chart-axis { stroke: #0D0E11; stroke-width: 0.45; }
+/* Balken (vertikal/horizontal/gestapelt) */
 .chart .bar-primary { fill: #0D0E11; }
 .chart .bar-secondary { fill: #5D6A77; }
 .chart .bar-accent { fill: #3D96D2; }
-.chart .line-primary { stroke: #0D0E11; stroke-width: 1.2; fill: none; }
-.chart .line-accent { stroke: #3D96D2; stroke-width: 1.2; fill: none; }
+.chart .bar-rest { fill: #D9DCDF; }
+/* Linien-/Flächendiagramme */
+.chart .line-primary { stroke: #0D0E11; stroke-width: 0.8; fill: none; }
+.chart .line-secondary { stroke: #5D6A77; stroke-width: 0.8; fill: none; stroke-dasharray: 2 1.2; }
+.chart .line-accent { stroke: #3D96D2; stroke-width: 0.8; fill: none; }
+.chart .area-primary { fill: rgba(13,14,17,0.07); stroke: none; }
 .chart .dot { fill: #0D0E11; }
 .chart .dot-accent { fill: #3D96D2; }
+/* Torten-/Donut-Segmente: flach, Markenfarben, weiße Fugen, KEIN 3D/Explode.
+   Reihenfolge nach Größe; #3D96D2 nur für DAS hervorzuhebende Segment;
+   Sammelrest immer #D9DCDF. Max. 4–5 Segmente, Beschriftung AUSSEN. */
+.chart .pie-1 { fill: #0D0E11; stroke: #FFFFFF; stroke-width: 0.6; }
+.chart .pie-2 { fill: #5D6A77; stroke: #FFFFFF; stroke-width: 0.6; }
+.chart .pie-3 { fill: #3D96D2; stroke: #FFFFFF; stroke-width: 0.6; }
+.chart .pie-rest { fill: #D9DCDF; stroke: #FFFFFF; stroke-width: 0.6; }
+.chart .pie-callout { stroke: #5D6A77; stroke-width: 0.25; fill: none; }
 
-/* ---------- Schlussseite: CTA + Kontakt (dunkel) ---------- */
+/* ---------- Schlussseite: CTA + Kontakt (HELL — Druckvorgabe: keine dunklen
+   Vollflächen; Struktur wie die Inhaltsseiten, CTA-Zeile im Website-.btn-Stil) ---------- */
 .page--closing {
-  background: #0D0E11;
-  color: #FFF;
+  background: #FFFFFF;
+  color: #0D0E11;
 }
-.page--closing .eyebrow { color: #C9CDD1; }
-.page--closing h2 { color: #FFF; font-size: 22pt; }
-.page--closing p { color: #E4E6E8; }
+.page--closing .eyebrow { color: #5D6A77; }
+.page--closing h2 { color: #0D0E11; font-size: 22pt; }
+.page--closing p { color: #0D0E11; }
 
 .cta-line {
   display: flex;
   align-items: center;
   gap: 4mm;
   margin: 8mm 0 10mm 0;
-  color: #FFF;
+  color: #0D0E11;
 }
 .cta-line__circle {
   width: 9mm;
   height: 9mm;
-  border: 0.6pt solid #FFF;
+  border: 0.6pt solid currentColor;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -402,11 +413,11 @@ table.data td {
   left: 20mm;
   right: 20mm;
   bottom: 12mm;
-  border-top: 0.4pt solid rgba(248,248,248,0.23);
+  border-top: 0.4pt solid #D9DCDF;
   padding-top: 3mm;
   font-size: 7pt;
   line-height: 1.7;
-  color: #C9CDD1;
+  color: #5D6A77;
 }
 
 </style>
@@ -414,12 +425,12 @@ table.data td {
 <body>
 
   <!-- ============================================================
-       SEITE 1 — TITELSEITE (dunkel; Bildzeichen in der Ecke,
+       SEITE 1 — TITELSEITE (HELL, druckfreundlich: Foto als Bild-Block
+       oben, Titel auf Weiß darunter; Bildzeichen in der Ecke,
        Kundenregel: Logo NIE frei im Raum)
        ============================================================ -->
   <div class="page page--cover">
     <img class="cover__image" src="{{COVER_IMAGE}}" alt="">
-    <div class="cover__scrim"></div>
     <img class="cover__logo" src="{{LOGO_ICON}}" alt="MSE Filterpressen">
     <div class="cover__badge">Whitepaper</div>
     <div class="cover__content">
@@ -521,6 +532,50 @@ table.data td {
       </svg>
       <p class="small" style="margin-top:2mm;">{{CHART_CAPTION}}</p>
     </div>
+
+    <!-- ============================================================
+         WEITERE DIAGRAMM-MUSTER (auskommentiert — bei Bedarf einsetzen,
+         Werte/Geometrie anpassen, Klassen NICHT ändern; Auswahlhilfe
+         nach Datentyp: siehe SKILL.md Abschnitt 5):
+
+         LINIENDIAGRAMM (Verlauf über die Zeit; 2. Reihe gestrichelt):
+         <div class="chart">
+           <svg viewBox="0 0 170 70" xmlns="http://www.w3.org/2000/svg">
+             <line class="chart-grid" x1="14" y1="12" x2="162" y2="12"/>
+             <line class="chart-grid" x1="14" y1="30" x2="162" y2="30"/>
+             <line class="chart-grid" x1="14" y1="48" x2="162" y2="48"/>
+             <line class="chart-axis" x1="14" y1="58" x2="162" y2="58"/>
+             <polyline class="line-primary" points="14,46 51,40 88,30 125,22 162,14"/>
+             <polyline class="line-secondary" points="14,50 51,48 88,44 125,42 162,38"/>
+             <circle class="dot-accent" cx="162" cy="14" r="1.4"/>
+             <text class="chart-value" x="160" y="10" text-anchor="end">WERT</text>
+             <text class="chart-label" x="14" y="63">2022</text>
+             <text class="chart-label" x="88" y="63" text-anchor="middle">2024</text>
+             <text class="chart-label" x="162" y="63" text-anchor="end">2026</text>
+           </svg>
+           <p class="small" style="margin-top:2mm;">Quelle: …</p>
+         </div>
+
+         TORTENDIAGRAMM (Anteile am Ganzen; flach, weiße Fugen, max. 4–5
+         Segmente, Akzentblau nur für DAS eine hervorzuhebende Segment,
+         Sammelrest pie-rest, Beschriftung AUSSEN — Pfade: Kreis um (50,35),
+         r=22; Segment = M50,35 L<start> A22,22 0 <large-arc>,1 <ende> Z):
+         <div class="chart" style="max-width:110mm;">
+           <svg viewBox="0 0 170 70" xmlns="http://www.w3.org/2000/svg">
+             <path class="pie-1" d="M50,35 L50,13 A22,22 0 0,1 71.2,41.1 Z"/>
+             <path class="pie-2" d="M50,35 L71.2,41.1 A22,22 0 0,1 38.9,54.3 Z"/>
+             <path class="pie-3" d="M50,35 L38.9,54.3 A22,22 0 0,1 28.4,29.4 Z"/>
+             <path class="pie-rest" d="M50,35 L28.4,29.4 A22,22 0 0,1 50,13 Z"/>
+             <text class="chart-value" x="82" y="22">42 %</text>
+             <text class="chart-label" x="82" y="26">SEGMENT A</text>
+             <text class="chart-value" x="82" y="38">28 %</text>
+             <text class="chart-label" x="82" y="42">SEGMENT B</text>
+             <text class="chart-value" x="82" y="54">18 % / 12 %</text>
+             <text class="chart-label" x="82" y="58">SEGMENT C / SONSTIGE</text>
+           </svg>
+           <p class="small" style="margin-top:2mm;">Quelle: …</p>
+         </div>
+         ============================================================ -->
 
     <div class="statement">
       <p>{{STATEMENT_TEXT}}</p>

@@ -20,7 +20,7 @@ in Klaviyo als **Draft-Kampagne** an (Template + Kampagne + Zuordnung). Er wird 
 ## 0. Markenkern zuerst laden (Pflicht)
 
 Bevor irgendein Text oder HTML erzeugt wird, in dieser Reihenfolge lesen (relativ zum aktuellen
-Arbeitsverzeichnis, dem Marketing-Hub-Root des Kunden):
+Arbeitsverzeichnis, dem CIDES-Root des Kunden):
 
 1. `CLAUDE.md` — kompaktes Master-Brand-Dokument.
 2. `brand/brand-guidelines.md` — vollständiges Regelwerk (Typografie, Bildsprache, Do's & Don'ts).
@@ -28,7 +28,7 @@ Arbeitsverzeichnis, dem Marketing-Hub-Root des Kunden):
 
 Bei Widerspruch gewinnt `CLAUDE.md`. Erfinde niemals eigene Claims, Zahlen oder Farbwerte — fehlt eine
 Angabe, nachfragen statt raten. Existieren diese Dateien nicht, stoppen und den Nutzer darauf
-hinweisen, dass im Marketing-Hub-Ordner des Kunden gearbeitet werden muss.
+hinweisen, dass im CIDES-Ordner des Kunden gearbeitet werden muss.
 
 ## 1. Immer zweisprachig — Deutsch UND Englisch, keine Sprachauswahl mehr nötig
 

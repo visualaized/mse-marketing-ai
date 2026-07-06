@@ -1,5 +1,5 @@
 ---
-description: "Erstellt einen markenkonformen Instagram-Post (Caption + Hashtags + CTA, immer Deutsch) und übernimmt auf Wunsch Veröffentlichung/Planung über Upload-Post. Triggert bei 'Instagram-Post erstellen', 'Post für Instagram', 'IG-Caption schreiben' oder wenn die Marketing-Zentrale den Kanal Instagram auswählt."
+description: "Erstellt einen markenkonformen Instagram-Post (Caption + Hashtags + CTA, immer Deutsch) und übernimmt auf Wunsch Veröffentlichung/Planung über Upload-Post. Triggert bei 'Instagram-Post erstellen', 'Post für Instagram', 'IG-Caption schreiben' oder wenn die CIDES-Zentrale den Kanal Instagram auswählt."
 disable-model-invocation: false
 ---
 
@@ -11,13 +11,13 @@ und übergibt ihn nach kurzer Freigabe an Upload-Post zur Veröffentlichung oder
 ## 1. Wann dieser Baustein läuft
 
 - Der Nutzer will explizit einen Instagram-Post erstellen lassen.
-- Die Marketing-Zentrale hat im Rahmen eines Themas den Kanal Instagram ausgewählt.
+- Die CIDES-Zentrale hat im Rahmen eines Themas den Kanal Instagram ausgewählt.
 - Der Nutzer bittet um Caption-Text, Hashtags oder direkte Veröffentlichung/Planung für Instagram.
 
 ## 2. Pflichtschritt: Markenkern IMMER zuerst laden
 
 Bevor du irgendeinen Text erzeugst, lies **in dieser Reihenfolge** (relativ zum aktuellen
-Arbeitsverzeichnis, dem Marketing-Hub-Root des Kunden):
+Arbeitsverzeichnis, dem CIDES-Root des Kunden):
 
 1. `CLAUDE.md` — kompaktes Master-Brand-Dokument.
 2. `brand/brand-guidelines.md` — vollständiges Regelwerk, insbesondere Kapitel zu Tonalität und Kanälen.
@@ -27,7 +27,7 @@ Arbeitsverzeichnis, dem Marketing-Hub-Root des Kunden):
 Diese drei Dateien sind die einzige verbindliche Quelle für Tonalität, Sprache, Claims und Do's/Don'ts.
 **Erfinde niemals eigene Markenfakten, Zahlen oder Claims** — auch nicht, wenn sie plausibel klingen.
 Fehlt eine Angabe, frage kurz nach, statt zu raten. Existieren diese Dateien nicht, stoppe und weise
-darauf hin, dass Claude im Marketing-Hub-Ordner des Kunden gestartet werden muss.
+darauf hin, dass Claude im CIDES-Ordner des Kunden gestartet werden muss.
 
 ## 3. Sprache & Tonalität — verbindlich, nicht verhandelbar
 

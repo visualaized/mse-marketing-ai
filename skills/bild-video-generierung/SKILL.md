@@ -21,7 +21,7 @@ passenden Visuals für alle anderen Bausteine (Newsletter, Social Media, Landing
 ## 2. Pflichtschritt: Markenkern IMMER zuerst laden
 
 Bevor du irgendeinen Prompt baust, lies **in dieser Reihenfolge** (relativ zum aktuellen
-Arbeitsverzeichnis, dem Marketing-Hub-Root des Kunden):
+Arbeitsverzeichnis, dem CIDES-Root des Kunden):
 
 1. `CLAUDE.md` — kompaktes Master-Brand-Dokument.
 2. `brand/brand-guidelines.md` — vollständiges Regelwerk, insbesondere Kapitel zur Bildsprache.
@@ -30,7 +30,7 @@ Arbeitsverzeichnis, dem Marketing-Hub-Root des Kunden):
 Diese drei Dateien sind die einzige verbindliche Quelle für Farben, Bildsprache und Do's/Don'ts.
 **Erfinde niemals eigene Markenfakten, Farbwerte oder Stilregeln** — auch nicht, wenn sie plausibel
 klingen. Fehlt eine Angabe, frage kurz nach, statt zu raten. Existieren diese Dateien nicht, stoppe und
-weise darauf hin, dass Claude im Marketing-Hub-Ordner des Kunden gestartet werden muss.
+weise darauf hin, dass Claude im CIDES-Ordner des Kunden gestartet werden muss.
 
 ## 3. Markenkonformen Higgsfield-Bild-Prompt aufbauen
 

@@ -178,7 +178,7 @@ sichtbaren Rand hinaus: genau das erzeugt den „abgeschnitten"-Effekt.
 ## 3. Markenkern zuerst laden (Pflicht)
 
 Bevor Text oder HTML erzeugt werden, in dieser Reihenfolge lesen (relativ zum aktuellen
-Arbeitsverzeichnis, dem Marketing-Hub-Root des Kunden):
+Arbeitsverzeichnis, dem CIDES-Root des Kunden):
 
 1. `CLAUDE.md` — kompaktes Master-Brand-Dokument.
 2. `brand/brand-guidelines.md`, insbesondere **§6 (Signaturen)** und **§7 (Icons)** — Details, die über

@@ -45,7 +45,7 @@ Bevor Text oder HTML erzeugt werden, folgende Punkte klären (bereits von der `m
 ## 3. Pflichtschritt: Markenkern zuerst laden
 
 Bevor irgendein Text oder HTML erzeugt wird, in dieser Reihenfolge lesen (relativ zum aktuellen
-Arbeitsverzeichnis, dem Marketing-Hub-Root des Kunden):
+Arbeitsverzeichnis, dem CIDES-Root des Kunden):
 
 1. `CLAUDE.md` — kompaktes Master-Brand-Dokument.
 2. `brand/brand-guidelines.md` — vollständiges Regelwerk (Typografie, Bildsprache, Do's & Don'ts).
@@ -53,7 +53,7 @@ Arbeitsverzeichnis, dem Marketing-Hub-Root des Kunden):
 
 Bei Widerspruch gewinnt `CLAUDE.md`. Erfinde niemals eigene Markenfakten, Zahlen, Claims oder
 Farbwerte — fehlt eine Angabe, nachfragen statt raten. Existieren diese Dateien nicht, stoppen und den
-Nutzer darauf hinweisen, dass im Marketing-Hub-Ordner des Kunden gearbeitet werden muss.
+Nutzer darauf hinweisen, dass im CIDES-Ordner des Kunden gearbeitet werden muss.
 
 **Sprache:** Jede Landing Page wird **immer vollständig in beiden Sprachen** erstellt — Deutsch
 (Sie-Ansprache, Standard-Fließtext-Sprache) **und** Englisch (die Sprache, in der MSE international

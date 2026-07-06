@@ -1,9 +1,9 @@
-# mse-marketing-ai — KI-Marketing-Zentrale für MSE Filterpressen GmbH
+# mse-marketing-ai — KI-CIDES-Zentrale für MSE Filterpressen GmbH
 
 Claude-Code-Plugin mit allen Bausteinen aus der Auftragsbestätigung `AB202606-1000`. Das Plugin
-enthält **keine** Marken-/Brand-Daten selbst — es liest diese zur Laufzeit aus dem **Marketing Hub**
+enthält **keine** Marken-/Brand-Daten selbst — es liest diese zur Laufzeit aus dem **CIDES**
 des Kunden (Grundbaustein, separat aufgesetzt: `CLAUDE.md`, `brand/`, `Outputs/`, `Campaigns/`). Das
-Plugin muss deshalb immer mit dem Marketing-Hub-Ordner als Arbeitsverzeichnis genutzt werden.
+Plugin muss deshalb immer mit dem CIDES-Ordner als Arbeitsverzeichnis genutzt werden.
 
 ## Enthaltene Bausteine (Skills)
 
@@ -19,16 +19,19 @@ Plugin muss deshalb immer mit dem Marketing-Hub-Ordner als Arbeitsverzeichnis ge
 | `kampagnen-dashboard` | 6 | Statisches Kampagnen-Dashboard für die Geschäftsführung |
 | `email-signatur` | 7 | Markenkonforme HTML-E-Mail-Signaturen |
 | `landing-pages` | 8 | Responsive Single-File-HTML-Landingpages für 2 Wechsel-Subdomains |
+| `whitepaper` | Add-on | Markenkonforme PDF-Whitepaper inkl. on-brand Diagrammen (Chrome-headless-Build) |
+| `social-google-business` | Add-on | Google-Business-Profile-Posts (Deutsch, SEO-relevant) + Upload-Post |
+| `google-ads` | Add-on | Google-Ads-Suchkampagnen via Pipeboard — nur mit ausdrücklicher Freigabe |
 
 Dokumentation/Schulung/Abnahme (Pos. 9) ist keine Skill-Datei, sondern dieser README + eine Live-Schulung.
 
-## Voraussetzung: Marketing Hub
+## Voraussetzung: CIDES
 
 Dieses Plugin erwartet im **Arbeitsverzeichnis** (nicht im Plugin-Ordner selbst) die Struktur des
-Marketing-Hub-Grundbausteins:
+CIDES-Grundbausteins:
 
 ```
-<Marketing-Hub-Root>/
+<CIDES-Root>/
   CLAUDE.md                     # Master-Brand-Dokument (immer zuerst gelesen)
   brand/
     brand-guidelines.md
@@ -43,12 +46,12 @@ Ohne diese Dateien lehnen die Skills die Erzeugung von Inhalten ab (siehe jeweil
 
 ## Installation beim Kunden (pro Arbeitsplatz/Client)
 
-1. Marketing-Hub-Ordner auf dem zentralen Server/Share des Kunden bereitstellen (einmalig, Grundbaustein).
+1. CIDES-Ordner auf dem zentralen Server/Share des Kunden bereitstellen (einmalig, Grundbaustein).
 2. Auf jedem Arbeitsplatz, der mit Claude Code arbeiten soll:
    - Repository dieses Plugins klonen bzw. aktualisieren (z. B. `git clone <repo-url>`).
    - In Claude Code: `/plugin marketplace add <owner>/<repo>` (oder lokal: `claude --plugin-dir "<Pfad zu diesem Ordner>"` für Tests).
    - Danach: `/plugin install mse-marketing-ai`.
-   - Claude Code **im Marketing-Hub-Ordner** starten (dort liegt `CLAUDE.md`) — nicht im Plugin-Ordner.
+   - Claude Code **im CIDES-Ordner** starten (dort liegt `CLAUDE.md`) — nicht im Plugin-Ordner.
 3. Benötigte MCP-Zugänge/API-Keys gemäß Auftragsbestätigung einrichten: Klaviyo, Higgsfield, Upload-Post,
    Claude (Anthropic) und — nur für die einmalige Kontakt-Migration — Brevo.
 
@@ -62,7 +65,7 @@ Die Versionierung erfolgt über `version` in `.claude-plugin/plugin.json` (aktue
 - Neue Version im Repo taggen/pushen → Version in `plugin.json` erhöhen (SemVer).
 - Kunde/Client: `/plugin update mse-marketing-ai` (bzw. automatisches Update, falls in den
   Claude-Code-Einstellungen aktiviert) holt die neue Version.
-- Da alle Marken-/Kundendaten **außerhalb** des Plugins im Marketing Hub liegen, betreffen Updates nie
+- Da alle Marken-/Kundendaten **außerhalb** des Plugins im CIDES liegen, betreffen Updates nie
   Kundendaten — nur Skill-Logik, Templates und Dashboard-Code.
 
 ## Bearbeitungs-Hinweis (für visualaized/pebro)
@@ -72,6 +75,26 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.15.0** (2026-07-03) — CIDES-Umbenennung, zwei neue Bausteine, Whitepaper druckfreundlich:
+  1. **CIDES:** Der gesamte Hub/die Zentrale heißt beim Kunden jetzt **CIDES** — Name überall im
+     internen Sprachgebrauch geführt (alle SKILL.mds, README, Dashboard-UI „CIDES ·
+     Kampagnen-Dashboard", CLAUDE.md mit Namens-Definition). Technische Bezeichner (Skill-IDs,
+     Ordnernamen) bleiben unverändert.
+  2. **Neuer Baustein `google-ads` (Pipeboard):** Suchkampagnen/RSA-Anzeigen markenkonform
+     erstellen und über pipeboard.co ins Google-Ads-Konto übertragen — mit hartem Freigabe-Gate:
+     KEINE schreibende Aktion (anlegen/ändern/aktivieren/Budget) ohne fallbezogene, ausdrückliche
+     Zustimmung; vollständige Wortlaut-Vorschau Pflicht; neue Kampagnen standardmäßig pausiert.
+  3. **Neuer Baustein `social-google-business` (Upload-Post):** Google-Business-Profile-Posts,
+     plattformgerecht (150–300 Zeichen, Keyword-Hook vorn, keine Hashtags, Bild 1200×900,
+     CTA-Button) und SEO-relevant (Leistungs-Keywords, lokaler Bezug, NAP-Konsistenz);
+     Standort-Auswahl + Go/No-Go vor Veröffentlichung. Beide Kanäle in Kanalauswahl der Zentrale
+     und im Dashboard (Planung/Validierung) integriert.
+  4. **Whitepaper druckfreundlich:** keine dunklen Vollflächen mehr (Titel-/Schlussseite hell,
+     Statement-Box hell mit Akzentbalken — Whitepaper werden gedruckt); Diagramm-Beschriftungen
+     deutlich zurückhaltender (~6–7pt, kalibriert); flexibler Diagramm-Katalog mit Auswahl je
+     Datentyp — Balken (auch gestapelt/horizontal), Linien/Flächen, jetzt auch brandkonforme
+     Torten (flach, weiße Fugen, max. 4–5 Segmente), Tabellen, KPI-Raster, Prozess-Schaubilder;
+     Muster für Linie + Torte im Template. Demo-PDF neu gerendert und geprüft.
 - **1.14.2** (2026-07-03) — Windows-/macOS-Komfort für das Kampagnen-Dashboard:
   Doppelklick-Starter `dashboard-starten.bat` (Windows) und `dashboard-starten.command` (macOS)
   im App-Ordner — starten den lokalen Server und öffnen den Browser automatisch, kein Terminal
@@ -100,7 +123,7 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
      Inhalte-Links, Bearbeiten-Shortcut); **geplante Kampagnen per Drag & Drop verschieben**
      (neuer Endpoint `PATCH /api/campaigns/<slug>/termin`, Ende wandert mit — Dauer bleibt).
   3. Neue Ideen-API (`GET/POST /api/ideen`, `PATCH/DELETE /api/ideen/<id>`), Ideen-Badge im Tab.
-     Läuft wie gehabt komplett lokal im Marketing Hub (`node server.mjs`).
+     Läuft wie gehabt komplett lokal im CIDES (`node server.mjs`).
 - **1.13.2** (2026-07-03) — Landing-Page-Template: Haupt-CTA exakt im Website-.btn-Stil — der
   Pfeilkreis steht jetzt LINKS vom Label (wie auf der Live-Website und konsistent zur
   Whitepaper-Download-Zeile); Label-Span-Regression aus der Umstellung behoben.
@@ -142,7 +165,7 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
   4. Signatur-Banner und Instagram-Carousel-Demo mit allen Fixes neu erzeugt.
 - **1.11.0** (2026-07-02) — **Vollständiges Website-Design-System extrahiert und als verbindliche
   CI-Grundlage verankert** (Theme-CSS + Seiten-HTML von mse-filterpressen.com komplett ausgewertet):
-  1. **Neues Brand-Dokument `brand/website-design-system.md`** im Marketing Hub: verifizierte
+  1. **Neues Brand-Dokument `brand/website-design-system.md`** im CIDES: verifizierte
      Farben, komplette Typo-Skala (1rem=20px, alpha–zeta), Formen/Elemente (eckig, 2rem-Pfeilkreis,
      quadratische Karussell-Dots, Reveal-Animationssprache), Layout/Abstände (Container 80rem/3rem,
      6rem-Rhythmus, Breakpoints), Sektions-Baukasten (alle block--Typen) und Footer-Spezifikation.
@@ -262,7 +285,7 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
      — Deutsch = Root-Pfad, Englisch = `/en/`-Präfix (Beispiel: `.../celltron/` vs.
      `.../en/celltron/`). Newsletter-CTAs und Landing-Page-CTA-Button (jetzt mit `_DE`/`_EN`-URL-Paar,
      wechselt live beim Sprachumschalter) wenden dieses Muster an; Konvention zusätzlich in der
-     Marketing-Hub-`CLAUDE.md` festgehalten.
+     CIDES-`CLAUDE.md` festgehalten.
 - **1.4.0** (2026-07-01) — `landing-pages`: **verbindlicher DE/EN-Sprachumschalter** oben rechts
   (Globus-Icon + "DE | EN", `position: fixed`, Brand-Design) — beide Sprachversionen liegen im selben
   HTML-Dokument, es wird **keine zweite Domain/Subdomain** benötigt. Alle Content-Platzhalter jetzt als

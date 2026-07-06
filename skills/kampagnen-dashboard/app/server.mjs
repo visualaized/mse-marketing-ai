@@ -79,6 +79,8 @@ const VALID_KANAELE = [
   "Landing Page",
   "E-Mail-Signatur",
   "Whitepaper",
+  "Google Business",
+  "Google Ads",
 ];
 
 const CONTENT_TYPES = {

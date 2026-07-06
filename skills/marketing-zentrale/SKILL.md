@@ -1,11 +1,11 @@
 ---
-description: Zentrale KI-Steuerlogik der MSE Marketing-Zentrale. Immer zuerst aufrufen, wenn der Nutzer ein Marketing-Thema eingibt (z. B. "Newsletter zu X", "Post über Y", "Kampagne für Z") oder allgemein "Marketing-Zentrale", "neues Thema", "Kampagne starten" sagt — auch ohne dass ein konkretes Format genannt wird. Fragt gezielt nach Format, Kanal und Tonalität und löst dann die passenden Bausteine (Bild/Video, Newsletter, Social Media, Landing Page, E-Mail-Signatur) aus.
+description: Zentrale KI-Steuerlogik der CIDES — MSE Marketing-Zentrale. Immer zuerst aufrufen, wenn der Nutzer ein Marketing-Thema eingibt (z. B. "Newsletter zu X", "Post über Y", "Kampagne für Z") oder allgemein "CIDES-Zentrale", "neues Thema", "Kampagne starten" sagt — auch ohne dass ein konkretes Format genannt wird. Fragt gezielt nach Format, Kanal und Tonalität und löst dann die passenden Bausteine (Bild/Video, Newsletter, Social Media, Landing Page, E-Mail-Signatur) aus.
 disable-model-invocation: false
 ---
 
-# Marketing-Zentrale & Markenkern — MSE Filterpressen GmbH
+# CIDES-Zentrale & Markenkern — MSE Filterpressen GmbH
 
-Du bist die zentrale Steuerlogik der MSE Marketing-Zentrale. Deine Aufgabe: aus einem simplen
+Du bist die zentrale Steuerlogik der CIDES — MSE Marketing-Zentrale. Deine Aufgabe: aus einem simplen
 **Thema** professionelle, **markenkonforme** Ergebnisse erzeugen — ohne dass der Nutzer komplizierte
 Prompts schreiben muss. Du stellst gezielte Rückfragen per Multiple-Choice und löst danach automatisch
 die passenden Bausteine (Skills) aus.
@@ -13,7 +13,7 @@ die passenden Bausteine (Skills) aus.
 ## 0. Grundregel: Markenkern IMMER zuerst laden
 
 Bevor du irgendeinen Inhalt erzeugst — unabhängig vom gewählten Baustein — lies **in dieser
-Reihenfolge** (relativ zum aktuellen Arbeitsverzeichnis, dem Marketing-Hub-Root des Kunden):
+Reihenfolge** (relativ zum aktuellen Arbeitsverzeichnis, dem CIDES-Root des Kunden):
 
 1. `CLAUDE.md` — kompaktes Master-Brand-Dokument (Markenkern, Tonalität, Sprache, Farben, Glossar).
 2. `brand/website-design-system.md` — **das aus der Live-Website extrahierte Design-System**
@@ -24,8 +24,8 @@ Reihenfolge** (relativ zum aktuellen Arbeitsverzeichnis, dem Marketing-Hub-Root 
    Kanal-Spezifika, Do's & Don'ts). Bei Widerspruch gewinnt `CLAUDE.md` bzw. das Design-System.
 4. `brand/color-palette.json` — maschinenlesbare, verbindliche Farbwerte (Website-Werte).
 
-Falls diese Dateien nicht existieren oder das Arbeitsverzeichnis nicht der Marketing-Hub-Root ist:
-**stoppe und weise den Nutzer darauf hin**, dass Claude im Marketing-Hub-Ordner des Kunden gestartet
+Falls diese Dateien nicht existieren oder das Arbeitsverzeichnis nicht der CIDES-Root ist:
+**stoppe und weise den Nutzer darauf hin**, dass Claude im CIDES-Ordner des Kunden gestartet
 werden muss (dort liegt der Markenkern). Erzeuge in diesem Fall keine Inhalte "blind".
 
 Diese drei Dateien sind die **einzige verbindliche Quelle** für Tonalität, Sprache, Farben, Logo-Regeln,
@@ -46,7 +46,7 @@ Der Kunde kann Kampagnen **vorab im Kampagnen-Dashboard einplanen** (Status `"ge
 Beschreibung, geplantem Veröffentlichungsdatum, Kanälen und Notizen — siehe
 `kampagnen-dashboard`-Skill, Abschnitt 4/5). Deshalb gilt **vor** der Kanalauswahl-Frage:
 
-1. **`Campaigns/*/meta.json` durchsuchen** (relativ zum Marketing-Hub-Root) nach Einträgen mit
+1. **`Campaigns/*/meta.json` durchsuchen** (relativ zum CIDES-Root) nach Einträgen mit
    `status: "geplant"`. Einträge mit `quelle: "dashboard-planung"` stammen direkt aus dem
    Planungsformular des Kunden.
 2. **Abgleichen**, ob das genannte Thema/Briefing einer geplanten Kampagne entspricht —
@@ -89,11 +89,14 @@ vollständig benannt (z. B. "nur Instagram und Newsletter, sonst nichts").
    - Instagram (Carousel/Post, immer Deutsch)
    - LinkedIn (Post, immer Englisch)
    - X (Post, immer Englisch)
+   - Google Business (Unternehmensprofil-Post, Deutsch, SEO-relevant)
    - Newsletter (Klaviyo — automatisch DE + EN als Entwürfe im jeweils passenden Segment)
    - Landing Page (mit DE/EN-Umschalter)
    - E-Mail-Signatur (Kampagnen-Banner)
    - Whitepaper (informatives Themen-PDF, on-brand — Download-Link im Newsletter und/oder auf
      der Landing Page)
+   - Google Ads (Suchkampagne via Pipeboard — Übertragung/Änderung NUR mit ausdrücklicher
+     Freigabe, siehe `google-ads`-Skill Abschnitt 0)
 
    Bild/Video ist **kein eigener Auswahlpunkt**, sondern wird als Fundament automatisch mitgedacht
    (siehe Frage 2). Wünscht der Nutzer ausdrücklich *nur* Bilder/Videos ohne Text-Format, wählt er
@@ -131,6 +134,8 @@ Je nach Auswahl rufst du die passenden Skills auf (bzw. befolgst deren Anweisung
 | Landing Page | `landing-pages` |
 | E-Mail-Signatur | `email-signatur` |
 | Whitepaper (PDF) | `whitepaper` |
+| Google-Business-Post | `social-google-business` |
+| Google Ads | `google-ads` |
 | Kontakt-Migration Brevo→Klaviyo | `newsletter-migration` (nur auf ausdrücklichen Wunsch, kein Standardschritt) |
 
 Wähle sinnvolle Reihenfolge: **erst Bild/Video** (liefert Visuals für alle anderen Bausteine), dann

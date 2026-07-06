@@ -1,5 +1,5 @@
 ---
-description: "Erstellt markenkonforme PDF-Whitepaper (informative Themen-PDFs) für MSE Filterpressen — inkl. on-brand Schaubildern/Diagrammen, PDF-Erzeugung über Chrome headless und Verlinkung aus Newsletter/Landing Page. Trigger: 'Whitepaper erstellen', 'PDF zu [Thema]', 'Leitfaden als PDF' oder wenn die Marketing-Zentrale den Kanal Whitepaper auswählt."
+description: "Erstellt markenkonforme PDF-Whitepaper (informative Themen-PDFs) für MSE Filterpressen — inkl. on-brand Schaubildern/Diagrammen, PDF-Erzeugung über Chrome headless und Verlinkung aus Newsletter/Landing Page. Trigger: 'Whitepaper erstellen', 'PDF zu [Thema]', 'Leitfaden als PDF' oder wenn die CIDES-Zentrale den Kanal Whitepaper auswählt."
 disable-model-invocation: false
 ---
 
@@ -12,11 +12,11 @@ Download-Asset für Kampagnen: verlinkt im Newsletter und/oder auf der Landing P
 ## 1. Wann dieser Baustein läuft
 
 - Der Nutzer möchte ein Whitepaper/Themen-PDF/einen PDF-Leitfaden erstellen.
-- Die Marketing-Zentrale hat im Rahmen einer Kampagne den Kanal „Whitepaper" ausgewählt.
+- Die CIDES-Zentrale hat im Rahmen einer Kampagne den Kanal „Whitepaper" ausgewählt.
 
 ## 2. Pflichtschritt: Markenkern IMMER zuerst laden
 
-Vor jeder Inhalts- oder Gestaltungsarbeit lesen (relativ zum Marketing-Hub-Root):
+Vor jeder Inhalts- oder Gestaltungsarbeit lesen (relativ zum CIDES-Root):
 
 1. `CLAUDE.md` — Master-Brand-Dokument.
 2. `brand/website-design-system.md` — **verbindliche Gestaltungsgrundlage** (Farben, Typo-Skala,
@@ -47,10 +47,12 @@ A4-Druckvorlage, die das Website-Design-System 1:1 in Print übersetzt:
 - **Seitengeometrie:** `@page A4/margin 0`, jede `.page` = exakt 210×297 mm.
 - **Typo im Website-Verhältnis** (Eyebrow : Headline : Body = 0.4 : 1 : 0.3): Eyebrow 9pt/600/
   uppercase/`#5D6A77`, H1 26pt / H2 17pt bold ls -0.02em `#0D0E11`, Body 10pt/1.5.
-- **Titelseite dunkel** (Vollbild-Produktfoto, Eyebrow + Titel + Subtitle, „Whitepaper"-Badge,
-  Bildzeichen in der Ecke), **Schlussseite dunkel** (CTA-Pfeilkreis-Zeile + Kontakt + Rechtsblock).
-- **Elemente:** Infobox (`#F8F8F8`, eckig), Key-Facts-3er-Raster, dunkle Statement-Box,
-  Datentabelle (hairline-Linien), Bild mit Caption, Diagramm-Stile (Abschnitt 5).
+- **Titelseite HELL** (Produktfoto als Bild-Block oben, Titel auf Weiß darunter,
+  „Whitepaper"-Badge auf dem Foto, Bildzeichen in der Ecke), **Schlussseite HELL**
+  (CTA-Pfeilkreis-Zeile + Kontakt + Rechtsblock) — Druckregel, siehe Abschnitt 5a.
+- **Elemente:** Infobox (`#F8F8F8`, eckig), Key-Facts-3er-Raster, helle Statement-Box mit
+  dunklem Akzentbalken, Datentabelle (hairline-Linien), Bild mit Caption, Diagramm-Stile für
+  alle Formen (Abschnitt 5).
 - **Bildzeichen-Regel:** auf jeder Seite in der Ecke (`corner-logo`) — nie frei im Raum.
 - Seitenfooter mit Kurztitel + Seitenzahl (beim Befüllen fortlaufend pflegen).
 
@@ -61,24 +63,43 @@ wiederverwenden), Pfade relativ oder absolut — sie werden ins PDF eingebacken.
 
 ## 5. Schaubilder, Graphen, Diagramme — 100 % on brand (verbindlich)
 
-Diagramme werden als **Inline-SVG direkt im HTML** gebaut (das Template enthält ein
-Balkendiagramm-Muster mit fertigen CSS-Klassen). Regeln:
+Diagramme werden als **Inline-SVG direkt im HTML** gebaut. Das Template liefert fertige
+CSS-Klassen und Muster (aktiv: Balkendiagramm; auskommentiert: Linien- und Tortendiagramm).
+Der Skill kann **jede benötigte Form** abbilden — die Wahl richtet sich nach den Daten:
 
-- **Farben AUSSCHLIESSLICH:** `#0D0E11` (Primärreihe), `#5D6A77` (Sekundärreihe), `#3D96D2`
-  (genau EINE hervorgehobene Reihe/Wert — sparsam, wie der Blau-Akzent der Website),
-  `#F8F8F8`/`#D9DCDF` (Flächen/Gitterlinien). Keine anderen Farben, kein Grün/Rot/Gelb,
-  keine Verläufe.
-- **Formen eckig:** Balken ohne Rundungen, Linien klar, hairline-Gitter — keine 3D-Effekte,
-  keine Schatten, keine Torten-/Donut-Diagramme (nicht Teil der Website-Formensprache; für
-  Anteile gestapelte Balken verwenden).
-- **Beschriftung in Nudica** über die Template-Klassen (`chart-label` = Eyebrow-Stil,
-  `chart-value` = bold `#0D0E11`) — niemals Default-SVG-Schrift.
+| Datentyp | Passende Form |
+|---|---|
+| Kategorien vergleichen | Balken vertikal (`bar-*`), bei langen Labels horizontal |
+| Verlauf über Zeit | Liniendiagramm (`line-primary`, 2. Reihe gestrichelt `line-secondary`, dezente Fläche `area-primary`) |
+| Anteile am Ganzen | **Tortendiagramm** (`pie-1..3`, `pie-rest`) ODER gestapelte Balken — Torte flach, weiße Fugen, max. 4–5 Segmente, Beschriftung außen, Sammelrest immer `pie-rest` (`#D9DCDF`), niemals 3D/Explode/Donut-Deko |
+| Zusammensetzung über Kategorien | Gestapelte Balken (`bar-primary`/`-secondary`/`-rest`) |
+| Exakte Werte/Spezifikationen | Datentabelle (`table.data`) |
+| Einzelne Kennzahlen | Key-Facts-Raster (`.facts`) |
+| Abläufe/Prozesse | Prozess-Schaubild: eckige Kästen (`#F8F8F8` oder Outline 0.6pt `#0D0E11`), schlichte Pfeillinien `#0D0E11` |
+
+Verbindliche Gestaltungsregeln für ALLE Formen:
+
+- **Farben AUSSCHLIESSLICH:** `#0D0E11` (Primär), `#5D6A77` (Sekundär), `#3D96D2` (genau EIN
+  hervorgehobener Wert/Segment — sparsam, wie der Blau-Akzent der Website), `#D9DCDF`/`#F8F8F8`
+  (weitere Anteile, Flächen, Gitter). Keine anderen Farben, kein Grün/Rot/Gelb, keine Verläufe,
+  keine Schatten, kein 3D.
+- **Beschriftung ZURÜCKHALTEND (Kundenvorgabe):** Labels/Werte im Druck ca. **6–7pt** — immer
+  kleiner als der Body-Text, nie dominanter als der Inhalt. Die Template-Klassen (`chart-label`,
+  `chart-value`) sind auf die Standard-Chartbreite (130mm) kalibriert; bei eigenem `viewBox`
+  die px-Werte so umrechnen, dass im Druck 6–7pt herauskommen. Nudica über die Klassen —
+  niemals Default-SVG-Schrift, niemals fette Riesen-Labels.
 - **Werte ehrlich:** Achsen bei 0 beginnen lassen (oder Abweichung ausweisen), Quellenzeile
-  unter dem Diagramm (`.small`).
-- Gilt genauso für Prozess-Schaubilder: eckige Kästen (`#F8F8F8` oder Outline 0.6pt `#0D0E11`),
-  Pfeile als schlichte Linien mit kleinen Pfeilspitzen in `#0D0E11`, Beschriftung Nudica.
+  unter jedem Diagramm (`.small`).
 - Komplexe fotorealistische Visuals kommen weiterhin aus `bild-video-generierung` — dieser
   Abschnitt gilt für vektorbasierte Informationsgrafiken.
+
+### 5a. Druckregel: keine dunklen Vollflächen (verbindlich)
+
+Whitepaper werden **ausgedruckt** — deshalb enthält das PDF **keine großflächig dunklen
+Seitenhintergründe**: Titelseite und Schlussseite sind hell (das Cover-Foto ist ein Bild-Block im
+oberen Seitenbereich, der Titel steht auf Weiß), die Statement-Box ist Light Grey mit dunklem
+Akzentbalken statt Flächen-Schwarz. Dunkle Farbe nur in kleinen Elementen (Balken, Linien,
+Textfarbe). Beim Befüllen niemals dunkle Vollflächen-Seiten zurückbauen.
 
 ## 6. PDF erzeugen: `scripts/build_whitepaper.py`
 
@@ -129,8 +150,10 @@ Das Whitepaper ist das Download-Asset der Kampagne — genau dafür verlinken:
       `#3D96D2` (sparsam)/Weiß; Trennlinien dunkel/neutral, nie blau?
 - [ ] Jede Section mit Eyebrow über der Headline; Typo-Verhältnisse des Templates unverändert?
 - [ ] Bildzeichen auf jeder Seite in der Ecke — nie frei im Raum?
-- [ ] Alle Diagramme/Schaubilder nach Abschnitt 5 (Brand-Farben, eckig, Nudica-Beschriftung,
-      keine Torten, Quellenzeile)?
+- [ ] Alle Diagramme/Schaubilder nach Abschnitt 5 (passende Form je Datentyp, Brand-Farben,
+      Nudica-Beschriftung ZURÜCKHALTEND ~6–7pt, Quellenzeile; Torten flach mit weißen Fugen)?
+- [ ] **Keine dunklen Vollflächen-Seiten** (Titel-/Schlussseite hell, Statement-Box hell) —
+      Druckregel Abschnitt 5a eingehalten?
 - [ ] Keine erfundenen Zahlen/Quellen; alle Fakten rückführbar; Umlaute nativ korrekt?
 - [ ] Kein Fax; Rechtsblock auf der Schlussseite korrekt; kein sichtbarer Platzhaltertext?
 - [ ] **Kein `text-shadow` irgendwo in der Vorlage** — Chrome rastert geblurte text-shadows beim

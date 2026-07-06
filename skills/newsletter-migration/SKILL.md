@@ -1,12 +1,12 @@
 ---
-description: "Kontakt-Migration von Brevo nach Klaviyo (Export, Bereinigung, DSGVO-Prüfung, Import). Nur auf ausdrücklichen Wunsch des Nutzers auslösen (\"Kontakte migrieren\", \"Brevo zu Klaviyo\", \"Kontakte übertragen\") — kein Standardschritt des Themen-zu-Output-Ablaufs der Marketing-Zentrale."
+description: "Kontakt-Migration von Brevo nach Klaviyo (Export, Bereinigung, DSGVO-Prüfung, Import). Nur auf ausdrücklichen Wunsch des Nutzers auslösen (\"Kontakte migrieren\", \"Brevo zu Klaviyo\", \"Kontakte übertragen\") — kein Standardschritt des Themen-zu-Output-Ablaufs der CIDES-Zentrale."
 disable-model-invocation: false
 ---
 
 # Newsletter – Kontakt-Migration (Add-on): Brevo → Klaviyo
 
 Dieser Skill ist ein **einmaliges (bzw. seltenes) Migrations-Add-on** und **kein** Teil des normalen
-Marketing-Zentrale-Ablaufs ("Thema → Output"). Er wird **niemals automatisch** von der
+CIDES-Zentrale-Ablaufs ("Thema → Output"). Er wird **niemals automatisch** von der
 `marketing-zentrale` ausgelöst, sondern ausschließlich dann, wenn der Nutzer explizit danach fragt
 (z. B. "Kontakte von Brevo zu Klaviyo migrieren", "Kontakt-Migration starten", "unsere Newsletter-Liste
 übertragen"). Wenn du unsicher bist, ob der Nutzer wirklich eine vollständige Migration will, frage

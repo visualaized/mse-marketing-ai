@@ -3,7 +3,7 @@ description: "Erstellt/aktualisiert das Kampagnen-Dashboard (Übersicht + Kampag
 disable-model-invocation: false
 ---
 
-# Kampagnen-Dashboard — MSE Marketing-Zentrale
+# Kampagnen-Dashboard — CIDES — MSE Marketing-Zentrale
 
 ## 1. Zweck
 
@@ -14,7 +14,7 @@ Das Kampagnen-Dashboard hat **zwei Aufgaben**:
 2. **Planungstool**: Der Kunde kann direkt im Dashboard neue Kampagnen **einplanen** — mit Thema/
    Beschreibung, geplantem Veröffentlichungsdatum, Kanal-Auswahl (Checkboxen) und Notizen. Ein so
    angelegter Eintrag erhält den Status `"geplant"` und landet als ganz normale
-   `Campaigns/<slug>/meta.json` im Marketing Hub. Wenn später über Claude eine Kampagne gestartet
+   `Campaigns/<slug>/meta.json` im CIDES. Wenn später über Claude eine Kampagne gestartet
    wird, gleicht die `marketing-zentrale` das Briefing gegen diese geplanten Kampagnen ab und
    übernimmt deren Daten (siehe Abschnitt 5).
 
@@ -43,7 +43,7 @@ das Planungsformular automatisch aus und bleibt reine Lese-Übersicht.
 ## 2. Das Datenmodell: `Campaigns/<kampagnen-slug>/meta.json`
 
 Dieser Skill ist die **verbindliche Quelle** (Single Source of Truth) für das `meta.json`-Schema.
-Alle anderen Bausteine (Marketing-Zentrale, Newsletter, Social-Media-Skills, Landing-Pages etc.)
+Alle anderen Bausteine (CIDES-Zentrale, Newsletter, Social-Media-Skills, Landing-Pages etc.)
 müssen sich beim Anlegen/Aktualisieren einer kampagnenbezogenen `meta.json` an dieses Schema halten.
 
 Jede Kampagne lebt in einem eigenen Ordner:
@@ -69,7 +69,7 @@ z. B. `celltron-xtreme-batterierecycling-2026-q3`.
 | `verantwortlich` | string | optional | Name/Kürzel der verantwortlichen Person **beim Kunden** (Standard: `"Marketing-Team"`). **Niemals** den Namen eines externen Dienstleisters/einer Agentur eintragen — das Dashboard ist eine kundeninterne Ansicht. |
 | `notiz` | string | optional | Kurze freie Notiz, z. B. Anlass, Zielgruppe, Kernbotschaft oder nächster Schritt. |
 | `quelle` | string | optional | Herkunftsmarker. `"dashboard-planung"` = vom Kunden über das Planungsformular angelegt (wichtig für den Planungsabgleich der `marketing-zentrale`, siehe Abschnitt 5). Von Bausteinen automatisch angelegte Kampagnen lassen das Feld weg. |
-| `inhalte` | Array<{`label`, `pfad`}> | optional | **Generierte Inhalte der Kampagne** — das Dashboard zeigt sie als ausklappbare Link-Liste in der Kampagnenzeile. `label` = sprechender Anzeigename (z. B. `"Newsletter (DE)"`), `pfad` = Pfad **relativ zum Marketing-Hub-Root** (z. B. `"Outputs/2026-07-01-celltron-launch-newsletter-de/newsletter.html"`). Ausgeliefert werden die Dateien über den lesenden `/hub/`-Mount von `server.mjs`. **Jeder Baustein, der einen Kampagnen-Output fertigstellt, MUSS ihn hier registrieren** (Eintrag anhängen, nichts überschreiben). |
+| `inhalte` | Array<{`label`, `pfad`}> | optional | **Generierte Inhalte der Kampagne** — das Dashboard zeigt sie als ausklappbare Link-Liste in der Kampagnenzeile. `label` = sprechender Anzeigename (z. B. `"Newsletter (DE)"`), `pfad` = Pfad **relativ zum CIDES-Root** (z. B. `"Outputs/2026-07-01-celltron-launch-newsletter-de/newsletter.html"`). Ausgeliefert werden die Dateien über den lesenden `/hub/`-Mount von `server.mjs`. **Jeder Baustein, der einen Kampagnen-Output fertigstellt, MUSS ihn hier registrieren** (Eintrag anhängen, nichts überschreiben). |
 
 ### Enum `status` (genau diese vier Werte, exakt so geschrieben)
 
@@ -109,12 +109,12 @@ Diese Datei kommt nach `Campaigns/messe-rueckblick-achema-2026/meta.json`.
 
 ## 3. Einrichtung beim Kunden (einmalig pro Marketing-Hub)
 
-1. Den kompletten Ordner `skills/kampagnen-dashboard/app/` aus dem Plugin in die Marketing-Hub-Root
+1. Den kompletten Ordner `skills/kampagnen-dashboard/app/` aus dem Plugin in die CIDES-Root
    des Kunden kopieren, z. B. nach `Kampagnen-Dashboard/` (oder an den Ort, von dem der bestehende
    Webserver des Kunden statische Dateien ausliefert).
 2. Sicherstellen, dass `Campaigns/` (mit den `meta.json`-Dateien der einzelnen Kampagnen) über einen
    relativen Pfad von `Kampagnen-Dashboard/` aus erreichbar ist — standardmäßig `../Campaigns/`, da
-   beide Ordner direkt unter der Marketing-Hub-Root liegen.
+   beide Ordner direkt unter der CIDES-Root liegen.
 3. **Logo und Nudica-Schrift sind Pflicht, nicht optional** — und liegen als **lokale Kopien im
    App-Ordner selbst** (`logo.png` sowie `fonts/Nudica-Regular.otf` + `fonts/Nudica-Bold.otf`),
    damit die App self-contained ist: `server.mjs` liefert ausschließlich den App-Ordner aus und
@@ -170,7 +170,7 @@ schon betreibt. Im Regelfall bei Option A bleiben.
 
 ### 3.2 Kampagne hinzufügen/aktualisieren (laufender Betrieb)
 
-Wenn die Marketing-Zentrale oder ein anderer Baustein (Newsletter, Social-Media, Landing-Page) einen
+Wenn die CIDES-Zentrale oder ein anderer Baustein (Newsletter, Social-Media, Landing-Page) einen
 kampagnenbezogenen Output fertigstellt:
 
 1. `Campaigns/<kampagnen-slug>/meta.json` anlegen (neue Kampagne) oder aktualisieren (bestehende
@@ -249,7 +249,7 @@ Markdown-Posts etc.).
 | `PATCH /api/ideen/<id>` | Idee aktualisieren (`status` offen/akzeptiert/abgelehnt/umgesetzt, `titel`, `beschreibung`, `themen_tag`). |
 | `DELETE /api/ideen/<id>` | Idee löschen. |
 | `GET /campaigns-index.json` | Live generierter Kampagnen-Index (inkl. `slug` je Eintrag). |
-| `GET /hub/<pfad>` | Lesender Zugriff auf Dateien im Marketing-Hub-Root (für die Inhalte-Links; Traversal-geschützt, nur GET). Hub-Root = eine Ebene über dem App-Ordner, Override via `HUB_DIR`. |
+| `GET /hub/<pfad>` | Lesender Zugriff auf Dateien im CIDES-Root (für die Inhalte-Links; Traversal-geschützt, nur GET). Hub-Root = eine Ebene über dem App-Ordner, Override via `HUB_DIR`. |
 
 ## 4a. Ideen-Sammlung & KI-Themenvorschläge (`Campaigns/ideen.json`)
 
@@ -335,7 +335,7 @@ verschiebt `zeitraum_start` und wandert ein vorhandenes `zeitraum_ende` um diese
 (Dauer bleibt erhalten). Kampagnen mit anderem Status sind im Kalender nur lesend. Die Spalten
 Di/Do/Fr tragen die Themen-Tage-Fokusse als dezente Orientierung.
 
-## 5. Planungsabgleich durch die Marketing-Zentrale (Pflicht-Verhalten)
+## 5. Planungsabgleich durch die CIDES-Zentrale (Pflicht-Verhalten)
 
 Geplante Kampagnen sind der **Auftakt für die spätere Umsetzung über Claude**: Startet der Nutzer
 über die `marketing-zentrale` eine neue Kampagne, MUSS diese zuerst `Campaigns/*/meta.json` nach
