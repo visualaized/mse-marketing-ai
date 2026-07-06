@@ -1,15 +1,16 @@
 ---
-description: "Erstellt eine markenkonforme E-Mail-Signatur als fertigen HTML-Code für eine konkrete Person bei MSE Filterpressen — heller/transparenter Untergrund, dunkle Schrift/Icons, inkl. klickbarem Banner-Bild und Social-Icons. Trigger: 'E-Mail-Signatur erstellen/generieren für [Name/Person]'."
+description: "Erstellt eine markenkonforme E-Mail-Signatur als fertigen HTML-Code für MSE Filterpressen — heller/transparenter Untergrund, dunkle Schrift/Icons, inkl. klickbarem Banner-Bild und Social-Icons. Fragt verbindlich zuerst den Verteilungsweg ab: manuell auf die Arbeitsplätze (einfache {{...}}-Platzhalter für Name, Abteilung usw.) oder CI-Sign-Format (automatische Verteilung via AD-Attribute). Trigger: 'E-Mail-Signatur erstellen/generieren'."
 disable-model-invocation: false
 ---
 
 # E-Mail-Signatur — MSE Filterpressen GmbH
 
 Eigenständiger Baustein zur Erzeugung markenkonformer E-Mail-Signaturen. Auf Basis der Brand
-Guidelines, eines vom Kunden vorgegebenen **Referenzlayouts** und der Angaben zu einer konkreten
-Person generiert die KI eine Signatur und gibt diese als fertigen HTML-Code aus. Die Einbindung
-erfolgt entweder manuell direkt in die gängigen E-Mail-Clients oder alternativ über ein
-Signatur-Management-Tool wie CI Sign.
+Guidelines und eines vom Kunden vorgegebenen **Referenzlayouts** generiert die KI eine Signatur und
+gibt diese als fertigen HTML-Code aus. Die Einbindung erfolgt entweder manuell direkt in die gängigen
+E-Mail-Clients (dann mit einfachen Platzhaltern für die Personendaten) oder über das
+Signatur-Management-Tool **CI Sign** (dann im CI-Sign-Platzhalterformat für automatische Verteilung)
+— welcher der beiden Wege gilt, wird **immer zuerst abgefragt** (siehe Abschnitt 1).
 
 ## 0. Verbindliches Layout (Struktur nach Kundenreferenz, Farbgebung nach brand-guidelines.md §6)
 
@@ -67,19 +68,59 @@ Beides bleibt auf genau diese zwei Stellen begrenzt; keine weiteren roten/grüne
 ## Wichtige Klarstellung zum Begriff "Thema"
 
 Anders als bei den Content-Bausteinen (Newsletter, Social Posts etc.) ist mit "Thema" hier **kein**
-Marketing-Thema gemeint. Dieser Skill erzeugt keine Kampagnen-Inhalte, sondern eine Signatur für eine
-**konkrete, namentlich benannte Person**.
+Marketing-Thema gemeint. Dieser Skill erzeugt keine Kampagnen-Inhalte, sondern eine
+Signatur(-Vorlage) für die Mitarbeitenden von MSE.
 
 ## Wann dieser Skill greift
 
-- Der Nutzer möchte eine E-Mail-Signatur erstellen oder generieren lassen, z. B. "Signatur für Herrn
-  Müller erstellen", "E-Mail-Signatur für unsere neue Vertriebsmitarbeiterin".
+- Der Nutzer möchte eine E-Mail-Signatur erstellen oder generieren lassen, z. B. "E-Mail-Signatur
+  erstellen", "Signatur für Herrn Müller", "Signatur-Vorlage für alle Arbeitsplätze".
 - Nicht zuständig für: Newsletter-Templates (`newsletter-brevo`), Social-Media-Grafiken, oder das
   Einrichten eines Signatur-Management-Systems selbst (siehe Abschnitt "Out of Scope").
 
-## 1. Benötigte Eingaben
+## 1. Pflichtfrage zuerst: Verteilungsweg (manuell oder CI Sign)
 
-Erforderlich (bei Fehlen kurz und direkt nachfragen — Namen niemals raten oder annehmen):
+**Bevor irgendetwas erzeugt wird, immer zuerst fragen**, wie die Signatur verteilt werden soll —
+außer der Nutzer hat es im Briefing bereits eindeutig gesagt:
+
+> "Soll die Signatur **manuell auf die Arbeitsplätze verteilt** werden (dann liefere ich sie mit
+> einfachen Platzhaltern für Name, Abteilung usw.), oder im **CI-Sign-Format für die automatische
+> Verteilung über CI Sign** (Platzhalter werden dann automatisch aus dem Active Directory befüllt)?"
+
+Die Antwort bestimmt Template und Platzhalterformat:
+
+**(a) Manuelle Verteilung** → Basis ist `templates/signatur-standard.html`. Die personenbezogenen
+Felder bleiben als **einfache `{{...}}`-Platzhalter** im ausgelieferten HTML stehen — sie werden
+später an jedem Arbeitsplatz (bzw. von der IT pro Mitarbeiter) von Hand ersetzt:
+
+| Platzhalter | Bedeutung |
+|---|---|
+| `{{NAME}}` | Vollständiger Vor- und Nachname |
+| `{{ROLE_DE}}` / `{{ROLE_EN}}` | Funktion/Rolle Deutsch / Englisch |
+| `{{DEPARTMENT_DE}}` | Abteilung/Bereich |
+| `{{PHONE}}` | Direkte Telefonnummer/Durchwahl |
+| `{{EMAIL}}` | Persönliche E-Mail-Adresse |
+
+Es werden dafür **keine Personendaten abgefragt** — die Vorlage ist bewusst personenneutral.
+**Ausnahme:** Nennt der Nutzer ausdrücklich eine konkrete Person und wünscht eine fertig befüllte
+Signatur, gelten die Pflichtangaben aus Abschnitt 1a und die Platzhalter werden direkt ersetzt.
+Zusammen mit dem HTML immer eine kurze Ausfüll-Anleitung liefern (welcher Platzhalter = welches
+Feld, Sonderzeichen als HTML-Entities einsetzen — siehe Abschnitt 4).
+
+**(b) CI-Sign-Format (automatische Verteilung)** → Basis ist `templates/signatur-cisign.html` mit der
+CI-Sign-Platzhaltersyntax (`@@attribut`/`##attribut`), die CI Sign automatisch aus dem
+Active-Directory-Profil des jeweiligen Mitarbeiters befüllt — Details, Attributtabelle und
+Einschränkungen in Abschnitt 5b. Auch hier werden keine Personendaten abgefragt.
+
+In **beiden** Fällen bleiben die unternehmensweiten Platzhalter (Logo-, Icon-, Banner-URLs,
+Social-Links) Teil des einen Rollouts und werden einmalig befüllt (siehe Abschnitt 4) — sie sind
+nicht personenbezogen.
+
+## 1a. Benötigte Eingaben (nur bei fertig befüllter Signatur für eine konkrete Person)
+
+Nur relevant, wenn bei manueller Verteilung ausdrücklich eine **konkrete, namentlich benannte
+Person** eingesetzt werden soll. Erforderlich (bei Fehlen kurz und direkt nachfragen — Namen niemals
+raten oder annehmen):
 
 - **Name** — vollständiger Vor- und Nachname der Person.
 - **Funktion/Rolle** — auf Deutsch **und** Englisch (zweisprachig, wie im Referenzlayout), z. B.
@@ -88,18 +129,19 @@ Erforderlich (bei Fehlen kurz und direkt nachfragen — Namen niemals raten oder
 - **Direkte Telefonnummer/Durchwahl.**
 - **Persönliche E-Mail-Adresse.**
 
-Optional:
+Optional (gilt unabhängig vom Verteilungsweg auch für die Vorlagen-Varianten):
 
-- **Abteilung/Bereich** (z. B. „Management", „Vertrieb International"). Fehlt sie, Zeile auf
-  „MSE Filterpressen GmbH" kürzen (siehe Template-Kommentar).
+- **Abteilung/Bereich** (z. B. „Management", „Vertrieb International"). Fehlt sie bei einer konkreten
+  Person, Zeile auf „MSE Filterpressen GmbH" kürzen (siehe Template-Kommentar); in der
+  personenneutralen Vorlage bleibt `{{DEPARTMENT_DE}}` stehen.
 - **Social-Profile**, die verlinkt werden sollen (LinkedIn/Instagram/X/Facebook) — nur die tatsächlich
   vorhandenen; nicht vorhandene Kanäle als ganze Spalte aus dem Template entfernen, keine toten Links.
 - **Banner-Bild-Thema/-Anlass**, falls kein fertiges Bild vom Kunden vorliegt (siehe Abschnitt 2).
 
 Beispiel für eine kurze Rückfrage, wenn Pflichtangaben fehlen:
 
-> "Für die Signatur brauche ich noch: vollständigen Namen, Funktion auf Deutsch und Englisch, Telefon-
-> Durchwahl und die persönliche E-Mail-Adresse — magst du mir die kurz nennen?"
+> "Für die fertig befüllte Signatur brauche ich noch: vollständigen Namen, Funktion auf Deutsch und
+> Englisch, Telefon-Durchwahl und die persönliche E-Mail-Adresse — magst du mir die kurz nennen?"
 
 ## 2. Banner-Bild: immer Foto + Headline + CTA in EINEM Bild — niemals ein bloßes Foto
 
@@ -206,11 +248,19 @@ vollständige Liste im HTML-Kommentar am Kopf der Datei: `{{NAME}}`, `{{ROLE_DE}
 
 Nicht vorhandene/gewünschte Elemente **vollständig entfernen** (ganze `<tr>`/`<td>`, keine leeren
 Platzhalter oder toten Links stehen lassen) — v. a. bei Social-Icons: nur tatsächlich vorhandene
-Kanäle behalten. **Verbindlich: im ausgelieferten HTML darf niemals sichtbarer Platzhalter-/
-Hinweistext stehen** (z. B. "PLATZHALTER — ..." oder ähnliche Regieanweisungen an den Nutzer) — das
+Kanäle behalten. **Verbindlich: im ausgelieferten HTML darf niemals sichtbarer Regieanweisungs-/
+Hinweistext stehen** (z. B. "PLATZHALTER — ..." oder ähnliche Anweisungen an den Nutzer) — das
 gehört, falls überhaupt nötig, in die Nachricht an den Nutzer außerhalb des HTML-Codes, niemals in
 den gerenderten Signatur-Body selbst. Fehlen Angaben (z. B. Social-URLs), die betreffende Zeile/Spalte
 sauber entfernen statt einen Hinweis dafür einzusetzen.
+
+**Bewusste Ausnahme (Verteilungsweg "manuell", siehe Abschnitt 1):** Die personenbezogenen
+`{{...}}`-Platzhalter (`{{NAME}}`, `{{ROLE_DE}}`, `{{ROLE_EN}}`, `{{DEPARTMENT_DE}}`, `{{PHONE}}`,
+`{{EMAIL}}`) bleiben in der manuellen Vorlage **absichtlich stehen** — sie sind das Ausfüllformat
+für die Arbeitsplätze und kein Verstoß gegen diese Regel. Beim CI-Sign-Format gilt dasselbe für die
+`@@`/`##`-Attribute. Unternehmensweite Platzhalter (Logo/Icons/Banner/Social/Rechtsblock) müssen
+dagegen in beiden Varianten vor Auslieferung real befüllt sein (bzw. mit explizitem Hinweis an den
+Nutzer, siehe "Bildlogik" unten).
 
 ### Zeichencodierung: immer HTML-Entities für Sonderzeichen — niemals rohe UTF-8-Sonderzeichen
 
@@ -249,30 +299,33 @@ Icons oder Banner als Base64-Data-URI einbetten. Stattdessen:
 
 ## 5. Ausgabe: HTML-Code plus Einbindungs-Hinweise
 
-Dem Nutzer immer beides liefern:
+Die Ausgabe richtet sich nach dem in Abschnitt 1 abgefragten Verteilungsweg. Dem Nutzer immer beides
+liefern — den HTML-Quellcode als Code-Block **und** die passenden Einbindungs-Hinweise:
 
-1. **Den fertigen HTML-Quellcode** als Code-Block, vollständig befüllt, bereit zum Kopieren.
-2. **Erklärung der zwei Integrationswege:**
+**(a) Manuelle Verteilung auf die Arbeitsplätze** (Outlook, Apple Mail, Gmail):
+- HTML auf Basis von `signatur-standard.html`; personenbezogene Felder als einfache
+  `{{...}}`-Platzhalter (siehe Abschnitt 1), unternehmensweite Platzhalter befüllt. Bei ausdrücklich
+  gewünschter Einzelperson-Signatur: vollständig befüllt (Abschnitt 1a).
+- Ausschließlich **inline Styles**, **kein externes Stylesheet**, **kein Flexbox/Grid** — nur
+  tabellenbasiertes Layout, genau wie im Template umgesetzt (Outlook Desktop ist bei CSS
+  erfahrungsgemäß am zickigsten).
+- Einbindung: pro Arbeitsplatz die Platzhalter durch die echten Personendaten ersetzen (Umlaute als
+  HTML-Entities, siehe Abschnitt 4), dann in den Signatur-Einstellungen des jeweiligen Clients die
+  HTML-Quelle einfügen bzw. über "Signatur bearbeiten (HTML)" importieren. Die mitgelieferte kurze
+  Ausfüll-Anleitung (Platzhalter → Feld) gehört immer dazu.
 
-   **(a) Manuelles Einfügen in gängige E-Mail-Clients** (Outlook, Apple Mail, Gmail):
-   - Ausschließlich **inline Styles**, **kein externes Stylesheet**, **kein Flexbox/Grid** — nur
-     tabellenbasiertes Layout, genau wie im Template umgesetzt (Outlook Desktop ist bei CSS
-     erfahrungsgemäß am zickigsten).
-   - In den Signatur-Einstellungen des jeweiligen Clients die HTML-Quelle einfügen bzw. über
-     "Signatur bearbeiten (HTML)" importieren.
-
-   **(b) Export für ein Signatur-Management-Tool** wie CI Sign:
-   - Für diesen Weg **immer** die CI-Sign-Variante verwenden (siehe Abschnitt 5b), nicht das
-     Standard-Template mit fest eingesetzten Personendaten — sonst zieht CI Sign die Werte nicht
-     automatisch pro Mitarbeiter.
-   - **Wichtiger Hinweis (verbindlich, immer erwähnen):** Die Einrichtung eines externen
-     Signatur-Management-Systems (z. B. CI Sign) ist **nicht Bestandteil dieses Angebots** und würde
-     **gesondert beauftragt und abgerechnet**. Dieser Skill liefert ausschließlich das HTML.
+**(b) CI-Sign-Format für die automatische Verteilung über CI Sign:**
+- HTML auf Basis von `signatur-cisign.html` mit der CI-Sign-Platzhaltersyntax (siehe Abschnitt 5b) —
+  **niemals** das Standard-Template mit fest eingesetzten Personendaten oder `{{...}}`-Platzhaltern
+  für diesen Weg verwenden, sonst zieht CI Sign die Werte nicht automatisch pro Mitarbeiter.
+- **Wichtiger Hinweis (verbindlich, immer erwähnen):** Die Einrichtung eines externen
+  Signatur-Management-Systems (z. B. CI Sign) ist **nicht Bestandteil dieses Angebots** und würde
+  **gesondert beauftragt und abgerechnet**. Dieser Skill liefert ausschließlich das HTML.
 
 ## 5b. CI-Sign-Variante — Platzhalter für automatischen Personenbezug
 
-Wird die Signatur für ein Rollout über **CI Sign** erstellt (nicht für eine einzelne Person manuell),
-**immer** `templates/signatur-cisign.html` als Basis verwenden statt `signatur-standard.html`. Der
+Hat der Nutzer in der Pflichtfrage (Abschnitt 1) den **CI-Sign-Weg** gewählt, **immer**
+`templates/signatur-cisign.html` als Basis verwenden statt `signatur-standard.html`. Der
 einzige Unterschied: alle personenbezogenen Felder sind durch die CI-Sign-Platzhaltersyntax ersetzt,
 sodass CI Sign die Werte automatisch aus dem Active-Directory-Profil des jeweiligen Mitarbeiters
 zieht — es muss dann **nicht** pro Mitarbeiter eine eigene HTML-Datei erzeugt werden.
@@ -318,17 +371,25 @@ zieht — es muss dann **nicht** pro Mitarbeiter eine eigene HTML-Datei erzeugt 
 
 ## 6. Speicherort
 
-Fertige Signatur speichern unter:
+Fertige Signatur speichern unter `Outputs/signaturen/`, Dateiname je nach Variante:
 
-```
-Outputs/signaturen/<name-slug>.html
-```
+| Variante | Dateiname |
+|---|---|
+| Manuelle Vorlage (personenneutral, `{{...}}`-Platzhalter) | `signatur-vorlage-manuell.html` |
+| CI-Sign-Format | `signatur-vorlage-cisign.html` |
+| Fertig befüllt für eine konkrete Person | `<name-slug>.html` |
 
 `<name-slug>` = Name der Person in Kleinbuchstaben, Leerzeichen durch Bindestriche ersetzt, ohne
 Sonderzeichen/Umlaute ausschreiben (z. B. "Jürgen Müller" → `juergen-mueller.html`).
 
 ## 7. QA-Checkliste (vor Auslieferung prüfen)
 
+- [ ] **Verteilungsweg abgefragt** (manuell vs. CI Sign, Abschnitt 1) — nicht angenommen — und das
+      dazu passende Template/Platzhalterformat verwendet (manuell = `{{...}}`-Platzhalter bzw. auf
+      Wunsch fertig befüllt; CI Sign = `@@`/`##`-Attribute)?
+- [ ] Bei manueller Vorlage: alle fünf personenbezogenen Platzhalter (`{{NAME}}`, `{{ROLE_DE}}`,
+      `{{ROLE_EN}}`, `{{DEPARTMENT_DE}}`, `{{PHONE}}`, `{{EMAIL}}`) unverändert vorhanden und eine
+      kurze Ausfüll-Anleitung mitgeliefert?
 - [ ] Hintergrund **explizit weiß** gesetzt (`bgcolor="#FFFFFF"` **und** `background-color:#FFFFFF`
       inline) — **niemals** `transparent` oder gar keine Hintergrundfarbe (sonst Dark-Mode-Risiko:
       Mail-Client/Browser legt einen eigenen dunklen Canvas darunter, anthrazitfarbene Schrift wird
@@ -356,8 +417,10 @@ Sonderzeichen/Umlaute ausschreiben (z. B. "Jürgen Müller" → `juergen-mueller
 - [ ] **Alle vier Kontakt-Icons und das Blatt-Icon sind echte `<img>`-Grafiken** (nicht Unicode-/
       Emoji-Zeichen als Text) und laden tatsächlich sichtbar — im Browser/Vorschau-Tool geprüft, nicht
       nur angenommen?
-- [ ] **Kein sichtbarer Platzhalter-/Regieanweisungstext im HTML-Body** (z. B. "PLATZHALTER — ...")
-      — fehlende Angaben führen zum sauberen Entfernen der Zeile, nicht zu einem Hinweistext?
+- [ ] **Kein sichtbarer Regieanweisungs-/Hinweistext im HTML-Body** (z. B. "PLATZHALTER — ...") —
+      fehlende Angaben führen zum sauberen Entfernen der Zeile, nicht zu einem Hinweistext?
+      (Personenbezogene `{{...}}`- bzw. `@@`/`##`-Platzhalter der jeweiligen Vorlagen-Variante sind
+      die dokumentierte Ausnahme, siehe Abschnitt 4.)
 - [ ] **Alle Sonderzeichen (ä/ö/ü/ß/é) als HTML-Entities gesetzt**, nicht als rohes UTF-8-Zeichen —
       Stichprobe: Vorschau im Browser zeigt korrekte Umlaute, keine "Ã¼"-artige Mojibake?
 - [ ] Nur tatsächlich vorhandene Social-Kanäle verlinkt, keine toten/leeren Icon-Links?
@@ -369,7 +432,9 @@ Sonderzeichen/Umlaute ausschreiben (z. B. "Jürgen Müller" → `juergen-mueller
 - [ ] HTML tabellenbasiert, ausschließlich Inline-Styles, kein externes Stylesheet, kein
       Flexbox/Grid — kompatibel mit Outlook Desktop, Apple Mail, Gmail?
 - [ ] Alle Bild-Platzhalter nutzen gehostete URLs, **kein** eingebettetes Base64-Bild?
-- [ ] Datei unter `Outputs/signaturen/<name-slug>.html` gespeichert?
+- [ ] Datei unter `Outputs/signaturen/` mit dem zur Variante passenden Dateinamen gespeichert
+      (`signatur-vorlage-manuell.html` / `signatur-vorlage-cisign.html` / `<name-slug>.html`,
+      siehe Abschnitt 6)?
 - [ ] Bei CI-Sign-Rollout: `templates/signatur-cisign.html` (nicht `signatur-standard.html`) verwendet,
       korrekte `@@`/`##`-Syntax je Feld, Zweisprachigkeits-Einschränkung bei `title` mit dem Kunden
       geklärt, Zeilen-Lösch-Verhalten vor dem Rollout testexportiert (siehe Abschnitt 5b)?

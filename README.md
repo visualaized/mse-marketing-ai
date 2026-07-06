@@ -76,6 +76,20 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.19.0** (2026-07-06) — `email-signatur`: verbindliche Pflichtfrage nach dem **Verteilungsweg**
+  vor jeder Signatur-Erstellung: **manuell auf die Arbeitsplätze** oder **CI-Sign-Format für die
+  automatische Verteilung über CI Sign**.
+  1. **Manuell** → `signatur-standard.html` mit einfachen, personenneutralen `{{...}}`-Platzhaltern
+     (`{{NAME}}`, `{{ROLE_DE}}`/`{{ROLE_EN}}`, `{{DEPARTMENT_DE}}`, `{{PHONE}}`, `{{EMAIL}}`), die
+     pro Arbeitsplatz von Hand ersetzt werden — inkl. mitgelieferter Ausfüll-Anleitung. Es werden
+     keine Personendaten mehr abgefragt; nur wenn ausdrücklich eine fertig befüllte Signatur für
+     eine konkrete Person gewünscht ist, greifen die bisherigen Pflichtangaben (jetzt Abschnitt 1a).
+  2. **CI Sign** → wie bisher `signatur-cisign.html` mit `@@`/`##`-AD-Attributsyntax (Abschnitt 5b).
+  3. Platzhalter-Regel präzisiert (personenbezogene Vorlagen-Platzhalter sind die dokumentierte
+     Ausnahme vom Verbot sichtbaren Hinweistexts), Speicherorte je Variante
+     (`signatur-vorlage-manuell.html` / `signatur-vorlage-cisign.html` / `<name-slug>.html`) und
+     QA-Checkliste entsprechend erweitert.
+
 - **1.18.0** (2026-07-06) — Newsletter-Versand umgestellt auf **Brevo** (Kundenentscheid) + verbindliche persönliche Anrede:
   1. **Skill `newsletter-klaviyo` → `newsletter-brevo`:** Die komplette Newsletter-Pipeline legt
      Draft-Kampagnen jetzt in Brevo an (Listen/Segmente statt Klaviyo-Segmente, verifizierte
