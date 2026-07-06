@@ -190,6 +190,12 @@ Das Dashboard ist eine statische Seite (HTML/CSS/Vanilla-JS), daher pragmatisch 
 - **Lokal/Test:** `node server.mjs` im `app/`-Ordner startet einen minimalen, abhängigkeitsfreien
   statischen Dateiserver (Standardport `8787`, override per `PORT`-Umgebungsvariable oder erstem
   CLI-Argument, z. B. `node server.mjs 3000`). Die Konsole zeigt beim Start die aufzurufende URL an.
+- **Doppelklick-Starter (kein Terminal nötig):** `dashboard-starten.bat` (Windows) bzw.
+  `dashboard-starten.command` (macOS) im App-Ordner — startet den Server und öffnet den Browser
+  automatisch. Der Server ist plattformunabhängig (reines Node.js, alle Pfade über das
+  `path`-Modul); einzige Voraussetzung auf jedem System ist ein installiertes Node.js
+  (nodejs.org). Windows-Hinweis: Beim ersten Start ggf. die Windows-Firewall-Nachfrage für
+  Node.js mit „Zulassen" bestätigen (rein lokaler Zugriff auf localhost).
 - Ein Öffnen direkt über `file://` funktioniert für einen ersten Eindruck der Optik, **aber**
   `fetch()` von `campaigns-index.json` wird von den meisten Browsern über `file://` aus
   Sicherheitsgründen blockiert. Für echten Gebrauch daher immer über `node server.mjs` oder den

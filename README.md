@@ -72,6 +72,11 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.14.2** (2026-07-03) — Windows-/macOS-Komfort für das Kampagnen-Dashboard:
+  Doppelklick-Starter `dashboard-starten.bat` (Windows) und `dashboard-starten.command` (macOS)
+  im App-Ordner — starten den lokalen Server und öffnen den Browser automatisch, kein Terminal
+  nötig. Server ist vollständig plattformunabhängig (reines Node.js, `path`-Modul für alle
+  Pfade); Windows-Firewall-Hinweis dokumentiert.
 - **1.14.1** (2026-07-03) — **Themenvorschläge mit Pflicht-Online-Recherche:** Beim Vorschlagen
   von Kampagnen-Themenideen recherchiert Claude jetzt verbindlich zuerst online, was die Branche
   aktuell beschäftigt (Websuche/News, LinkedIn-Fachdiskussionen, Branchenmagazine wie PROCESS/
