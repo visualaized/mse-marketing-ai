@@ -141,7 +141,7 @@ Je nach Auswahl rufst du die passenden Skills auf (bzw. befolgst deren Anweisung
 
 Wähle sinnvolle Reihenfolge: **erst Bild/Video** (liefert Visuals für alle anderen Bausteine), dann
 Text-Formate. Wiederverwendbare, bereits genehmigte Bilder findest du in `brand/product/` bzw. in
-`Outputs/` (Referenz-Assets aus vorherigen Higgsfield-Generierungen) — prüfe dort zuerst, bevor du neu
+`Outputs/` (Referenz-Assets aus vorherigen KI-Generierungen) — prüfe dort zuerst, bevor du neu
 generierst.
 
 ### Schritt 4 — Qualitätssicherung gegen Brand Guidelines
@@ -209,7 +209,7 @@ automatisch aus. Dabei verbindlich:
 - Keine Nennung von Wettbewerbern in nach außen gerichteten Inhalten (siehe `brand-guidelines.md` §3),
   außer der Nutzer verlangt es ausdrücklich.
 - Kein Erzeugen laufender Kosten-Impressionen: weise bei Bedarf sachlich auf Drittanbieter-Kosten
-  (Higgsfield, Brevo, Upload-Post) hin, aber löse keine Buchungen/Zahlungen aus.
+  (Fal.ai, Higgsfield, Brevo, Upload-Post) hin, aber löse keine Buchungen/Zahlungen aus.
 
 ## 3. Ton für Rückfragen
 Halte Rückfragen kurz, konkret und auf Deutsch (interne Nutzeransprache). Der erzeugte Content selbst

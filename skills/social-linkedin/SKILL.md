@@ -149,7 +149,10 @@ und CTA eingebaut sind — siehe Abschnitt 8b.
    `edit_scheduled`/`cancel_scheduled` zur Verwaltung). **Bei einem Mehrbild-Post (Fall B) alle
    Slide-Bilder gemeinsam als eine Bild-Liste übergeben**, damit sie als ein Post veröffentlicht
    werden. Prüfe die exakten Tool-Namen und Parameter zur Laufzeit in der aktuellen Session
-   (Installationen können variieren) — nicht blind eine feste Tool-ID annehmen.
+   (Installationen können variieren) — nicht blind eine feste Tool-ID annehmen. **Verbindlich: Der
+   Upload-Post-User für MSE heißt `mse`** — diesen Wert bei jedem `upload_*`-/Scheduling-Aufruf als
+   User-Parameter übergeben; niemals einen anderen User raten oder ungefragt aus `list_users`
+   auswählen.
 4. Hinweis: Für Upload-Post fallen aktuell ca. 19 €/Monat an, die der Kunde selbst trägt
    (informativer Hinweis, nicht weiter vertiefen).
 

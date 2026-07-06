@@ -136,7 +136,9 @@ CTA — siehe Abschnitt 8b.
    Upload-Post-Tools zur Laufzeit prüfen; Planung über die entsprechenden Scheduled-Post-Parameter bzw.
    `list_scheduled`/`edit_scheduled`/`cancel_scheduled` zur Verwaltung). Prüfe die exakten Tool-Namen und
    Parameter zur Laufzeit in der aktuellen Session (Installationen können variieren) — nicht blind eine
-   feste Tool-ID annehmen.
+   feste Tool-ID annehmen. **Verbindlich: Der Upload-Post-User für MSE heißt `mse`** — diesen Wert bei
+   jedem `upload_*`-/Scheduling-Aufruf als User-Parameter übergeben; niemals einen anderen User raten
+   oder ungefragt aus `list_users` auswählen.
 4. Hinweis: Für Upload-Post fallen aktuell ca. 19 €/Monat an, die der Kunde selbst trägt
    (informativer Hinweis, nicht weiter vertiefen).
 

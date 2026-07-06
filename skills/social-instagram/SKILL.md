@@ -169,7 +169,9 @@ Caption) — siehe Abschnitt 8b.
    als ein einziges Mehrbild-Carousel veröffentlicht, nicht als mehrere Einzelposts — Parameter-Name
    für Mehrfachbilder zur Laufzeit prüfen (Installationen können variieren). Prüfe generell die exakten
    Tool-Namen und Parameter zur Laufzeit in der aktuellen Session — nicht blind eine feste Tool-ID
-   annehmen.
+   annehmen. **Verbindlich: Der Upload-Post-User für MSE heißt `mse`** — diesen Wert bei jedem
+   `upload_*`-/Scheduling-Aufruf als User-Parameter übergeben; niemals einen anderen User raten oder
+   ungefragt aus `list_users` auswählen.
 4. Hinweis (einmalig, informativ): Für Upload-Post fallen aktuell **ca. 19 €/Monat** an, die der Kunde
    selbst trägt. Nicht weiter thematisieren, nur sachlich erwähnen falls relevant.
 

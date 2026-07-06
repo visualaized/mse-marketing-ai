@@ -67,6 +67,9 @@ Schreibweisen (CellTRON®, MSE Filterpressen®); keine Wettbewerbernennung; kein
    `select_google_business_location` setzen, dann den Post über das Upload-Tool mit
    Platform-Parameter `google_business` (Enum zur Laufzeit prüfen — Installationen können
    variieren) veröffentlichen oder terminieren (`list_scheduled`/`edit_scheduled` zur Verwaltung).
+   **Verbindlich: Der Upload-Post-User für MSE heißt `mse`** — diesen Wert bei jedem
+   `upload_*`-/Scheduling-/Standort-Aufruf als User-Parameter übergeben; niemals einen anderen User
+   raten oder ungefragt aus `list_users` auswählen.
 4. Hinweis wie bei den übrigen Social-Bausteinen: Upload-Post kostet aktuell ca. 19 €/Monat
    (trägt der Kunde; nur sachlich erwähnen, falls relevant).
 

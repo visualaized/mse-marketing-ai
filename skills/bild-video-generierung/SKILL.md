@@ -1,14 +1,15 @@
 ---
-description: "Erzeugt markenkonforme Bilder und Videos mit Higgsfield (immer in 2K, Prompt-Aufbau nach der 6-Layer-Struktur des nano-banana-prompt-Skills) für jeden anderen Baustein (Newsletter, Social Media, Landing Page, Kampagnen). Triggert bei 'Bild generieren', 'Video generieren', 'Visual erstellen', 'Higgsfield', oder wenn ein anderer Baustein ein Visual für Social Media, Newsletter oder Landing Page benötigt."
+description: "Erzeugt markenkonforme Bilder (vorerst über Fal.ai) und Videos (über Higgsfield) — immer in 2K, Prompt-Aufbau nach der 6-Layer-Struktur des nano-banana-prompt-Skills — für jeden anderen Baustein (Newsletter, Social Media, Landing Page, Kampagnen). Triggert bei 'Bild generieren', 'Video generieren', 'Visual erstellen', 'Fal', 'Higgsfield', oder wenn ein anderer Baustein ein Visual für Social Media, Newsletter oder Landing Page benötigt."
 disable-model-invocation: false
 ---
 
 # Bild- & Videogenerierung — MSE Filterpressen GmbH
 
 Dieser Baustein generiert markenkonforme Bilder und Videos auf Basis der MSE Brand Guidelines.
-Bildgenerierung erfolgt über Higgsfield; Videogenerierung baut auf den generierten (oder bestehenden,
-genehmigten) Bildern auf — ebenfalls über Higgsfield, per Image-to-Video. Dieser Baustein liefert die
-passenden Visuals für alle anderen Bausteine (Newsletter, Social Media, Landing Pages, Kampagnen).
+**Bildgenerierung erfolgt vorerst über Fal.ai** (aktueller Stand Juli 2026 — zuvor Higgsfield);
+Videogenerierung baut auf den generierten (oder bestehenden, genehmigten) Bildern auf und läuft
+**weiterhin über Higgsfield** (Image-to-Video). Dieser Baustein liefert die passenden Visuals für
+alle anderen Bausteine (Newsletter, Social Media, Landing Pages, Kampagnen).
 
 ## 1. Wann dieser Baustein läuft
 
@@ -32,7 +33,7 @@ Diese drei Dateien sind die einzige verbindliche Quelle für Farben, Bildsprache
 klingen. Fehlt eine Angabe, frage kurz nach, statt zu raten. Existieren diese Dateien nicht, stoppe und
 weise darauf hin, dass Claude im CIDES-Ordner des Kunden gestartet werden muss.
 
-## 3. Markenkonformen Higgsfield-Bild-Prompt aufbauen
+## 3. Markenkonformen Bild-Prompt aufbauen
 
 **Verbindlich: jeder Bild-Prompt folgt der 6-Layer-Struktur des `nano-banana-prompt`-Skills**
 (Concept → Subject → Colors & Materials → Composition → Lighting & Mood → Camera & Lens). Rufe für
@@ -144,7 +145,7 @@ Bevor du komplett neu generierst:
 
 1. Prüfe `brand/product/` — echte vorhandene Fotos/Videos realer MSE-Anlagen. Diese sind die
    verlässlichste Referenzquelle für Bildmodelle (reale Industriefotografie, kein Stockmaterial).
-2. Prüfe `Outputs/` (frühere Kampagnenordner) auf bereits genehmigte, frühere Higgsfield-Generierungen
+2. Prüfe `Outputs/` (frühere Kampagnenordner) auf bereits genehmigte, frühere KI-Generierungen
    zum gleichen oder einem ähnlichen Thema.
 3. Existiert ein passendes Referenzbild: **bevorzugt Image-to-Image-Varianten oder Upscaling auf Basis
    dieser Referenz erzeugen**, statt komplett neu von einem leeren Prompt zu starten. Das erhält
@@ -152,18 +153,28 @@ Bevor du komplett neu generierst:
 4. Existiert keine passende Referenz: neu generieren, aber den fertigen, genehmigten Output danach als
    neue Referenz ablegen (siehe Abschnitt 6), damit zukünftige Generierungen darauf aufbauen können.
 
-## 5. Higgsfield-MCP-Tools aufrufen
+## 5. Generierungs-Tools aufrufen — Bilder: Fal.ai (vorerst), Videos: Higgsfield
 
-Die Higgsfield-MCP-Tools sind in jeder Session unter einem session-spezifischen Server-Präfix
-eingebunden (z. B. `mcp__<server-id>__generate_image`, `generate_video`, `models_explore`,
-`upscale_image`, `outpaint_image`, `reframe`, `remove_background`, `motion_control`,
-`media_upload_widget`). Die genaue Tool-ID unterscheidet sich je nach Installation — **suche die
-verfügbaren Higgsfield-Bild-/Video-Generierungs-Tools in der aktuellen Session** (z. B. per Tool-Suche
-nach Namen wie `generate_image`, `generate_video`, `models_explore`) und nutze sie generisch; hardcode
-keine feste Tool-ID.
+**Bildgenerierung läuft vorerst über Fal.ai** (aktueller Stand Juli 2026). Die Fal.ai-Anbindung ist
+in der Session als MCP-Server und/oder als Skill verfügbar — **zur Laufzeit lokalisieren, nicht
+raten**:
 
-- Ist unklar, welches Higgsfield-Modell für den Anwendungsfall am besten passt, rufe zuerst das
-  Modell-Empfehlungs-Tool auf (z. B. `models_explore` mit `action: recommend`), bevor du generierst.
+1. Ist ein Skill wie `fal-image-gen` in der Session verfügbar, diesen für die Bild-Generierung
+   verwenden (er kapselt Modellwahl und Aufrufkonventionen).
+2. Sonst per Tool-Suche nach Fal.ai-Tools suchen (Stichworte wie `"fal"`, `"fal image"`,
+   `"generate image"`) und das gefundene Tool generisch nutzen — keine feste Tool-ID hardcoden.
+3. Der markenkonforme Prompt nach Abschnitt 3 (6-Layer-Struktur) bleibt unverändert die Grundlage —
+   er ist anbieterunabhängig.
+
+**Videogenerierung läuft weiterhin über die Higgsfield-MCP-Tools.** Diese sind in jeder Session unter
+einem session-spezifischen Server-Präfix eingebunden (z. B. `mcp__<server-id>__generate_video`,
+`models_explore`, `upscale_image`, `outpaint_image`, `reframe`, `remove_background`,
+`motion_control`, `media_upload_widget`). Die genaue Tool-ID unterscheidet sich je nach Installation —
+per Tool-Suche lokalisieren (z. B. `generate_video`, `models_explore`) und generisch nutzen.
+
+- Ist unklar, welches Modell für den Anwendungsfall am besten passt, zuerst die Modell-Empfehlung des
+  jeweiligen Anbieters nutzen (bei Higgsfield z. B. `models_explore` mit `action: recommend`; bei
+  Fal.ai die Modellwahl des `fal-image-gen`-Skills bzw. der Tool-Beschreibung), bevor generiert wird.
 - Für Bearbeitungen an einem bestehenden Asset (statt komplett neu zu generieren) das passende
   dedizierte Tool verwenden statt erneuter Vollgenerierung: Upscaling/Auflösung erhöhen, Outpainting/
   Bildausschnitt erweitern, Reframe für neues Seitenverhältnis, Hintergrund entfernen, Motion Control
@@ -171,13 +182,15 @@ keine feste Tool-ID.
 
 ### Auflösung: immer 2K
 
-**Verbindlich: jedes Bild wird in 2K generiert** (Higgsfield/Nano Banana Pro unterstützt 2K als
-Ausgabequalität — diese Auflösung ist der Standard für alle MSE-Bild-Generierungen, unabhängig vom
-Zielkanal). Stelle beim Aufruf des Higgsfield-Bild-Tools den 2K-Auflösungsparameter (bzw. das
-entsprechende Qualitäts-/Resolution-Preset des jeweiligen Modells) explizit ein — generiere niemals in
-einer niedrigeren Standardauflösung "auf gut Glück". Muss ein Kanal ein kleineres Format ausspielen
-(z. B. ein Instagram-Thumbnail), wird das fertige 2K-Bild passend zugeschnitten/skaliert — nicht direkt
-in niedriger Auflösung erzeugt.
+**Verbindlich: jedes Bild wird in 2K generiert** (die verwendeten Modelle — z. B. Nano Banana Pro via
+Fal.ai — unterstützen 2K als Ausgabequalität; diese Auflösung ist der Standard für alle
+MSE-Bild-Generierungen, unabhängig vom Zielkanal). Stelle beim Aufruf des Bild-Tools den
+2K-Auflösungsparameter (bzw. das entsprechende Qualitäts-/Resolution-Preset des jeweiligen Modells)
+explizit ein — generiere niemals in einer niedrigeren Standardauflösung "auf gut Glück". Muss ein
+Kanal ein kleineres Format ausspielen (z. B. ein Instagram-Thumbnail), wird das fertige 2K-Bild
+passend zugeschnitten/skaliert — nicht direkt in niedriger Auflösung erzeugt. (Die Einbindung in
+Newsletter/Landing Page/Signatur komprimiert anschließend auf den jeweiligen Anwendungsfall — siehe
+die Kompressions-Abschnitte der Ziel-Bausteine; das 2K-Original bleibt die Ablage-/Referenzfassung.)
 
 ### Seitenverhältnis je Kanal
 
@@ -275,15 +288,16 @@ python3 "<Pfad-zum-Plugin>/skills/bild-video-generierung/scripts/compose_slide.p
   `marketing-zentrale`-QA-Checkliste) — `brand/logo/MSE Favicon.png` (blaues Bildzeichen, funktioniert
   auf jedem Hintergrund) ist der Standardfall für kleine Eck-Platzierungen.
 - Hintergrundbild (`--background`) kommt wie immer zuerst aus bereits generierten/genehmigten
-  Bildern (`Outputs/`, `brand/product/`), erst dann neu über Higgsfield generieren (siehe
+  Bildern (`Outputs/`, `brand/product/`), erst dann neu generieren (Bilder via Fal.ai, siehe
   Abschnitt 4). Für ein Carousel können mehrere Slides dasselbe oder verschiedene Hintergrundbilder
   nutzen (z. B. Vollansicht + 2 Detailaufnahmen + Vollansicht für CTA-Slide).
 
 Jede fertige Slide durchläuft dieselbe Freigabe & Ablage wie unter Abschnitt 6 beschrieben.
 
-## 9. Hinweis zu Modell-Updates bei Higgsfield
+## 9. Hinweis zu Modell-Updates beim Generierungsanbieter
 
-Higgsfield aktualisiert seine zugrundeliegenden Bild-/Videomodelle regelmäßig. Das kann dazu führen,
+Die Generierungsanbieter (Fal.ai für Bilder, Higgsfield für Videos) aktualisieren ihre
+zugrundeliegenden Bild-/Videomodelle regelmäßig. Das kann dazu führen,
 dass ein zuvor gut funktionierender Prompt nach einem Modell-Update leicht abweichende Ergebnisse
 liefert (z. B. andere Bildstimmung, Detailgrad oder Farbnuancen). Das ist normales, zu erwartendes
 Verhalten bei KI-Bildmodellen — kein Fehler im Baustein. Gelegentliches Nachjustieren von Prompts nach

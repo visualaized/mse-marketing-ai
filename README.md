@@ -10,7 +10,7 @@ Plugin muss deshalb immer mit dem CIDES-Ordner als Arbeitsverzeichnis genutzt we
 | Skill | Pos. im Angebot | Zweck |
 |---|---|---|
 | `marketing-zentrale` | 1 (Grundbaustein-Logik) | Zentrale Steuerlogik: Thema → Rückfragen → Auslösen der passenden Bausteine |
-| `bild-video-generierung` | 2 | KI-Bilder (2K, nach `nano-banana-prompt`-Struktur) & KI-Videos via Higgsfield |
+| `bild-video-generierung` | 2 | KI-Bilder (2K, nach `nano-banana-prompt`-Struktur, vorerst via Fal.ai) & KI-Videos via Higgsfield |
 | `newsletter-brevo` | 3 | Thema → Text & Bilder → HTML-Newsletter (mit persönlicher Anrede) → Brevo-Draft-Kampagne |
 | `newsletter-migration` | 4 (Add-on) | Kontakt-Import/-Pflege Kundenliste → Brevo inkl. DSGVO-Prüfung |
 | `social-instagram` | 5 | Instagram-Posts (Deutsch, lockerer-professionell) + Upload-Post |
@@ -53,7 +53,8 @@ Ohne diese Dateien lehnen die Skills die Erzeugung von Inhalten ab (siehe jeweil
    - Danach: `/plugin install mse-marketing-ai`.
    - Claude Code **im CIDES-Ordner** starten (dort liegt `CLAUDE.md`) — nicht im Plugin-Ordner.
 3. Benötigte MCP-Zugänge/API-Keys gemäß Auftragsbestätigung einrichten: Brevo (Newsletter-Versand und
-   Kontakt-Import, Kundenentscheid seit Juli 2026 — ersetzt Klaviyo), Higgsfield, Upload-Post und
+   Kontakt-Import, Kundenentscheid seit Juli 2026 — ersetzt Klaviyo), Fal.ai (Bildgenerierung, vorerst),
+   Higgsfield (Videogenerierung), Upload-Post (Social-Media-Veröffentlichung, MSE-User: `mse`) und
    Claude (Anthropic).
 
 Dieser Schritt ("Client-Anbindung": Verlinkung zum Brand Hub + Installation der Plugins/Skills pro
@@ -75,6 +76,18 @@ Bei Änderungen an Skills: Versionsnummer in `.claude-plugin/plugin.json` erhöh
 unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
+
+- **1.21.0** (2026-07-06) — Upload-Post-User verbindlich + Bildgenerierung vorerst über Fal.ai:
+  1. **Upload-Post-User `mse`** in allen vier Social-Skills verankert (`social-instagram`,
+     `social-linkedin`, `social-x`, `social-google-business`): jeder `upload_*`-/Scheduling-Aufruf
+     übergibt den User-Parameter `mse` — niemals raten oder ungefragt aus `list_users` wählen.
+  2. **`bild-video-generierung`: Bildgenerierung läuft vorerst über Fal.ai** (Stand Juli 2026, zuvor
+     Higgsfield) — bevorzugt über den Session-Skill `fal-image-gen`, sonst per Tool-Suche nach
+     Fal.ai-Tools; **Videogenerierung bleibt bei Higgsfield** (Image-to-Video/Motion Control). Die
+     6-Layer-Prompt-Struktur (`nano-banana-prompt`) und die 2K-Pflicht gelten anbieterunabhängig
+     weiter; Abschnitt 9 (Modell-Updates) auf beide Anbieter verallgemeinert.
+  3. Querverweise aktualisiert (README-Tabelle, MCP-Zugangs-Liste inkl. Upload-Post-User,
+     `marketing-zentrale`-Drittanbieterkosten, plugin.json-Keyword `fal-ai`).
 
 - **1.20.0** (2026-07-06) — **Verbindliche Bild-Kompression je Anwendungsfall** (Kundenvorgabe) in
   Newsletter, Landing Page und Signatur — niemals 2K-Originale aus `bild-video-generierung` direkt
