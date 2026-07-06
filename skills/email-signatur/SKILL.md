@@ -217,6 +217,30 @@ sichtbaren Rand hinaus: genau das erzeugt den „abgeschnitten"-Effekt.
    ca. 375px Viewportbreite) — sichtbar prüfen, dass das Banner vollständig sichtbar bleibt und
    proportional mitschrumpft, nicht nur behaupten, dass es responsive sei.
 
+### 2b. Grafiken für den Signatur-Anwendungsfall komprimieren (Pflicht, vor dem Hosten)
+
+Die Signatur hängt an **jeder einzelnen ausgehenden E-Mail** — hier gelten die strengsten
+Grenzwerte aller Bausteine. **Jede Grafik wird vor dem Hosten für diesen Anwendungsfall
+optimiert** — niemals die 2K-Originale aus `bild-video-generierung` oder das komponierte
+Banner-PNG in voller Auflösung direkt einbinden.
+
+Verbindliche Vorgaben (Banner-Anzeigebreite max. 592 px):
+
+| Grafik | Format | Abmessung (Export) | Zielgröße |
+|---|---|---|---|
+| Banner (Foto + Headline + CTA) | **JPEG, Qualität 70–80** (das komponierte PNG vor dem Hosten nach JPEG wandeln — Fotos als PNG sind um ein Vielfaches größer) | 1184 px Breite (2× 592 px für Retina) | ≤ 100 KB |
+| Logo/Wortmarke | PNG (Transparenz), verlustfrei optimiert | 260 px Breite (2× 130 px) | ≤ 20 KB |
+| Kontakt-/Blatt-Icons | PNG, verlustfrei optimiert | 36–48 px (2× Anzeigegröße) | ≤ 5 KB je Icon |
+| Social-Icons | PNG, verlustfrei optimiert | 2× Anzeigegröße | ≤ 5 KB je Icon |
+
+- **Gesamtgewicht aller Signatur-Grafiken: ≤ 150 KB** — liegt es darüber, zuerst die
+  Banner-Qualität reduzieren.
+- **Kein WebP/AVIF** — gleiche E-Mail-Client-Einschränkung wie beim Newsletter (Outlook Desktop).
+- Praktische Umsetzung mit Bordmitteln (Pillow im Bash-Tool), sinngemäß:
+  `python3 -c "from PIL import Image; im = Image.open('banner.png').convert('RGB'); im.thumbnail((1184, 10000)); im.save('banner.jpg', 'JPEG', quality=75, progressive=True, optimize=True)"`
+- **Dateigröße nach dem Export prüfen** (`ls -la`) und erst dann hosten — nicht annehmen, dass die
+  Grenzwerte eingehalten sind.
+
 ## 3. Markenkern zuerst laden (Pflicht)
 
 Bevor Text oder HTML erzeugt werden, in dieser Reihenfolge lesen (relativ zum aktuellen
@@ -432,6 +456,9 @@ Sonderzeichen/Umlaute ausschreiben (z. B. "Jürgen Müller" → `juergen-mueller
 - [ ] HTML tabellenbasiert, ausschließlich Inline-Styles, kein externes Stylesheet, kein
       Flexbox/Grid — kompatibel mit Outlook Desktop, Apple Mail, Gmail?
 - [ ] Alle Bild-Platzhalter nutzen gehostete URLs, **kein** eingebettetes Base64-Bild?
+- [ ] **Grafiken für den Signatur-Anwendungsfall komprimiert** (Abschnitt 2b): Banner als JPEG
+      ≤ 100 KB (1184 px), Logo ≤ 20 KB, Icons ≤ 5 KB je Stück, Gesamtgewicht ≤ 150 KB, kein
+      WebP/AVIF — Dateigrößen tatsächlich geprüft, keine unkomprimierten Originale gehostet?
 - [ ] Datei unter `Outputs/signaturen/` mit dem zur Variante passenden Dateinamen gespeichert
       (`signatur-vorlage-manuell.html` / `signatur-vorlage-cisign.html` / `<name-slug>.html`,
       siehe Abschnitt 6)?

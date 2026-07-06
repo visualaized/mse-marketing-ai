@@ -76,6 +76,22 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.20.0** (2026-07-06) — **Verbindliche Bild-Kompression je Anwendungsfall** (Kundenvorgabe) in
+  Newsletter, Landing Page und Signatur — niemals 2K-Originale aus `bild-video-generierung` direkt
+  einbinden, Dateigrößen nach Export immer real prüfen (`ls -la`), Pillow-Einzeiler je Skill
+  dokumentiert:
+  1. **`newsletter-brevo` Schritt 3c:** E-Mail-Kontext — JPEG 75–80 für Fotos (kein WebP/AVIF wegen
+     Outlook), Export in 2× Anzeigebreite (Hero 1280 px ≤ 200 KB, Produktbild 520 px ≤ 100 KB,
+     Footer-Bild ≤ 150 KB, Logo-PNG ≤ 30 KB), **Mailing gesamt ≤ 600 KB**.
+  2. **`landing-pages` Abschnitt 8a:** Web-Kontext — WebP ~80 bevorzugt (Hero max. 1920 px ≤ 350 KB,
+     Sektionsbilder max. 1600 px ≤ 250 KB, Logo SVG/PNG ≤ 30 KB), **Seite gesamt ≤ 1 MB**,
+     `loading="lazy"` für alle Bilder unter dem Fold — nie auf dem Hero (LCP).
+  3. **`email-signatur` Abschnitt 2b:** strengste Grenzen, da die Signatur an jeder Mail hängt —
+     Banner als JPEG 1184 px ≤ 100 KB (komponiertes PNG vor dem Hosten wandeln), Logo ≤ 20 KB,
+     Icons ≤ 5 KB je Stück, **gesamt ≤ 150 KB**, kein WebP/AVIF.
+  4. Zentral verankert in der `marketing-zentrale`-Kundenvorgaben-Liste (mit Verweis auf die drei
+     Abschnitte); QA-Checklisten aller drei Bausteine um Kompressions-Prüfpunkte erweitert.
+
 - **1.19.0** (2026-07-06) — `email-signatur`: verbindliche Pflichtfrage nach dem **Verteilungsweg**
   vor jeder Signatur-Erstellung: **manuell auf die Arbeitsplätze** oder **CI-Sign-Format für die
   automatische Verteilung über CI Sign**.

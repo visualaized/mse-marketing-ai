@@ -224,6 +224,29 @@ Hero-/Split-Bild im passenden Querformat generieren lassen (siehe dortige Format
 Landing-Page-Hero). Die finalen, extern erreichbaren Bild-URLs/-Pfade in `{{HERO_IMAGE_URL}}` und
 `{{SOLUTION_IMAGE_URL}}` einsetzen — niemals generische Stockfoto- oder Cartoon-Platzhalter.
 
+### 8a. Bilder für Web komprimieren (Pflicht, vor dem Hosten)
+
+**Jede Grafik wird vor dem Einsetzen für den Web-Anwendungsfall optimiert** — niemals die
+2K-Originale aus `bild-video-generierung` oder unbearbeitete Produktfotos direkt einbinden. Die
+Landing Page ist eine Conversion-Seite: Ladezeit ist Teil der Qualität (Core Web Vitals / LCP).
+
+Verbindliche Vorgaben:
+
+| Bildtyp | Format | Abmessung (Export) | Zielgröße |
+|---|---|---|---|
+| Hero-Bild (Vollbild-Hintergrund) | **WebP, Qualität ~80** (Browser-Support ist heute universell); alternativ JPEG progressiv 75–80 | max. 1920 px lange Kante | ≤ 350 KB |
+| Split-/Sektionsbilder | WebP ~80 bzw. JPEG 75–80 | max. 1600 px lange Kante | ≤ 250 KB |
+| Logo/Bildzeichen | SVG bevorzugt; sonst PNG verlustfrei optimiert | Anzeigegröße 2× | ≤ 30 KB |
+
+- **Gesamtgewicht aller Bilder der Seite: ≤ 1 MB** (das Base64-Nudica-`@font-face` kommt ohnehin
+  dazu) — liegt es darüber, Qualität/Abmessungen weiter reduzieren.
+- **`loading="lazy"` auf alle Bilder unterhalb des Folds** (Split-/Sektionsbilder) — **niemals** auf
+  das Hero-Bild (das ist das LCP-Element und muss sofort laden).
+- Praktische Umsetzung mit Bordmitteln (Pillow im Bash-Tool), sinngemäß:
+  `python3 -c "from PIL import Image; im = Image.open('in.png'); im.thumbnail((1920, 1920)); im.save('out.webp', 'WEBP', quality=80, method=6)"`
+- **Dateigröße nach dem Export prüfen** (`ls -la`) und erst dann hosten — nicht annehmen, dass die
+  Grenzwerte eingehalten sind.
+
 ## 9. Footer — immer der Website-Footer (site-footer, dunkel)
 
 **Kundenvorgabe, verbindlich:** Jede Landing Page trägt denselben Footer wie die Live-Website
@@ -316,5 +339,8 @@ damit die Zuordnung beim Hochladen stimmt.
       rechtliche Zeile auf `#000` mit hellem Text (Abschnitt 9)? Keine Faxnummer?
 - [ ] Keine erfundenen Statistiken, Studien oder Claims — alles auf `CLAUDE.md`/`brand-guidelines.md`
       bzw. Nutzerangaben rückführbar.
+- [ ] **Bilder für Web komprimiert** (Abschnitt 8a): WebP/JPEG in den vorgegebenen Abmessungen,
+      Einzelgrößen und Gesamtgewicht ≤ 1 MB eingehalten, `loading="lazy"` unterhalb des Folds
+      (nie auf dem Hero) — Dateigrößen tatsächlich geprüft, keine 2K-Originale direkt eingebunden?
 - [ ] Subdomain-Slot (A/B) mit dem Nutzer geklärt und in Dateiname/Notiz vermerkt.
 - [ ] Nutzer wurde klar darauf hingewiesen, dass der Upload auf den Webspace ein manueller Schritt ist.

@@ -206,6 +206,32 @@ fällt dann kontrolliert auf Arial zurück. Das ist eine bekannte, branchenübli
 HTML-E-Mail (u. a. Outlook Desktop ignoriert `@font-face` grundsätzlich) — **kein** Zeichen dafür, dass
 die Marke ignoriert wird, sondern eine bewusste, dokumentierte Fallback-Entscheidung.
 
+### Schritt 3c — Bilder für E-Mail komprimieren (Pflicht, vor dem Hosten/Hochladen)
+
+**Jede Grafik wird vor dem Einsetzen für den E-Mail-Anwendungsfall optimiert** — niemals die
+2K-Originale aus `bild-video-generierung` oder unbearbeitete Produktfotos direkt einbinden. Große
+Mailings laden langsam, werden von Gmail bei > ~102 KB HTML-Größe abgeschnitten (Clipping betrifft
+das HTML, große Bilder verschlechtern zusätzlich Ladezeit und Spam-Bewertung) und wirken
+unprofessionell.
+
+Verbindliche Vorgaben (Template ist 640 px breit):
+
+| Bildtyp | Format | Abmessung (Export) | Zielgröße |
+|---|---|---|---|
+| Hero-/Header-Bild (`{{HEADER_IMAGE_URL}}`) | JPEG, Qualität 75–80, progressiv | 1280 px Breite (2× Anzeigebreite für Retina) | ≤ 200 KB |
+| Produkt-/Split-Bild (`{{PRODUCT_IMAGE_URL}}`) | JPEG, Qualität 75–80 | 520 px Breite (2× 260 px) | ≤ 100 KB |
+| Footer-Bild (`{{FOOTER_IMAGE_URL}}`) | PNG (Flächen/Text) oder JPEG, falls fotografisch | 1280 px Breite | ≤ 150 KB |
+| Logo (`{{LOGO_URL}}`) | PNG (Transparenz), verlustfrei optimiert | 320 px Breite (2× 160 px) | ≤ 30 KB |
+
+- **Gesamtgewicht aller Bilder eines Mailings: ≤ 600 KB** — liegt es darüber, Qualität/Abmessungen
+  weiter reduzieren, bevor hochgeladen wird.
+- **Kein WebP/AVIF in E-Mails** — Outlook Desktop und ältere Clients rendern diese Formate nicht
+  zuverlässig; für Fotos immer JPEG, für Grafiken mit Transparenz/harten Kanten PNG.
+- Praktische Umsetzung mit Bordmitteln (Pillow im Bash-Tool), sinngemäß:
+  `python3 -c "from PIL import Image; im = Image.open('in.png').convert('RGB'); im.thumbnail((1280, 10000)); im.save('out.jpg', 'JPEG', quality=78, progressive=True, optimize=True)"`
+- **Dateigröße nach dem Export prüfen** (`ls -la`) und erst dann hosten/hochladen — nicht annehmen,
+  dass die Grenzwerte eingehalten sind.
+
 ### Schritt 4 — In HTML-Template einsetzen
 Eines der beiden Starter-Templates dieses Skills als Basis nehmen (Pfade relativ zum Skill-Verzeichnis
 `newsletter-brevo/`):
@@ -352,5 +378,8 @@ dies ein Onboarding-/Infrastruktur-Thema ist, statt es hier zu lösen.
 - [ ] Keine erfundenen Zahlen, Studien, Kundenzitate oder unbelegten Claims — alles auf
       `CLAUDE.md`/`brand-guidelines.md` bzw. Nutzerangaben rückführbar.
 - [ ] Bildsprache: echte Industriefotografie, keine Stockfotos/Cartoons/generische KI-Abstraktion.
+- [ ] **Bilder für E-Mail komprimiert** (Schritt 3c): JPEG für Fotos (kein WebP/AVIF), Abmessungen
+      max. 2× Anzeigebreite, Einzelgrößen und Gesamtgewicht ≤ 600 KB eingehalten — Dateigrößen
+      tatsächlich geprüft, keine 2K-Originale direkt eingebunden?
 - [ ] Brevo-Kampagne liegt als **Draft** vor — kein Versand-/Schedule-Tool wurde aufgerufen, kein
       `scheduledAt` gesetzt.

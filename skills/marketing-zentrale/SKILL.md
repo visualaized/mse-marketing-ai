@@ -168,6 +168,12 @@ jeweiligen Skills, aber immer mindestens):
   - Landing Pages tragen **immer den Website-Footer** (site-footer, dunkel); Newsletter tragen
     **immer das Footer-Bild** `brand/elements/MSE Newsletter Footer.png` + nahtlosen schwarzen
     Rechtsfooter.
+  - **Grafiken immer optimal für den Anwendungsfall komprimieren**, bevor sie gehostet/eingebunden
+    werden — niemals 2K-Originale aus `bild-video-generierung` direkt verwenden. Verbindliche
+    Grenzwerte je Baustein: Newsletter `newsletter-brevo` Schritt 3c (JPEG/PNG, kein WebP,
+    Mailing gesamt ≤ 600 KB), Landing Page `landing-pages` Abschnitt 8a (WebP bevorzugt,
+    Seite gesamt ≤ 1 MB, `loading="lazy"` unter dem Fold), Signatur `email-signatur`
+    Abschnitt 2b (strengste Grenzen, gesamt ≤ 150 KB).
 - **Echtes Logo aus `brand/logo/` und echte Nudica-Schrift tatsächlich eingebunden** — niemals
   Klartext statt Logo, niemals stillschweigend nur beim Arial-Fallback bleiben, ohne die
   Font-Einbindung (Base64/gehostete URL, je nach Baustein) versucht zu haben. Nur bei E-Mail-Inhalten
