@@ -167,7 +167,7 @@ vorangestelltem `/en/`**. Bestätigtes Beispiel (CellTRON-Seite):
 - Verlinkt der CTA auf **diese Landing Page selbst** oder eine andere Landing Page mit eingebautem
   Sprachumschalter (z. B. ein "Zurück zur Übersicht"-Link): dieselbe URL für beide Sprachen verwenden
   — der Umschalter der Zielseite übernimmt die Sprachzuordnung selbst.
-- Dieselbe Logik gilt spiegelbildlich im `newsletter-klaviyo`-Baustein für CTA-Links, die auf diese
+- Dieselbe Logik gilt spiegelbildlich im `newsletter-brevo`-Baustein für CTA-Links, die auf diese
   Landing Page zeigen — dort ist es ausführlicher dokumentiert, hier nur der Verweis darauf.
 
 ## 6. Technische Anforderungen an die HTML-Datei

@@ -135,7 +135,7 @@ Teil einer Kampagne? Dann verbindlich:
 
 Das Whitepaper ist das Download-Asset der Kampagne — genau dafür verlinken:
 
-- **Newsletter (`newsletter-klaviyo`):** Download-Link als **sekundärer Ghost-CTA** unter dem
+- **Newsletter (`newsletter-brevo`):** Download-Link als **sekundärer Ghost-CTA** unter dem
   Haupt-CTA (gleicher Ghost-Stil wie der Haupt-CTA des Templates, Label z. B.
   „Whitepaper herunterladen (PDF)" — Verb + Outcome). In BEIDEN Sprachversionen; verlinkt die
   jeweils sprachpassende PDF-Fassung (existiert nur DE, in der EN-Version kennzeichnen:

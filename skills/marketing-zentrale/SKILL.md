@@ -90,7 +90,8 @@ vollständig benannt (z. B. "nur Instagram und Newsletter, sonst nichts").
    - LinkedIn (Post, immer Englisch)
    - X (Post, immer Englisch)
    - Google Business (Unternehmensprofil-Post, Deutsch, SEO-relevant)
-   - Newsletter (Klaviyo — automatisch DE + EN als Entwürfe im jeweils passenden Segment)
+   - Newsletter (Brevo — automatisch DE + EN als Entwürfe an die jeweils passende Liste/Segment,
+     immer mit persönlicher Anrede über Brevo-Kontaktattribute)
    - Landing Page (mit DE/EN-Umschalter)
    - E-Mail-Signatur (Kampagnen-Banner)
    - Whitepaper (informatives Themen-PDF, on-brand — Download-Link im Newsletter und/oder auf
@@ -113,7 +114,7 @@ Danach nur noch fragen, was für die Umsetzung wirklich offen ist:
    (z. B. Recruiting-Content → "Du"-Ansprache statt "Sie"; siehe `CLAUDE.md`).
 
 Sprachen werden **nicht** abgefragt — sie sind pro Kanal fest hinterlegt (Instagram = Deutsch,
-LinkedIn/X = Englisch, Newsletter = immer beide Sprachen, siehe `newsletter-klaviyo`).
+LinkedIn/X = Englisch, Newsletter = immer beide Sprachen, siehe `newsletter-brevo`).
 
 Tonalität, Sprache pro Kanal und Ansprache ("Sie"/"Du") sind **im Markenkern bereits fest hinterlegt**
 (siehe `CLAUDE.md` → Sprache & Ansprache, Kanäle) — frage das NICHT erneut ab, sondern wende es
@@ -127,7 +128,7 @@ Je nach Auswahl rufst du die passenden Skills auf (bzw. befolgst deren Anweisung
 | Auswahl | Skill |
 |---|---|
 | Bild/Video benötigt | `bild-video-generierung` |
-| Newsletter | `newsletter-klaviyo` |
+| Newsletter | `newsletter-brevo` |
 | Instagram-Post | `social-instagram` |
 | LinkedIn-Post | `social-linkedin` |
 | X-Post | `social-x` |
@@ -136,7 +137,7 @@ Je nach Auswahl rufst du die passenden Skills auf (bzw. befolgst deren Anweisung
 | Whitepaper (PDF) | `whitepaper` |
 | Google-Business-Post | `social-google-business` |
 | Google Ads | `google-ads` |
-| Kontakt-Migration Brevo→Klaviyo | `newsletter-migration` (nur auf ausdrücklichen Wunsch, kein Standardschritt) |
+| Kontakt-Import/-Pflege (Kundenliste → Brevo) | `newsletter-migration` (nur auf ausdrücklichen Wunsch, kein Standardschritt) |
 
 Wähle sinnvolle Reihenfolge: **erst Bild/Video** (liefert Visuals für alle anderen Bausteine), dann
 Text-Formate. Wiederverwendbare, bereits genehmigte Bilder findest du in `brand/product/` bzw. in
@@ -158,7 +159,7 @@ jeweiligen Skills, aber immer mindestens):
   - **Nie eine Headline ohne Eyebrow** darüber — in jedem Baustein, jeder Sektion.
   - **Typografie-Verhältnisse wie die Website**: Headline `2.5rem`/bold/`#0D0E11`/lh 1.2/ls -0.02em;
     Body 15px/lh 1.4/`#0D0E11`; Eyebrow `1rem`/600/uppercase/ls 0.05em/`#5D6A77` (Details je
-    Baustein: `landing-pages` Abschnitt 4a, `newsletter-klaviyo` Schritt 4).
+    Baustein: `landing-pages` Abschnitt 4a, `newsletter-brevo` Schritt 4).
   - **Heller Text auf hellen Bildbereichen** bekommt einen leichten, weichen Schatten zum Abheben
     (macht `compose_slide.py` automatisch — keinen harten Umriss bauen).
   - **Bildzeichen nie frei im Raum**: nur in einer der vier Bildecken (einheitlicher Eckabstand)
@@ -202,7 +203,7 @@ automatisch aus. Dabei verbindlich:
 - Keine Nennung von Wettbewerbern in nach außen gerichteten Inhalten (siehe `brand-guidelines.md` §3),
   außer der Nutzer verlangt es ausdrücklich.
 - Kein Erzeugen laufender Kosten-Impressionen: weise bei Bedarf sachlich auf Drittanbieter-Kosten
-  (Higgsfield, Klaviyo, Upload-Post) hin, aber löse keine Buchungen/Zahlungen aus.
+  (Higgsfield, Brevo, Upload-Post) hin, aber löse keine Buchungen/Zahlungen aus.
 
 ## 3. Ton für Rückfragen
 Halte Rückfragen kurz, konkret und auf Deutsch (interne Nutzeransprache). Der erzeugte Content selbst

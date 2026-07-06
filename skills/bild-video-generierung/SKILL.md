@@ -185,7 +185,7 @@ in niedriger Auflösung erzeugt.
 |---|---|
 | Instagram Feed-Post | 1:1 (quadratisch) oder 4:5 (Hochformat) |
 | LinkedIn / X | 16:9 oder 1.91:1 (Querformat) |
-| Newsletter-Header | i. d. R. breites Querformat (z. B. 16:9 oder ähnlich, passend zum Klaviyo-Template) |
+| Newsletter-Header | i. d. R. breites Querformat (z. B. 16:9 oder ähnlich, passend zum Brevo-Template) |
 | Landing-Page-Hero | Querformat, hohe Auflösung (Desktop-Hero-Breite, i. d. R. 16:9 oder breiter) |
 
 Frage den Nutzer bzw. den aufrufenden Baustein nach dem Zielkanal, falls nicht bereits bekannt, und

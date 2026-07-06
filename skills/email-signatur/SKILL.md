@@ -74,7 +74,7 @@ Marketing-Thema gemeint. Dieser Skill erzeugt keine Kampagnen-Inhalte, sondern e
 
 - Der Nutzer möchte eine E-Mail-Signatur erstellen oder generieren lassen, z. B. "Signatur für Herrn
   Müller erstellen", "E-Mail-Signatur für unsere neue Vertriebsmitarbeiterin".
-- Nicht zuständig für: Newsletter-Templates (`newsletter-klaviyo`), Social-Media-Grafiken, oder das
+- Nicht zuständig für: Newsletter-Templates (`newsletter-brevo`), Social-Media-Grafiken, oder das
   Einrichten eines Signatur-Management-Systems selbst (siehe Abschnitt "Out of Scope").
 
 ## 1. Benötigte Eingaben

@@ -1,0 +1,356 @@
+---
+description: "Erstellt markenkonforme Newsletter für MSE Filterpressen und legt sie als Draft-Kampagne in Brevo an — immer mit persönlicher Anrede (z. B. 'Sehr geehrter Herr Müller') über Brevo-Kontaktattribute. Trigger: 'Newsletter erstellen', 'Brevo-Kampagne', 'Kampagnen-Mail', 'Mailing zu Thema X', 'Newsletter versenden vorbereiten'."
+disable-model-invocation: false
+---
+
+# Newsletter (Brevo) — MSE Filterpressen GmbH
+
+Dieser Baustein erzeugt aus einem Thema einen fertigen, markenkonformen HTML-Newsletter und legt ihn
+in Brevo als **Draft-Kampagne** an. Er wird in der Regel von der `marketing-zentrale` aufgerufen,
+kann aber auch direkt angesprochen werden.
+
+> **Plattform-Hinweis:** Der Newsletterversand läuft seit Juli 2026 über **Brevo** (Kundenentscheid) —
+> nicht mehr über Klaviyo. Wenn irgendwo noch Klaviyo-Referenzen auftauchen (alte Notizen, alte
+> `meta.txt`-Ablagen), sind sie historisch; neue Kampagnen entstehen ausschließlich in Brevo.
+
+## Wann dieser Skill greift
+
+- Der Nutzer möchte einen Newsletter, ein Mailing oder eine E-Mail-Kampagne zu einem Thema erstellen.
+- Der Nutzer sagt z. B. "Newsletter zu CellTRON Xtreme", "Brevo-Kampagne aufsetzen", "Mailing für
+  die Messe", "Newsletter-Entwurf für nächste Woche".
+- Nicht zuständig für: einmalige Transaktions-E-Mails, SMS/WhatsApp-Kampagnen, Kontakt-Import/-Pflege
+  (dafür `newsletter-migration`).
+
+## 0. Markenkern zuerst laden (Pflicht)
+
+Bevor irgendein Text oder HTML erzeugt wird, in dieser Reihenfolge lesen (relativ zum aktuellen
+Arbeitsverzeichnis, dem CIDES-Root des Kunden):
+
+1. `CLAUDE.md` — kompaktes Master-Brand-Dokument.
+2. `brand/brand-guidelines.md` — vollständiges Regelwerk (Typografie, Bildsprache, Do's & Don'ts).
+3. `brand/color-palette.json` — verbindliche, maschinenlesbare Farbwerte.
+
+Bei Widerspruch gewinnt `CLAUDE.md`. Erfinde niemals eigene Claims, Zahlen oder Farbwerte — fehlt eine
+Angabe, nachfragen statt raten. Existieren diese Dateien nicht, stoppen und den Nutzer darauf
+hinweisen, dass im CIDES-Ordner des Kunden gearbeitet werden muss.
+
+## 1. Immer zweisprachig — Deutsch UND Englisch, keine Sprachauswahl mehr nötig
+
+**Jeder Newsletter wird verbindlich in beiden Sprachen erstellt** — eine deutsche Version (Sie-
+Ansprache) **und** eine eigenständig im MSE-Ton formulierte englische Version (keine wörtliche/
+maschinelle Übersetzung, siehe `landing-pages`-Konvention für dieselbe Regel). Es gibt keine
+Vorab-Sprachwahl mehr — der komplette Pipeline-Durchlauf (Text → Bilder → Template →
+Brevo-Draft → Empfänger-Zuordnung als Entwurf) läuft **einmal pro Sprache**, mit zwei eigenständigen
+Kampagnen/Ausgabeordnern, nie einer gemischt-sprachigen Datei.
+
+Jede Sprachversion bekommt außerdem ihre **eigene, sprachpassende CTA-Ziel-URL** (siehe Abschnitt
+1a) und wird als eigener Draft an die **entsprechende Brevo-Liste bzw. das Brevo-Segment** dieser
+Sprache gerichtet (siehe Abschnitt 1b) — beide Sprachversionen sind vollständig eigenständige
+Kampagnen, nicht nur zwei Textvarianten derselben Kampagne.
+
+### 1a. URL-Lokalisierung: CTA verlinkt immer auf die sprachpassende Landing-Page-Variante
+
+mse-filterpressen.com nutzt ein bestätigtes Muster für zweisprachige Seiten: die **deutsche Version
+liegt auf dem Root-Pfad ohne Sprachpräfix**, die **englische Version liegt unter demselben Pfad mit
+vorangestelltem `/en/`**. Bestätigtes Beispiel (CellTRON-Seite):
+
+| Sprache | URL |
+|---|---|
+| Deutsch | `https://mse-filterpressen.com/celltron/` |
+| Englisch | `https://mse-filterpressen.com/en/celltron/` |
+
+Beim Setzen von `{{CTA_URL}}`:
+- **Deutsche Newsletter-Version** → CTA verlinkt auf die deutsche (Root-)URL.
+- **Englische Newsletter-Version** → CTA verlinkt auf dieselbe Seite mit `/en/`-Präfix.
+- Ist die Ziel-Landing-Page ein Ergebnis des `landing-pages`-Bausteins **derselben Kampagne**: dort
+  liegt ohnehin nur eine Datei mit eingebautem DE/EN-Umschalter vor (kein separater Pfad pro Sprache)
+  — in diesem Fall für beide Newsletter-Sprachversionen dieselbe URL verwenden; der Umschalter auf
+  der Landing Page selbst übernimmt die Sprachzuordnung.
+- Verlinkt der Newsletter stattdessen auf eine **bestehende Seite der Hauptwebsite** (wie im
+  CellTRON-Beispiel): das `/en/`-Präfix-Muster anwenden — aber **nur für Pfade, die der Nutzer
+  bestätigt hat oder die bereits als Beispiel belegt sind**. Nicht blind für jede beliebige URL ein
+  `/en/`-Pendant annehmen, ohne dass dessen Existenz plausibel/bestätigt ist — im Zweifel kurz
+  nachfragen: "Hat die Seite [URL] auch eine englische Version unter `/en/...`?"
+
+### 1b. Brevo-Empfänger: DE- und EN-Version an die jeweils richtige Liste / das richtige Segment senden
+
+Jede Sprachversion wird als Draft-Kampagne an eine **eigene Brevo-Empfängergruppe** dieser Sprache
+gerichtet (Brevo kennt statische **Listen** und dynamische **Segmente** — beides kann als
+Kampagnen-Zielgruppe dienen). Da eine falsch zugeordnete Empfängergruppe dazu führen kann, dass
+Kontakte E-Mails in der falschen Sprache bekommen, **niemals blind raten**:
+
+1. Verfügbare Listen und Segmente über die Brevo-MCP-Tools abrufen (sinngemäß `lists_get_lists` und
+   `segments_get_segments` — Tool-Namen zur Laufzeit lokalisieren, siehe Abschnitt 2/Schritt 6).
+2. Anhand des Namens eine Gruppe für Deutsch (z. B. "DE", "Deutsch", "German") und eine für Englisch
+   (z. B. "EN", "English", "International") identifizieren. Anhaltspunkt aus der Kundenliste: Kontakte
+   mit Anrede `Herr`/`Frau` sind deutschsprachig gepflegt, Kontakte mit `Mr.`/`Ms.` englischsprachig.
+3. **Ist die Zuordnung nicht eindeutig** (z. B. keine sprachlich benannten Listen/Segmente vorhanden,
+   oder mehrere infrage kommende): dem Nutzer die gefundene Liste zeigen und **explizit nachfragen**,
+   welche Liste/welches Segment für welche Sprachversion verwendet werden soll — nicht raten oder
+   eine Gruppe "wahrscheinlich passend" auswählen.
+4. Die einmal bestätigte Zuordnung (Listen-/Segment-ID und -Name je Sprache) in der Kampagnen-Notiz/
+   Ablage (Abschnitt 2/Schritt 7) vermerken, damit sie bei künftigen Newslettern wiederverwendet
+   werden kann, ohne erneut nachzufragen — bis der Nutzer etwas anderes angibt.
+
+### 1c. Persönliche Anrede (Pflicht in jedem Newsletter)
+
+Die Kundendaten in Brevo sind mit **Anrede, Titel, Vorname und Nachname** gepflegt (Quelle:
+bereinigte MSE-Kundenliste). **Jeder Newsletter beginnt deshalb verbindlich mit einer persönlichen
+Anrede** — niemals ein unpersönliches "Hallo," und niemals ein Newsletter ganz ohne Anrede.
+
+**Bekannte Datenlage der Kundenliste (Stand Juli 2026):**
+
+| Feld | Werte / Besonderheiten |
+|---|---|
+| Anrede | `Herr`, `Frau` (deutschsprachige Kontakte) sowie `Mr.`, `Ms.` (englischsprachige Kontakte); ein kleiner Rest ist **leer** |
+| Titel | meist leer; sonst z. B. `Dr.`, `Dr.-Ing.`, `Dipl.-Ing.`, `Ing.` |
+| Vorname / Nachname | durchgehend gepflegt, vereinzelt fehlend |
+
+**Verbindliche Anrede-Logik:**
+
+| Fall | Deutsch | Englisch |
+|---|---|---|
+| Anrede `Herr` / `Mr.` + Nachname vorhanden | `Sehr geehrter Herr [Titel ]Nachname,` | `Dear Mr. [Titel ]Nachname,` |
+| Anrede `Frau` / `Ms.` + Nachname vorhanden | `Sehr geehrte Frau [Titel ]Nachname,` | `Dear Ms. [Titel ]Nachname,` |
+| Anrede leer/unbekannt oder Nachname fehlt (Fallback) | `Sehr geehrte Damen und Herren,` | `Dear Sir or Madam,` |
+
+Der Titel steht — falls gepflegt — zwischen Anrede-Wort und Nachname ("Sehr geehrter Herr Dr. Müller").
+
+**Technische Umsetzung — die Personalisierung passiert in Brevo, nicht als statischer Text:** Die
+Anrede wird als **Bedingungsblock in Brevo-Template-Sprache** (Django-ähnlich) in das HTML
+eingesetzt, damit **eine** Kampagne alle Empfänger korrekt anspricht. Beide Starter-Templates
+enthalten dafür den Platzhalter `{{SALUTATION}}` direkt über dem Body-Text.
+
+Kanonischer Block für die **deutsche** Version (Attributnamen ggf. anpassen, siehe unten):
+
+```
+{% if contact.ANREDE == "Herr" and contact.NACHNAME %}Sehr geehrter Herr {% if contact.TITEL %}{{ contact.TITEL }} {% endif %}{{ contact.NACHNAME }},{% elif contact.ANREDE == "Mr." and contact.NACHNAME %}Sehr geehrter Herr {% if contact.TITEL %}{{ contact.TITEL }} {% endif %}{{ contact.NACHNAME }},{% elif contact.ANREDE == "Frau" and contact.NACHNAME %}Sehr geehrte Frau {% if contact.TITEL %}{{ contact.TITEL }} {% endif %}{{ contact.NACHNAME }},{% elif contact.ANREDE == "Ms." and contact.NACHNAME %}Sehr geehrte Frau {% if contact.TITEL %}{{ contact.TITEL }} {% endif %}{{ contact.NACHNAME }},{% else %}Sehr geehrte Damen und Herren,{% endif %}
+```
+
+Kanonischer Block für die **englische** Version:
+
+```
+{% if contact.ANREDE == "Mr." and contact.NACHNAME %}Dear Mr. {% if contact.TITEL %}{{ contact.TITEL }} {% endif %}{{ contact.NACHNAME }},{% elif contact.ANREDE == "Herr" and contact.NACHNAME %}Dear Mr. {% if contact.TITEL %}{{ contact.TITEL }} {% endif %}{{ contact.NACHNAME }},{% elif contact.ANREDE == "Ms." and contact.NACHNAME %}Dear Ms. {% if contact.TITEL %}{{ contact.TITEL }} {% endif %}{{ contact.NACHNAME }},{% elif contact.ANREDE == "Frau" and contact.NACHNAME %}Dear Ms. {% if contact.TITEL %}{{ contact.TITEL }} {% endif %}{{ contact.NACHNAME }},{% else %}Dear Sir or Madam,{% endif %}
+```
+
+**Attributnamen verifizieren, nicht raten:** Vor dem ersten Einsetzen die tatsächlich in Brevo
+angelegten Kontakt-Attribute abrufen (sinngemäß `attributes_get_attributes`) und die Namen im Block
+anpassen (z. B. falls das Nachname-Feld `NAME` statt `NACHNAME` heißt oder englische Standardnamen
+wie `LASTNAME` verwendet werden). Die Blöcke oben sind die Referenz-Logik — die exakten
+Attributbezeichner kommen aus dem Brevo-Konto des Kunden. Die einmal verifizierten Attributnamen in
+der Ablage-Notiz (Schritt 7) dokumentieren und bei künftigen Läufen wiederverwenden.
+
+Beide Bedingungsblöcke decken bewusst **alle vier Anrede-Werte plus Fallback in beiden
+Sprachversionen** ab: Falls eine Liste nicht perfekt nach Sprache getrennt ist, bekommt trotzdem
+niemand eine kaputte oder leere Anrede.
+
+## 2. Pipeline: Thema → fertiger Draft in Brevo
+
+### Schritt 1 — Thema entgegennehmen
+Thema, Anlass und Kernbotschaft kurz erfassen (i. d. R. bereits von der `marketing-zentrale`
+übergeben).
+
+### Schritt 2 — Text erzeugen
+Folgende Textbausteine in Sie-Ansprache und im MSE-Content-Flow (BIG HEADLINE → kurze Erklärung →
+technisches Wertversprechen → CTA) erzeugen:
+
+- **Betreff** (`{{SUBJECT}}`) — kurz, konkret, kein Clickbait, keine unbelegten Superlative.
+- **Preheader** (`{{PREHEADER}}`) — ergänzt den Betreff, keine Wiederholung.
+- **Eyebrow** (`{{EYEBROW}}`) — kurzes, getracktes Label in Kleinbuchstaben-Konzept aber Großschreibung
+  gemäß Brand (z. B. "PRODUKT-UPDATE", "CASE STUDY").
+- **Headline** (`{{HEADLINE}}`) — Satzform (Sentence case), kein AUSSCHLIESSLICH GROSS.
+- **Persönliche Anrede** (`{{SALUTATION}}`) — der sprachpassende Brevo-Bedingungsblock aus
+  Abschnitt 1c (DE-Block in die deutsche, EN-Block in die englische Version). Kein statischer Text.
+- **Body-Text** (`{{BODY_TEXT}}`) — kurze Sätze, harte Fakten, technische Präzision, keine
+  Filler-Wörter. Der Body schließt direkt an die persönliche Anrede an — also nicht mit einer
+  zweiten Begrüßung beginnen.
+- **CTA-Label** (`{{CTA_LABEL}}`) — immer Verb + Outcome (z. B. "Filtrationssystem konfigurieren",
+  "Mit unseren Experten sprechen" / EN: "Configure Your Filtration System", "Connect with Our Experts").
+- **CTA-Ziel-URL** (`{{CTA_URL}}`) — **immer sprachpassend** setzen (siehe Abschnitt 1a: deutsche
+  Version verlinkt auf die deutsche/Root-URL, englische Version auf die `/en/`-Variante, außer die
+  Zielseite ist eine `landing-pages`-Seite mit eingebautem Sprachumschalter — dann für beide
+  Newsletter-Sprachversionen dieselbe URL verwenden). Vom Nutzer/Kampagnenkontext übernehmen, sonst
+  Platzhalter lassen und nachfragen.
+
+Alle Aussagen ausschließlich auf Basis von `CLAUDE.md` / `brand-guidelines.md` bzw. vom Nutzer
+gelieferten Fakten. Keine erfundenen Zahlen, Studien oder Kundenaussagen.
+
+### Schritt 3 — Bilder beschaffen
+Bilder nicht neu erzeugen, wenn bereits passendes Material existiert. Reihenfolge der Prüfung:
+
+1. Bereits im aktuellen Durchlauf von `bild-video-generierung` erzeugte und freigegebene Bilder.
+2. `Outputs/` — frühere, bereits genehmigte Generierungen zum selben Thema/Produkt.
+3. `brand/product/` — vorhandenes Produktfotografie-Material.
+
+Erst wenn dort nichts Passendes vorliegt, den Skill `bild-video-generierung` für eine Neu-Generierung
+aufrufen. Bildsprache immer: echte Industriefotografie (Filterpressen, Anlagen, technische Details) —
+niemals Stockfotos, Cartoons oder generische KI-Abstraktionen.
+
+### Schritt 3b — Logo und Schrift: immer die echten Marken-Assets verwenden
+
+**{{LOGO_URL}} ist Pflicht, kein optionales Extra.** Verwende immer das echte, freigegebene Logo aus
+`brand/logo/` (Standardfall: `Logo_06.10.2020_ohne Hintergrund.png`) als gehostete URL — niemals
+Klartext ("MSE Filterpressen" als Wort) anstelle des Logos einsetzen, niemals das Logo selbst
+nachzeichnen/neu generieren (CellTRON®/MSE® sind geschützte Marken). Der Header-Bereich des Templates
+ist bewusst **Light Grey** hinterlegt, weil das vorhandene Logo-Asset dunkel/transparent ist und auf
+einem hellen Untergrund den nötigen Kontrast hat (siehe `brand-guidelines.md` §6, "Standard"-Nutzung) —
+niemals auf einen dunklen/anthrazitfarbenen Header-Hintergrund wechseln, dafür existiert kein
+freigegebenes Weiß-Logo-Asset.
+
+**Optionale Nudica-Einbindung:** Beide Templates enthalten einen auskommentierten `@font-face`-Block
+für `{{FONT_URL_REGULAR}}`/`{{FONT_URL_BOLD}}`. Aktivieren, **wenn** die echten Nudica-Dateien aus
+`brand/fonts/Nudica/` an einer stabilen, öffentlich erreichbaren URL gehostet werden (z. B. auf
+mse-filterpressen.com) — dann zeigen Apple Mail, iOS Mail und viele Webmailer echtes Nudica. Ist keine
+gehostete Font-URL vorhanden, den Block auskommentiert lassen: Der `'Nudica', Arial, sans-serif`-Stack
+fällt dann kontrolliert auf Arial zurück. Das ist eine bekannte, branchenübliche Einschränkung von
+HTML-E-Mail (u. a. Outlook Desktop ignoriert `@font-face` grundsätzlich) — **kein** Zeichen dafür, dass
+die Marke ignoriert wird, sondern eine bewusste, dokumentierte Fallback-Entscheidung.
+
+### Schritt 4 — In HTML-Template einsetzen
+Eines der beiden Starter-Templates dieses Skills als Basis nehmen (Pfade relativ zum Skill-Verzeichnis
+`newsletter-brevo/`):
+
+- `templates/newsletter-standard.html` — allgemeines Ankündigungs-/Themen-Mailing.
+- `templates/newsletter-produkt.html` — produkt-/technologie-fokussiertes Mailing mit Spec-Raster
+  (z. B. für CellTRON-Spezifikationen) und Bild-Split-Layout.
+
+Alle `{{PLATZHALTER}}` im gewählten Template durch die in Schritt 2/3 erzeugten Inhalte ersetzen —
+`{{SALUTATION}}` durch den sprachpassenden Brevo-Bedingungsblock (Abschnitt 1c). **Nach dem Ersetzen
+dürfen im HTML nur noch Brevo-eigene Ausdrücke übrig sein** (`{{ contact.… }}`, `{% if … %}`,
+`{{ unsubscribe }}`, optional `{{ mirror }}`) — kein einziger `{{PLATZHALTER}}` im
+GROSSBUCHSTABEN-Stil dieses Skills.
+Beim Produkt-Template zusätzlich `{{SPEC_ROWS}}` durch generierte Label/Value-Zeilen ersetzen (siehe
+Kommentar im Template für das erwartete HTML-Fragment). Bild-Platzhalter (`{{HEADER_IMAGE_URL}}` etc.)
+durch finale, gehostete Bild-URLs ersetzen (z. B. via Brevo-Bildupload — sinngemäß
+`upload_image_to_gallery` — oder Outputs-Ablage, sobald ein extern erreichbarer Link vorliegt).
+
+**Verbindliche Design-Regeln (Kundenvorgaben, bereits in beide Templates eingebaut — beim Anpassen
+nie zurückbauen):**
+
+1. **Typografie exakt im Website-Verhältnis** (verifiziert gegen mse-filterpressen.com):
+   - Headline: 40px, `font-weight: bold`, `line-height: 1.2` (48px), `letter-spacing: -0.02em`
+     (-0.8px), Farbe `#0D0E11`.
+   - Body: 15px, `line-height: 1.4` (21px), `font-weight: normal`, Farbe `#0D0E11`.
+   - Eyebrow: 16px, `line-height: 1.2`, `text-transform: uppercase`, `letter-spacing: 0.05em`
+     (0.8px), `font-weight: 600`, Farbe `#5D6A77`.
+   - **Eine Headline steht NIEMALS ohne Eyebrow darüber.**
+2. **Persönliche Anrede (Pflicht):** Direkt über dem Body-Text steht IMMER der `{{SALUTATION}}`-Block
+   (Abschnitt 1c) — nie entfernen, nie durch statischen Text ersetzen.
+3. **Footer-Bild (Pflicht):** Über dem rechtlichen Footer steht IMMER das Bild
+   `brand/elements/MSE Newsletter Footer.png` in **voller Breite** (`{{FOOTER_IMAGE_URL}}`).
+   Das Bild liegt beim Kunden auf dem eigenen Server mit **identischem Unterordnerpfad** —
+   die gehostete URL endet also auf `/brand/elements/MSE%20Newsletter%20Footer.png`.
+4. **Rechtlicher Footer nahtlos darunter:** Hintergrund exakt `#000000` (= Hintergrundfarbe des
+   Footer-Bilds, verifiziert), heller Text (`#C9C9C9`, Links `#FFFFFF`), kein Abstand zwischen
+   Bild und Footer (Bild `display:block`, direkt anschließende Zelle).
+5. **Keine Faxnummer** — Fax wird laut Kundenvorgabe nirgends genannt.
+6. **Whitepaper-Download (falls die Kampagne eines hat, siehe Skill `whitepaper`):** Download-Link
+   als **sekundärer Ghost-CTA** unter dem Haupt-CTA (gleicher Ghost-Stil, Label Verb + Outcome,
+   z. B. „Whitepaper herunterladen (PDF)") — in BEIDEN Sprachversionen, jeweils auf die
+   sprachpassende PDF-URL (existiert nur eine DE-Fassung, in der EN-Version als
+   „(PDF, German)" kennzeichnen). Ersetzt nie den Haupt-CTA.
+
+### Schritt 5 — Qualitätssicherung (siehe Checkliste unten)
+Vor dem Anlegen in Brevo den fertigen HTML-Inhalt gegen die Checkliste in Abschnitt 4 prüfen.
+
+### Schritt 6 — Brevo MCP: Draft-Kampagne anlegen
+Die Brevo-MCP-Tools sind in der aktuellen Session unter session-spezifischen Serverpräfixen
+verfügbar (das Präfix ändert sich je nach Installation). Vor der Nutzung die passenden Tools per
+Tool-Suche lokalisieren, z. B. mit Suchbegriffen wie `"brevo email campaign"`,
+`"create email campaign"`, `"get lists"`, `"get segments"` oder `"get attributes"` — niemals ein
+festes Server-Präfix fest verdrahten.
+
+Konzeptioneller Ablauf (Tool-Namen sinngemäß, je nach Session ggf. leicht abweichend) — **einmal pro
+Sprachversion durchlaufen**:
+
+1. **Kontakt-Attribute verifizieren** (sinngemäß `attributes_get_attributes`), damit der
+   Anrede-Bedingungsblock die exakten Attributnamen des Brevo-Kontos verwendet (siehe Abschnitt 1c).
+   Nur beim ersten Lauf nötig, danach aus der Ablage-Notiz übernehmen.
+2. **Passende Empfängerliste/-segment bestimmen** (sinngemäß `lists_get_lists` /
+   `segments_get_segments`, siehe Abschnitt 1b) — DE-Version an die deutschsprachige, EN-Version an
+   die englischsprachige Gruppe. Bei Unklarheit den Nutzer fragen statt zu raten.
+3. **Absender bestimmen** (sinngemäß `senders_get_senders`) — einen der in Brevo verifizierten
+   Absender verwenden; bei mehreren Kandidaten den Nutzer fragen. Niemals eine unverifizierte
+   Absenderadresse erfinden.
+4. **Kampagne als Draft anlegen** (sinngemäß `create_email_campaign`) mit Betreff, Preheader,
+   Absender, dem fertigen QA-geprüften HTML (`htmlContent`) und der in Punkt 2 bestimmten Liste/dem
+   Segment als Empfänger. **Keinen Versandzeitpunkt (`scheduledAt`) setzen** — die Kampagne bleibt
+   Entwurf.
+5. **Ergebnis verifizieren** (sinngemäß `get_email_campaign`): Status ist Draft, Empfängergruppe und
+   Betreff stimmen, HTML inkl. Anrede-Bedingungsblock ist vollständig hinterlegt.
+
+**Wichtige Regel — niemals automatisch versenden:** Das Ergebnis dieses Ablaufs ist ausschließlich
+eine **Draft-Kampagne** in Brevo. Es wird zu keinem Zeitpunkt ein Versand-, Schedule- oder
+"Send now"-Tool aufgerufen (insbesondere nicht sinngemäß `send_email_campaign_now` und kein
+Status-Update Richtung Versand; eine Test-Mail via sinngemäß `send_test_email` nur auf ausdrücklichen
+Nutzerwunsch). Der Versand erfolgt ausschließlich manuell durch einen Menschen nach Prüfung im
+Brevo-Interface — dort lässt sich die persönliche Anrede auch per Vorschau mit echten Kontakten
+gegenprüfen.
+
+### Schritt 7 — Ablage
+Eine Kopie des finalen HTML sowie eine kurze Meta-Notiz speichern unter:
+
+```
+Outputs/<datum>-<thema>-newsletter-<sprache>/
+  newsletter.html
+  meta.txt   (Thema, Sprache, Betreff, CTA-URL, verwendete Brevo-Liste/-Segment (ID/Name),
+              Brevo-Kampagnen-ID/-Name, verifizierte Anrede-Attributnamen (z. B. ANREDE/TITEL/
+              NACHNAME), Erstellungsdatum, Status: Draft)
+```
+
+Datum im Format `JJJJ-MM-TT`, Thema kurz und dateinamenfreundlich (Kleinbuchstaben, Bindestriche),
+Sprache als `de` bzw. `en` — **immer beide Ordner anlegen**, da jeder Newsletter zweisprachig läuft.
+
+## 3. Hinweis: Sending Domain, DNS und API-Key-Verwaltung (nicht Teil dieses Laufs)
+
+Die dedizierte Sending Domain, DNS-Konfiguration (SPF/DKIM/DMARC), verifizierte Absender sowie die
+sichere Verwaltung des Brevo-API-Keys sind **einmalige Onboarding-Aufgaben**, kein Bestandteil des
+Pro-Newsletter-Ablaufs. Diese Einrichtung erfolgt separat beim Setup der Anbindung; die Zugangsdaten
+liegen konzeptionell in der MCP-/Umgebungskonfiguration der Session (nicht in diesem Skill oder in
+Projektdateien). Dieser Skill geht davon aus, dass die Anbindung bereits funktionsfähig ist. Gibt es
+Hinweise auf Zustellbarkeitsprobleme oder fehlende Autorisierung, den Nutzer darauf hinweisen, dass
+dies ein Onboarding-/Infrastruktur-Thema ist, statt es hier zu lösen.
+
+## 4. QA-Checkliste vor Abschluss (Draft erst dann als "fertig" markieren)
+
+- [ ] Farben im HTML korrekt: Fast White dominant, MSE Blue `#3498DB` nur als Akzent (CTA/Link,
+      max. 10–15 % der Fläche), Anthracite Black `#1B1B1B` nur als Akzent-Band/-Box, kein
+      vollflächiges Schwarz, kein Grün/Rot außer bei Eco:LOGIC-Inhalten.
+- [ ] Typografie: `font-family: 'Nudica', Arial, sans-serif`, **Website-Verhältnisse eingehalten**
+      (Headline 40px bold `#0D0E11` lh 1.2 ls -0.02em; Body 15px lh 1.4 `#0D0E11`; Eyebrow 16px 600
+      uppercase ls 0.05em `#5D6A77`), Headline in Sentence case (nicht GROSSBUCHSTABEN), **keine
+      Headline ohne Eyebrow**. Falls eine gehostete Nudica-Font-URL vorliegt: `@font-face` aktiviert?
+- [ ] **Persönliche Anrede vorhanden und korrekt:** `{{SALUTATION}}` durch den sprachpassenden
+      Brevo-Bedingungsblock ersetzt (Abschnitt 1c), Attributnamen gegen das Brevo-Konto verifiziert,
+      alle vier Anrede-Werte (`Herr`, `Frau`, `Mr.`, `Ms.`) **plus** Fallback („Sehr geehrte Damen
+      und Herren," / „Dear Sir or Madam,") abgedeckt, Titel wird — falls gepflegt — mit ausgegeben?
+- [ ] **Kein doppelter Gruß:** Body-Text beginnt nicht mit einer zweiten Begrüßung („Hallo…",
+      „Guten Tag…") — die persönliche Anrede ist die einzige Begrüßung.
+- [ ] **Keine übrig gebliebenen Skill-Platzhalter** (`{{GROSSBUCHSTABEN}}`-Stil) im finalen HTML —
+      nur Brevo-Ausdrücke (`{{ contact.… }}`, `{% … %}`, `{{ unsubscribe }}`) dürfen stehen bleiben.
+- [ ] **Footer-Bild** (`brand/elements/MSE Newsletter Footer.png`) in voller Breite über dem
+      rechtlichen Footer, rechtlicher Footer **nahtlos** darunter auf `#000000` mit hellem Text?
+- [ ] **Keine Faxnummer** irgendwo im Mailing?
+- [ ] **{{LOGO_URL}} zeigt auf das echte Logo-Asset aus `brand/logo/`** — kein Klartext-Ersatz, kein
+      selbst nachgezeichnetes/generiertes Logo, Header-Hintergrund bleibt Light Grey (Kontrastgrund
+      für das dunkle Logo)?
+- [ ] **Beide Sprachversionen (DE + EN) vollständig erstellt** — nicht nur eine, außer der Nutzer hat
+      ausdrücklich nach nur einer Sprache verlangt?
+- [ ] Ton korrekt: durchgehend "Sie"-Form (bzw. formelles Englisch bei EN-Version). Englische
+      Version eigenständig im MSE-Ton formuliert, keine wörtliche/maschinelle Übersetzung?
+- [ ] Sprache korrekt und konsistent (keine Sprachmischung innerhalb einer Version).
+- [ ] **CTA-URL sprachpassend** — DE-Version verlinkt auf die deutsche/Root-URL, EN-Version auf die
+      `/en/`-Variante (bzw. dieselbe URL, falls Ziel eine `landing-pages`-Seite mit eingebautem
+      Sprachumschalter ist)?
+- [ ] **Jede Sprachversion wurde an die dafür bestätigte Brevo-Liste/-Segment gerichtet** — Zuordnung
+      mit dem Nutzer abgeglichen, nicht geraten?
+- [ ] CTA-Label = Verb + Outcome, kein reines "Mehr erfahren" ohne Kontext.
+- [ ] Gesetzlicher Footer vollständig und unverändert vorhanden (siehe Template), inkl.
+      Brevo-Abmeldelink `{{ unsubscribe }}`.
+- [ ] Schreibweise CellTRON® / MSE® korrekt (Markenzeichen an der ersten Nennung).
+- [ ] Keine Wettbewerber namentlich genannt.
+- [ ] Keine erfundenen Zahlen, Studien, Kundenzitate oder unbelegten Claims — alles auf
+      `CLAUDE.md`/`brand-guidelines.md` bzw. Nutzerangaben rückführbar.
+- [ ] Bildsprache: echte Industriefotografie, keine Stockfotos/Cartoons/generische KI-Abstraktion.
+- [ ] Brevo-Kampagne liegt als **Draft** vor — kein Versand-/Schedule-Tool wurde aufgerufen, kein
+      `scheduledAt` gesetzt.

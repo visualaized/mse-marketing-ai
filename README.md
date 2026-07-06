@@ -11,8 +11,8 @@ Plugin muss deshalb immer mit dem CIDES-Ordner als Arbeitsverzeichnis genutzt we
 |---|---|---|
 | `marketing-zentrale` | 1 (Grundbaustein-Logik) | Zentrale Steuerlogik: Thema → Rückfragen → Auslösen der passenden Bausteine |
 | `bild-video-generierung` | 2 | KI-Bilder (2K, nach `nano-banana-prompt`-Struktur) & KI-Videos via Higgsfield |
-| `newsletter-klaviyo` | 3 | Thema → Text & Bilder → HTML-Newsletter → Klaviyo-Draft-Campaign |
-| `newsletter-migration` | 4 (Add-on) | Einmalige Kontakt-Migration Brevo → Klaviyo inkl. DSGVO-Prüfung |
+| `newsletter-brevo` | 3 | Thema → Text & Bilder → HTML-Newsletter (mit persönlicher Anrede) → Brevo-Draft-Kampagne |
+| `newsletter-migration` | 4 (Add-on) | Kontakt-Import/-Pflege Kundenliste → Brevo inkl. DSGVO-Prüfung |
 | `social-instagram` | 5 | Instagram-Posts (Deutsch, lockerer-professionell) + Upload-Post |
 | `social-linkedin` | 5 | LinkedIn-Posts (Englisch, sehr professionell/Thought-Leadership) + Upload-Post |
 | `social-x` | 5 | X-Posts (Englisch, kurz/prägnant) + Upload-Post |
@@ -52,15 +52,16 @@ Ohne diese Dateien lehnen die Skills die Erzeugung von Inhalten ab (siehe jeweil
    - In Claude Code: `/plugin marketplace add <owner>/<repo>` (oder lokal: `claude --plugin-dir "<Pfad zu diesem Ordner>"` für Tests).
    - Danach: `/plugin install mse-marketing-ai`.
    - Claude Code **im CIDES-Ordner** starten (dort liegt `CLAUDE.md`) — nicht im Plugin-Ordner.
-3. Benötigte MCP-Zugänge/API-Keys gemäß Auftragsbestätigung einrichten: Klaviyo, Higgsfield, Upload-Post,
-   Claude (Anthropic) und — nur für die einmalige Kontakt-Migration — Brevo.
+3. Benötigte MCP-Zugänge/API-Keys gemäß Auftragsbestätigung einrichten: Brevo (Newsletter-Versand und
+   Kontakt-Import, Kundenentscheid seit Juli 2026 — ersetzt Klaviyo), Higgsfield, Upload-Post und
+   Claude (Anthropic).
 
 Dieser Schritt ("Client-Anbindung": Verlinkung zum Brand Hub + Installation der Plugins/Skills pro
 Arbeitsplatz) ist laut Auftragsbestätigung aufwandsbezogen abzurechnen und nicht Teil dieser Pauschalen.
 
 ## Remote-Updates
 
-Die Versionierung erfolgt über `version` in `.claude-plugin/plugin.json` (aktuell `1.0.0`):
+Die Versionierung erfolgt über `version` in `.claude-plugin/plugin.json`:
 
 - Neue Version im Repo taggen/pushen → Version in `plugin.json` erhöhen (SemVer).
 - Kunde/Client: `/plugin update mse-marketing-ai` (bzw. automatisches Update, falls in den
@@ -74,6 +75,26 @@ Bei Änderungen an Skills: Versionsnummer in `.claude-plugin/plugin.json` erhöh
 unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
+
+- **1.18.0** (2026-07-06) — Newsletter-Versand umgestellt auf **Brevo** (Kundenentscheid) + verbindliche persönliche Anrede:
+  1. **Skill `newsletter-klaviyo` → `newsletter-brevo`:** Die komplette Newsletter-Pipeline legt
+     Draft-Kampagnen jetzt in Brevo an (Listen/Segmente statt Klaviyo-Segmente, verifizierte
+     Brevo-Absender, `htmlContent`-Kampagne ohne `scheduledAt`, Abmeldelink `{{ unsubscribe }}`).
+     Nie-automatisch-versenden-Regel bleibt unverändert bestehen.
+  2. **Persönliche Anrede ist jetzt Pflicht in jedem Newsletter** („Sehr geehrter Herr Dr. Müller," /
+     „Dear Ms. Miller,"): Die Kundendaten sind mit Anrede/Titel/Vorname/Nachname gepflegt (Anrede-Werte
+     `Herr`/`Frau`/`Mr.`/`Ms.`). Beide Starter-Templates enthalten dafür einen neuen
+     `{{SALUTATION}}`-Block über dem Body-Text; die Personalisierung läuft als Bedingungsblock in
+     Brevo-Template-Sprache über Kontaktattribute — inkl. Titel-Ausgabe und Fallback („Sehr geehrte
+     Damen und Herren," / „Dear Sir or Madam,") für Kontakte ohne Anrede/Nachname. Attributnamen
+     werden vor dem ersten Einsatz gegen das Brevo-Konto verifiziert, nicht geraten.
+  3. **Skill `newsletter-migration` umgebaut:** Die Richtung Brevo → Klaviyo ist hinfällig; der Skill
+     importiert und pflegt jetzt Kundenlisten (bereinigte ERP-/Excel-Exports mit dem dokumentierten
+     Spaltenschema inkl. Anrede/Titel/Vorname/Name) **nach Brevo** — mit Deduplizierung,
+     DSGVO-Prüfung, DE/EN-Listen-Zuordnung anhand der Anrede und Import-Report. Abgemeldete/blockierte
+     Brevo-Kontakte werden durch einen Import niemals reaktiviert.
+  4. Alle Querverweise aktualisiert (`marketing-zentrale`, `landing-pages`, `whitepaper`,
+     `email-signatur`, `bild-video-generierung`, README, plugin.json-Keywords).
 
 - **1.17.0** (2026-07-06) — Kampagnen-Dashboard: feinerer Status-Lebenszyklus + Schnellaktion „Abschließen":
   1. **Neuer Status `"eingeplant"`** zwischen „in Arbeit" und „veröffentlicht": alle erforderlichen
