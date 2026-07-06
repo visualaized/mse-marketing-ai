@@ -70,14 +70,21 @@ z. B. `celltron-xtreme-batterierecycling-2026-q3`.
 | `quelle` | string | optional | Herkunftsmarker. `"dashboard-planung"` = vom Kunden über das Planungsformular angelegt (wichtig für den Planungsabgleich der `marketing-zentrale`, siehe Abschnitt 5). Von Bausteinen automatisch angelegte Kampagnen lassen das Feld weg. |
 | `inhalte` | Array<{`label`, `pfad`}> | optional | **Generierte Inhalte der Kampagne** — das Dashboard zeigt sie als ausklappbare Link-Liste in der Kampagnenzeile. `label` = sprechender Anzeigename (z. B. `"Newsletter (DE)"`), `pfad` = Pfad **relativ zum CIDES-Root** (z. B. `"Outputs/2026-07-01-celltron-launch-newsletter-de/newsletter.html"`). Ausgeliefert werden die Dateien über den lesenden `/hub/`-Mount von `server.mjs`. **Jeder Baustein, der einen Kampagnen-Output fertigstellt, MUSS ihn hier registrieren** (Eintrag anhängen, nichts überschreiben). |
 
-### Enum `status` (genau diese vier Werte, exakt so geschrieben)
+### Enum `status` (genau diese fünf Werte, exakt so geschrieben)
 
-- `"geplant"` — Kampagne ist definiert, aber noch nicht gestartet.
-- `"in Arbeit"` — Inhalte werden aktuell produziert/bearbeitet.
+Der Lebenszyklus macht dem Team auf einen Blick klar, wie weit eine Kampagne ist:
+
+- `"geplant"` — Kampagne ist nur definiert (Thema, Kanäle, Zeitraum), noch keine Inhalte erstellt.
+- `"in Arbeit"` — Inhalte werden aktuell produziert/bearbeitet; die ✓-Haken an den Kanal-Badges
+  (Abschnitt 4c) zeigen den Fortschritt pro Kanal.
+- `"eingeplant"` — **alle** erforderlichen Inhalte sind erstellt UND die Veröffentlichungen sind
+  terminiert (Posts geplant/gescheduled, Newsletter-Entwurf steht, Termine fixiert). Die Kampagne
+  wartet nur noch auf ihren Start.
 - `"veröffentlicht"` — mindestens ein Kanal ist live, Kampagne läuft.
-- `"abgeschlossen"` — Kampagne ist beendet.
+- `"abgeschlossen"` — Kampagne ist beendet (manuell über den Button **Abschließen** in der
+  Kampagnenzeile oder über die Status-Auswahl im Bearbeiten-Formular).
 
-Andere Statuswerte sind nicht vorgesehen. Das Dashboard stellt diese vier Zustände über abgestufte
+Andere Statuswerte sind nicht vorgesehen. Das Dashboard stellt diese fünf Zustände über abgestufte
 Grau-/Anthrazit-/Blau-Töne dar (gefüllt, umrandet, blass) — **niemals** über Rot/Grün/Gelb-Ampelfarben,
 da Grün/Rot markenseitig für Eco:LOGIC reserviert bzw. verboten sind.
 
@@ -223,8 +230,11 @@ Umlaute — nur der Ordnername ist ASCII.
 
 **Bearbeiten & Löschen:** In der Zeile **jeder** Kampagne erscheinen (nur bei laufendem Server)
 die Buttons **Bearbeiten** und **Löschen** — unabhängig vom Status. Bearbeiten öffnet das
-Planungsformular vorbefüllt inklusive Status-Auswahl (geplant / in Arbeit / veröffentlicht /
-abgeschlossen; Speichern per `PUT`); Löschen fragt per Bestätigungsdialog nach und entfernt den
+Planungsformular vorbefüllt inklusive Status-Auswahl (geplant / in Arbeit / eingeplant /
+veröffentlicht / abgeschlossen; Speichern per `PUT`). Zusätzlich trägt jede noch nicht
+abgeschlossene Kampagne den Button **Abschließen** — er setzt den Status nach Bestätigungsdialog
+per `PATCH /api/campaigns/<slug>/status` direkt auf `"abgeschlossen"`, ohne dass das Formular
+geöffnet werden muss. Löschen fragt per Bestätigungsdialog nach und entfernt den
 kompletten `Campaigns/<slug>/`-Ordner (bereits generierte Dateien unter `Outputs/` bleiben
 unberührt). Beim Bearbeiten bleiben Felder erhalten, die das Formular nicht kennt (z. B. bereits
 registrierte `inhalte` und `quelle`).
@@ -242,6 +252,7 @@ Markdown-Posts etc.).
 | `POST /api/campaigns` | Neue geplante Kampagne. Body: `{thema, kanaele[], zeitraum_start, zeitraum_ende?, notiz?, verantwortlich?}`. Antwort `201` mit `{ok, slug, meta}`. |
 | `PUT /api/campaigns/<slug>` | Kampagne bearbeiten (gleicher Body wie POST + optional `status`; alle Statuswerte erlaubt). Vorhandene `inhalte`/`quelle` bleiben erhalten. |
 | `DELETE /api/campaigns/<slug>` | Kampagne löschen (alle Statuswerte; die Oberfläche fragt vorher per Dialog nach). Entfernt den Kampagnen-Ordner. |
+| `PATCH /api/campaigns/<slug>/status` | Nur den Status umstellen: `{status}` (einer der fünf gültigen Werte). Genutzt von der Schnellaktion **Abschließen**. |
 | `PATCH /api/campaigns/<slug>/termin` | Kalender-Drag&Drop: `{zeitraum_start}` verschieben (alle Statuswerte); `zeitraum_ende` wandert um dieselbe Differenz mit. |
 | `GET /api/ideen` | Ideen-Sammlung + Themen-Tage (legt `Campaigns/ideen.json` mit Standard-Themen-Tagen an, falls fehlend). |
 | `POST /api/ideen` | Eigene Idee/Notiz erfassen: `{titel, beschreibung?, themen_tag?}` → `status:"offen"`, `quelle:"kunde"`. |
@@ -381,6 +392,8 @@ Datenmodell; die Abgleichslogik lebt in der Zentrale.
       `Campaigns/<slug>/meta.json` auf der Platte?
 - [ ] Bearbeiten/Löschen funktioniert für Kampagnen **jedes** Status (Buttons in jeder Zeile,
       Status-Auswahl im Formular, Löschen mit Bestätigungsdialog)?
+- [ ] Button **Abschließen** erscheint bei allen nicht abgeschlossenen Kampagnen und setzt den
+      Status nach Bestätigung auf `"abgeschlossen"`?
 - [ ] Kanal-Badges zeigen ✓-Haken für Kanäle mit registrierten `inhalte`-Einträgen (Labels führen
       den Kanalnamen)?
 - [ ] Generierte Outputs der Kampagne im `inhalte`-Feld registriert, Links öffnen über `/hub/`

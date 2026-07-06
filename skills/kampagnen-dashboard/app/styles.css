@@ -305,6 +305,13 @@ body {
   color: #1f6fa8;
 }
 
+/* eingeplant: gefüllt blau — alle Inhalte fertig, Veröffentlichungen terminiert */
+.status--scheduled {
+  background: var(--color-blue);
+  border: 1px solid var(--color-blue);
+  color: var(--color-white);
+}
+
 /* veröffentlicht: gefüllt, kräftig anthrazit */
 .status--filled {
   background: var(--color-anthracite);
@@ -760,6 +767,7 @@ body {
 }
 
 .cal__chip--inarbeit { background: rgba(52, 152, 219, 0.15); color: #1f6fa8; border: 1px solid var(--color-blue); }
+.cal__chip--eingeplant { background: var(--color-blue); color: #FFF; }
 .cal__chip--verffentlicht { background: var(--color-anthracite); color: #FFF; }
 .cal__chip--abgeschlossen { background: #E4E4E4; color: var(--color-medium-grey); }
 

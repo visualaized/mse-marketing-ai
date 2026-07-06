@@ -75,6 +75,17 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.17.0** (2026-07-06) — Kampagnen-Dashboard: feinerer Status-Lebenszyklus + Schnellaktion „Abschließen":
+  1. **Neuer Status `"eingeplant"`** zwischen „in Arbeit" und „veröffentlicht": alle erforderlichen
+     Inhalte sind erstellt UND die Veröffentlichungen sind terminiert (Posts geplant, Newsletter-
+     Entwurf steht) — die Kampagne wartet nur noch auf ihren Start. Damit ist der Fortschritt für
+     das Team klar ablesbar: geplant → in Arbeit (✓-Haken zeigen Kanal-Fortschritt) → eingeplant →
+     veröffentlicht → abgeschlossen. Eigener Badge-/Kalender-Look (blau gefüllt), in Filter und
+     Formular wählbar; die CIDES-Zentrale pflegt den Status jetzt aktiv mit.
+  2. **Button „Abschließen"** in jeder nicht abgeschlossenen Kampagnenzeile: setzt den Status nach
+     Bestätigungsdialog direkt auf `"abgeschlossen"` — ohne das Formular zu öffnen. Neuer schlanker
+     Endpunkt `PATCH /api/campaigns/<slug>/status` (validiert gegen die fünf Statuswerte).
+
 - **1.16.0** (2026-07-06) — Kampagnen-Dashboard: Bearbeiten/Löschen für alle Kampagnen + Erledigt-Haken:
   1. **Bearbeiten & Löschen für jeden Status:** Die Buttons erscheinen jetzt in jeder Kampagnenzeile
      (nicht mehr nur bei Status „geplant"); das Formular hat eine Status-Auswahl (geplant / in Arbeit /

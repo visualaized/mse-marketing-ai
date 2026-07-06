@@ -42,6 +42,7 @@
           <option value="">Alle</option>
           <option value="geplant">geplant</option>
           <option value="in Arbeit">in Arbeit</option>
+          <option value="eingeplant">eingeplant</option>
           <option value="veröffentlicht">veröffentlicht</option>
           <option value="abgeschlossen">abgeschlossen</option>
         </select>
@@ -100,6 +101,7 @@
             <select class="control" id="plan-status">
               <option value="geplant">geplant</option>
               <option value="in Arbeit">in Arbeit</option>
+              <option value="eingeplant">eingeplant</option>
               <option value="veröffentlicht">veröffentlicht</option>
               <option value="abgeschlossen">abgeschlossen</option>
             </select>
@@ -262,6 +264,7 @@
     switch (status) {
       case "geplant": return "status status--outline";
       case "in Arbeit": return "status status--accent";
+      case "eingeplant": return "status status--scheduled";
       case "veröffentlicht": return "status status--filled";
       case "abgeschlossen": return "status status--faded";
       default: return "status status--outline";
@@ -455,6 +458,14 @@
         delBtn.textContent = "Löschen";
         delBtn.addEventListener("click", function () { deleteCampaign(c); });
         actions.appendChild(editBtn);
+        if (c.status !== "abgeschlossen") {
+          var doneBtn = document.createElement("button");
+          doneBtn.type = "button";
+          doneBtn.className = "row-actions__btn";
+          doneBtn.textContent = "Abschließen";
+          doneBtn.addEventListener("click", function () { completeCampaign(c); });
+          actions.appendChild(doneBtn);
+        }
         actions.appendChild(delBtn);
         tdThema.appendChild(actions);
       }
@@ -598,6 +609,23 @@
     planFeedback.className = "plan__feedback";
     setFormVisible(true);
     planSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function completeCampaign(c) {
+    if (!window.confirm('Kampagne "' + (c.thema || c.slug) + '" auf Status "abgeschlossen" setzen?')) {
+      return;
+    }
+    fetch("/api/campaigns/" + encodeURIComponent(c.slug) + "/status", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "abgeschlossen" })
+    })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (!res.ok) throw new Error((res.d.errors || ["Unbekannter Fehler"]).join(" "));
+        return loadCampaigns();
+      })
+      .catch(function (err) { window.alert("Abschließen fehlgeschlagen: " + err.message); });
   }
 
   function deleteCampaign(c) {

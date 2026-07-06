@@ -190,6 +190,11 @@ automatisch aus. Dabei verbindlich:
 - **`verantwortlich` ist immer eine kundeninterne Angabe** (Standard: `"Marketing-Team"`) — niemals
   den Namen eines externen Dienstleisters/einer Agentur eintragen; das Dashboard ist eine
   kundeninterne Ansicht.
+- **`status` aktiv pflegen** (fünf Werte, siehe `kampagnen-dashboard`-Skill Abschnitt 2): bei
+  Arbeitsbeginn `"in Arbeit"`; sobald **alle** erforderlichen Inhalte erstellt UND die
+  Veröffentlichungen terminiert sind (Posts geplant, Newsletter-Entwurf steht) → `"eingeplant"`;
+  nach dem ersten Live-Gang → `"veröffentlicht"`. Auf `"abgeschlossen"` setzt der Kunde die
+  Kampagne selbst im Dashboard (Button **Abschließen**) — nicht automatisch.
 
 ## 2. Was diese Zentrale NICHT tut
 - Keine Freigabeprozesse oder komplexe Genehmigungs-Workflows (das ist bewusst nicht Teil des Systems).

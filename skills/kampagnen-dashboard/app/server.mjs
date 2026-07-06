@@ -23,6 +23,8 @@
  *   PUT  /api/campaigns/<slug>   Kampagne bearbeiten (gleicher Body wie POST + optional status)
  *                                — für ALLE Statuswerte erlaubt.
  *   DELETE /api/campaigns/<slug> Kampagne löschen (alle Statuswerte; UI fragt vorher nach).
+ *   PATCH /api/campaigns/<slug>/status   Nur den Status umstellen: {status} (einer der
+ *                                fünf gültigen Werte) — genutzt von der Schnellaktion "Abschließen".
  *   PATCH /api/campaigns/<slug>/termin   Kampagne im Kalender verschieben (Drag & Drop):
  *                                Body {zeitraum_start: "YYYY-MM-DD"} — ein vorhandenes
  *                                zeitraum_ende wird um dieselbe Differenz mitverschoben.
@@ -205,7 +207,7 @@ function readBody(req, callback) {
   req.on("end", () => callback(raw));
 }
 
-const VALID_CAMPAIGN_STATUS = ["geplant", "in Arbeit", "veröffentlicht", "abgeschlossen"];
+const VALID_CAMPAIGN_STATUS = ["geplant", "in Arbeit", "eingeplant", "veröffentlicht", "abgeschlossen"];
 
 function buildMetaFromPayload(body, existingMeta) {
   const status = VALID_CAMPAIGN_STATUS.includes(body.status)
@@ -336,6 +338,33 @@ function handleMoveCampaign(req, res, slug) {
       meta.zeitraum_ende = ende.toISOString().slice(0, 10);
     }
     meta.zeitraum_start = newStart;
+    try {
+      fs.writeFileSync(loaded.metaPath, JSON.stringify(meta, null, 2) + "\n", "utf-8");
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, errors: ["Konnte meta.json nicht schreiben: " + err.message] });
+    }
+    writeStaticIndex(buildIndex());
+    sendJson(res, 200, { ok: true, slug, meta });
+  });
+}
+
+function handleSetStatus(req, res, slug) {
+  // Schnelle Status-Umstellung ohne kompletten PUT-Body (z. B. Button "Abschließen").
+  const loaded = loadCampaignMeta(slug);
+  if (loaded.error) return sendJson(res, loaded.error[0], { ok: false, errors: [loaded.error[1]] });
+
+  readBody(req, (raw) => {
+    let body;
+    try {
+      body = JSON.parse(raw);
+    } catch {
+      return sendJson(res, 400, { ok: false, errors: ["Body ist kein gültiges JSON."] });
+    }
+    if (!VALID_CAMPAIGN_STATUS.includes(body.status)) {
+      return sendJson(res, 400, { ok: false, errors: ["status muss einer von: " + VALID_CAMPAIGN_STATUS.join(", ") + " sein."] });
+    }
+    const meta = loaded.meta;
+    meta.status = body.status;
     try {
       fs.writeFileSync(loaded.metaPath, JSON.stringify(meta, null, 2) + "\n", "utf-8");
     } catch (err) {
@@ -484,6 +513,11 @@ const server = http.createServer((req, res) => {
 
   if (urlPath === "/api/campaigns" && req.method === "POST") {
     return handleCreateCampaign(req, res);
+  }
+
+  const statusMatch = urlPath.match(/^\/api\/campaigns\/([^/]+)\/status$/);
+  if (statusMatch && req.method === "PATCH") {
+    return handleSetStatus(req, res, decodeURIComponent(statusMatch[1]));
   }
 
   const terminMatch = urlPath.match(/^\/api\/campaigns\/([^/]+)\/termin$/);
