@@ -75,6 +75,11 @@ unten ergänzen, damit Remote-Updates beim Kunden nachvollziehbar bleiben.
 
 ## Changelog
 
+- **1.15.1** (2026-07-03) — Fix Kampagnen-Dashboard: Die Tabellenüberschriften (Thema/Kanäle/
+  Status/Zeitraum/Verantwortlich) saßen nicht über den Spalten, sondern stapelten sich links —
+  Ursache: die `.eyebrow`-Klasse setzt global `display:inline-block` und hebelte auf den
+  `<th>`-Zellen das table-cell-Layout aus. Behoben durch explizites `display: table-cell` auf
+  `.campaign-table thead th`.
 - **1.15.0** (2026-07-03) — CIDES-Umbenennung, zwei neue Bausteine, Whitepaper druckfreundlich:
   1. **CIDES:** Der gesamte Hub/die Zentrale heißt beim Kunden jetzt **CIDES** — Name überall im
      internen Sprachgebrauch geführt (alle SKILL.mds, README, Dashboard-UI „CIDES ·

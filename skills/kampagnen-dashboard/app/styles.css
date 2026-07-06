@@ -203,6 +203,10 @@ body {
   text-align: left;
   padding: 0 16px 12px;
   border-bottom: 1px solid var(--color-hairline);
+  /* WICHTIG: .eyebrow setzt global display:inline-block — auf <th> zerstoert das
+     das table-cell-Layout (Ueberschriften stapeln sich links statt ueber den
+     Spalten zu sitzen). Hier explizit zuruecksetzen. */
+  display: table-cell;
 }
 
 .campaign-table tbody tr {
